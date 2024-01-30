@@ -1,0 +1,1 @@
+export const className_button = 'p-6 py-3 bg-[#ffadad] rounded-xl text-white';
