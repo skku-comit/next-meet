@@ -14,6 +14,3 @@ export function stringifyDate(date:Date) {
     return `${year}-${month}-${day}`;
 }
 
-// Example usage
-const now = new Date();
-console.log(stringifyDate(now)); // Outputs the current date in YYYY-MM-DD format

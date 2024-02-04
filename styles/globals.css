@@ -50,6 +50,7 @@ body{
   /* border: 1px solid #a0a096; */
   font-family: Gmarket, Helvetica, sans-serif;
   line-height: 1.125em;
+  
 }
 
 .react-calendar--doubleView {
@@ -111,10 +112,15 @@ body{
   font: inherit;
   font-size: 0.75em;
   font-weight: bold;
+  
 }
 
 .react-calendar__month-view__weekdays__weekday {
   padding: 0.5em;
+}
+
+abbr{
+  text-decoration: none;
 }
 
 .react-calendar__month-view__weekNumbers .react-calendar__tile {

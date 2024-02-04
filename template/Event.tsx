@@ -1,8 +1,10 @@
 import { User } from "./User";
 
 export type Event_t = {
-    eventID:string;
     eventName:string;
+    eventID:string;
     fixedDate:Date|null;
-    host:User;
+    hostUser?:User;
+    hostName?:string;
+    hostPW?:string;
 }
