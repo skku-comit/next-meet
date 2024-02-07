@@ -11,8 +11,8 @@ const CreateEvent = ():ReactNode =>{
     //useState
     const [isCreatingEvent,setIsCreatingEvent] = useState<boolean>(false);
     const [dateSelection,setDateSelection] = useState<DateSelection>({isWeekly:false,dateList:[]});
-    const [startTime,setStartTime] = useState<Date|''>('');
-    const [endTime,setEndTime] = useState<Date|''>('');
+    const [startTime,setStartTime] = useState<string|''>('');
+    const [endTime,setEndTime] = useState<string|''>('');
     const [canProceed,setCanProceed] = useState<boolean>(false);
 
     //useRefs
@@ -30,7 +30,8 @@ const CreateEvent = ():ReactNode =>{
         if(value instanceof Date) setDateSelection({isWeekly:false,dateList:[value]});
           else{
             if (!dateSelection.dateList.includes(value)){
-              setDateSelection(prev => ({isWeekly:true,dateList:[...prev.dateList as DaysOfWeek[],value]})); // add new date
+              setDateSelection(prev => (
+                {isWeekly:true,dateList:[...prev.dateList as DaysOfWeek[],value]})); // add new date
             } else {
               setDateSelection(prev => ({isWeekly:true,dateList:(prev.dateList as DaysOfWeek[]).filter(date => date!== value)})); // remove date
             }
@@ -52,9 +53,19 @@ const CreateEvent = ():ReactNode =>{
       isWeekly ? setDateSelection({isWeekly:true, dateList:[]}) : setDateSelection({isWeekly:false,dateList:[]});
     }
     const proceedCheck = () =>{
-      if(!hostIDRef.current || !hostPWRef.current) return;;
-      if(hostIDRef.current.value.trim().length > 2 && hostPWRef.current.value.trim().length > 4) setCanProceed(true);
+      if(!hostIDRef.current || !hostPWRef.current) return;
+      if(hostIDRef.current.value.trim().length > 2 
+        && hostPWRef.current.value.trim().length > 4
+        ) setCanProceed(true);
       else setCanProceed(false); 
+    }
+
+    const onStartTimeChange = (startTime:string) =>{
+      setStartTime(startTime);
+    }
+
+    const onEndTimeChange = (endTime:string) =>{
+      setEndTime(endTime);
     }
 
     return <div className="w-screen h-max mb-40 flex flex-col items-center">
@@ -71,7 +82,10 @@ const CreateEvent = ():ReactNode =>{
             onToggleDateMode={onToggleDateMode} 
             onClickDate={dateClickHandler}
             selectedDates={dateSelection}/>
-          <TimeInput/>
+          <TimeInput
+            onStartTimeChange={onStartTimeChange}
+            onEndTimeChange={onEndTimeChange}
+            />
           <p className="mt-16 text-2xl">Not member yet?</p>
           <div className="m-8 mb-24 flex flex-col gap-4">
             <div className="flex items-center gap-2">

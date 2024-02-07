@@ -1,10 +1,16 @@
-import { User } from "./User";
+import { DaysOfWeek } from "./DaysOfWeek";
+import { NextMeetUser } from "./User";
+import { WeeklyFixedDate } from "./WeeklyFixedDate";
 
-export type Event_t = {
+export type NextMeetEvent = {
     eventName:string;
+    description:string;
     eventID:string;
-    fixedDate:Date|null;
-    hostUser?:User;
-    hostName?:string;
+    startTime:string;
+    endTime:string;
+    participateStatus:null;
+    fixedDate:Date[]|WeeklyFixedDate[];
+    hostUser?:NextMeetUser; //made by member
+    hostName?:string; //made by non-member
     hostPW?:string;
 }
