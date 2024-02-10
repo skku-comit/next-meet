@@ -5,5 +5,8 @@ export default function handler(
     res: NextApiResponse
 )
 {
-    
+    if (req.method === "POST")
+    {
+        
+    }
 }
