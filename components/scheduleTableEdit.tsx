@@ -1,6 +1,7 @@
 import scheduleTable from "@/styles/scheduleTable.module.css";
 import React, {useEffect, useState } from "react";
-import Selecto from "react-selecto";
+// import Selecto from "react-selecto";
+import { IoMdLogIn } from "react-icons/io";
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
 interface MyComponentProps {

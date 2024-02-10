@@ -12,12 +12,21 @@
 } */
 
 .login_btn{
+    /* width:70px; */
     height:35px;
     align-items: center;
     justify-items: center;
+    font-size: var();
 }
 
 .login_btn:hover{
     font-weight: bold;
     background-color: #eee;
+}
+
+
+@media screen and (max-width:767px) {
+    .login_btn{
+        content:"<IoMdLogIn />";
+    }
 }

@@ -1,11 +1,19 @@
 import setterBtnTab from "@/styles/setterbtntab.module.css";
 import { ReactNode, useState, useEffect } from "react";
+import { IoMdLogIn } from "react-icons/io";
+
 const className_button = 'w-2/4 p-6 py-3 text-white';
 const Setter = (props:any): ReactNode => {
   const [isMember,setIsMember] = useState<boolean>(false);
   // const [isLogin, setIsLogin] = useState<boolean>(false);
   const [idName, setIdName] = useState<String>("");
   const [pw, setPw] = useState<String>("");
+
+  props.setName(idName);
+  const addTotalNum:Function = ()=>{
+    console.log("islogin", props.isLogin);
+    !props.isLogin ? props.setTotalMem(props.totalMem+1):"";
+  }
 
   return (
     <div className="w-screen px-20 pt-20">
@@ -30,9 +38,9 @@ const Setter = (props:any): ReactNode => {
                 <input className="w-3/5 border-[1px] h-8 p-2 outline-none rounded" type='password' onChange={(e)=>{setPw(e.target.value)}}></input>
             </div>
         </form>}
-        <button className={`items-center ${setterBtnTab.login_btn} grow bg-white rounded text-center p-1.5 pt-2 pl-2 mr-10 text-sm grow-0`}
-          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true)}}
-        >{props.isLogin ? "로그아웃" : "로그인"}</button>
+        <button className={`items-center ${setterBtnTab.login_btn} grow bg-white rounded text-center p-1 m-2 mr-10 text-sm grow-0`}
+          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); console.log(props.isLogin)}}
+        >{props.isLogin ? "로그아웃" : <IoMdLogIn className="w-full h-full" />}</button>
       </div>
 
     </div>

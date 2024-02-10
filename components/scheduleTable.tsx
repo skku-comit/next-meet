@@ -1,6 +1,6 @@
 import scheduleTable from "@/styles/scheduleTable.module.css";
 import React, {useState } from "react";
-import Selecto from "react-selecto";
+// import Selecto from "react-selecto";
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
 interface MyComponentProps {
@@ -16,7 +16,7 @@ const ScheduleTable = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => {
   var newDay = new Date(today);
   newDay.setDate(today.getDate()+3);
   const dummyDateList = [] as String[];
-  const WEEKDAY = ['일', '월', '화', '수', '목', '굼', '토'];
+  const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
   while (today <= newDay) {
     let week = WEEKDAY[today.getDay()];
     dummyDateList.push(today.toISOString().split('T')[0]+'-'+week);

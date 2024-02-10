@@ -3,7 +3,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import CalendarInput from "./CalendarInput";
 import TimeInput from "./TimeInput";
 import { className_button } from "@/styles/button";
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid';
 import { DateSelection } from "@/template/DateSelection";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 
