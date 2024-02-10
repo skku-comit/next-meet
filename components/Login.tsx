@@ -7,9 +7,11 @@ const Login = (): ReactNode => {
   //useState
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
+  const [canRegister,setCanRegister] = useState<boolean>(false);
   //useRefs
   const nameInputRef = useRef<HTMLInputElement>(null);
   const idInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
   const pwInputRef = useRef<HTMLInputElement>(null);
   const pwcInputRef = useRef<HTMLInputElement>(null);
   
@@ -29,6 +31,7 @@ const Login = (): ReactNode => {
             isRegistering={isRegistering} 
             nameRef={nameInputRef}
             idRef={idInputRef}
+            emailRef={emailInputRef}
             pwRef={pwInputRef}
             pwcRef={pwcInputRef}/>
           <button className="mt-6 text-sm underline underline-offset-[6px] cursor-pointer"

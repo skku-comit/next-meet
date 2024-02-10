@@ -4,11 +4,12 @@ type LoginFormProps = {
     isRegistering:boolean;
     nameRef:RefObject<HTMLInputElement>
     idRef:RefObject<HTMLInputElement>
+    emailRef:RefObject<HTMLInputElement>
     pwRef:RefObject<HTMLInputElement>
     pwcRef:RefObject<HTMLInputElement>
 }
 
-const LoginForm = ({isRegistering,nameRef,idRef,pwRef,pwcRef}:LoginFormProps): ReactNode => {
+const LoginForm = ({isRegistering,nameRef,idRef,emailRef,pwRef,pwcRef}:LoginFormProps): ReactNode => {
   return (
     <div className="w-fit">
       <form className="flex flex-col items-end gap-4">
@@ -24,6 +25,12 @@ const LoginForm = ({isRegistering,nameRef,idRef,pwRef,pwcRef}:LoginFormProps): R
           type='text'
           ref={idRef}></input>
         </div>
+        {isRegistering && <div className="flex items-center gap-2">
+          <label className="w-32 text-center">이메일<br/>Email</label>
+          <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
+          type='email'
+          ref={emailRef}></input>
+        </div>}
         <div className="flex items-center gap-2">
           <label className="w-32 text-center">비밀번호<br/>PW</label>
           <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 

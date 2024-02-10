@@ -1,6 +1,11 @@
 import { ReactNode, useRef } from "react";
 
-const TimeInput = (): ReactNode => {
+type TimeInputProps = {
+  onStartTimeChange:(startTime:string)=>void;
+  onEndTimeChange:(endTime:string)=>void;
+}
+
+const TimeInput = ({onStartTimeChange,onEndTimeChange}:TimeInputProps): ReactNode => {
   const startTimeRef = useRef<HTMLInputElement>(null);
   const endTimeRef = useRef<HTMLInputElement>(null);
  
@@ -10,18 +15,26 @@ const TimeInput = (): ReactNode => {
       <div className="p-8 pb-4 flex flex-col items-end gap-2">
         <div className="flex items-center gap-2">
           <label>from</label>
-          <input type="time" className="w-32 border-[1px]" ref={startTimeRef} onChange={(e)=>console.log(e.target.value)}></input>
+          <input 
+            type="time" 
+            className="w-32 border-[1px]" 
+            ref={startTimeRef} 
+            onChange={(e)=>onStartTimeChange(e.target.value)}></input>
         </div>
         <div className="flex items-center gap-2">
           <label>to</label>
-          <input type="time" className="w-32 border-[1px]" ref={endTimeRef}></input>
+          <input 
+            type="time" 
+            className="w-32 border-[1px]" 
+            ref={endTimeRef}
+            onChange={(e)=>onEndTimeChange(e.target.value)}></input>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <input type="checkbox" onChange={(e)=>{
           if(e.target.checked){
-            startTimeRef.current!.value = '';
-            endTimeRef.current!.value = '';
+            startTimeRef.current!.value = '00:00';
+            endTimeRef.current!.value = '00:00';
             startTimeRef.current!.disabled = true;
             endTimeRef.current!.disabled = true;
           }

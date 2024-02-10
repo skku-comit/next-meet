@@ -1,7 +1,7 @@
-import { Event_t } from "./Event";
 
-export type User={
+export type NextMeetUser={
     userId:string;
-    password:string;
-    eventList:Event_t[];
+    userName:string;
+    email:string;
+    eventIDList:string[]; //이미 참여한 이벤트 or 자신이 호스트인 이벤트
 }
