@@ -83,7 +83,7 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
 //    const [schedule, setSchedule] = useState({schedule :[]})
    const handleChange = (newSchedule:Date[]) => {
     setSchedule({schedule:newSchedule})
-    console.log(typeof(schedule.schedule));
+    // console.log(typeof(schedule.schedule));
    }
 
    useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);

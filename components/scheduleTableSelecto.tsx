@@ -137,7 +137,7 @@ const dummyDateList = [] as Date[];
 
         schedule.schedule.map((sche)=>{
             for(let i=0; i<Object.keys(scheduleList.checked_num).length; i++){
-                console.log(sche, sche);
+                // console.log(sche, sche);
                 if(sche in scheduleList.checked_num){
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
@@ -244,9 +244,13 @@ const dummyDateList = [] as Date[];
                     }
                 
                     return <div ref={()=>refSetter} className="w-full h-full" style={{backgroundColor : cellColor, height:'25px'}}
-                        onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr])}}></div>
+                        onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr])}}
+                        onMouseOut={()=>{setShowMember(false)}}></div>
                 }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
+                //https://codesandbox.io/p/sandbox/react-schedule-selector-bug-on-11-7-forked-d12j5?file=%2Fsrc%2Findex.js
+                //https://codesandbox.io/p/sandbox/react-schedule-selector-initialization-example-74l03t?file=%2Findex.tsx
+                //https://github.com/bibekg/react-schedule-selector
             />
             
             </div>

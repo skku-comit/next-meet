@@ -16,9 +16,9 @@ const ScheduleResultBottom = ({setShowResult, showResult,showMember, scheduleLis
     let max_checked_mem_sche:string[]=[];
 
     const [totalMemNum, setTotalMemNum] = useState(totalMem);
-    useEffect(()=>{setTotalMemNum(totalMem); console.log(totalMem)},[totalMem]);
+    useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
 
-    console.log(scheduleList.checked_num);
+    // console.log(scheduleList.checked_num);
     if(scheduleList.checked_num){
         checked_mem_num= Object.values(scheduleList.checked_num);
         

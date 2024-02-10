@@ -11,7 +11,7 @@ const Setter = (props:any): ReactNode => {
 
   props.setName(idName);
   const addTotalNum:Function = ()=>{
-    console.log("islogin", props.isLogin);
+    // console.log("islogin", props.isLogin);
     !props.isLogin ? props.setTotalMem(props.totalMem+1):"";
   }
 
@@ -39,7 +39,7 @@ const Setter = (props:any): ReactNode => {
             </div>
         </form>}
         <button className={`items-center ${setterBtnTab.login_btn} grow bg-white rounded text-center p-1 m-2 mr-10 text-sm grow-0`}
-          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); console.log(props.isLogin)}}
+          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); }}
         >{props.isLogin ? "로그아웃" : <IoMdLogIn className="w-full h-full" />}</button>
       </div>
 
