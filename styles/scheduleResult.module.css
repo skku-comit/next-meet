@@ -3,3 +3,25 @@
     border-spacing: 10px 0px;
     overflow-y:scroll;
 }
+
+.result_height{
+    min-height: 100px;
+    border-spacing: 10px 0px;
+}
+
+
+.closeBtn{
+    height:24px;
+    width: 24px;
+}
+
+.result_flex{
+    display: flex;
+    flex-direction: row;
+}
+
+/* @media screen and (max-width: 768px){
+    .result_flex{
+        flex-direction:column;
+    }
+} */

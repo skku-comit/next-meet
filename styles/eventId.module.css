@@ -1,0 +1,10 @@
+.result_position{
+    bottom:0px;
+}
+
+/* @media screen and (max-width: 768px){
+    .result_position{
+        right: 0px;
+        bottom:none;
+    }
+} */

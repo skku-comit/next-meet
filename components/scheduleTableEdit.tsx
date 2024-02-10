@@ -47,7 +47,6 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
     },[isActive]);
     
     return <td className={`${scheduleTable.slot} cursor-pointer ${scheduleTable.btn} ${row_num == 0 && time_block_num==0 ? '': scheduleTable.btn_border_top0} ${isActive ? scheduleTable.selected: scheduleTable.unselected}`}
-      key={key}
       //onClick={()=>{isActive ? setIsActive(false) : setIsActive(true); console.log(isActive)}}
       onMouseDown={()=>{isActive == true ? setIsActive(false) : setIsActive(true); console.log("isActive" , isActive); }}
       onMouseOver={(e)=>{e.buttons == 1 ? isActive == false ? setIsActive(true) : setIsActive(false) : ""; console.log("isActive" , isActive)}}
