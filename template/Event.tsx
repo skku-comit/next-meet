@@ -1,5 +1,6 @@
 import { DaysOfWeek } from "./DaysOfWeek";
-import { User } from "./User";
+import { Participate } from "./Participate";
+import { NextMeetUser, User } from "./User";
 import { FixedDate, WeeklyFixedDate } from "./WeeklyFixedDate";
 
 export type NextMeetEvent = {
@@ -8,11 +9,8 @@ export type NextMeetEvent = {
     eventID:                number;
     startTime:              string;
     endTime:                string;
-    participateStatus:      null;
-    candidates:             DaysOfWeek[] | Date[];
-    meetingTable:           number[][];
+    participateStatus:      Participate[];
     fixedMeeting:           FixedDate[] | WeeklyFixedDate[];
     hostUserInfo:           User; // Both member and non-member
-    //hostName?:              string; //made by non-member
-    //hostPW?:                string;
+    
 }

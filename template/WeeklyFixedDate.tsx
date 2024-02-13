@@ -1,20 +1,18 @@
 import { DaysOfWeek } from "./DaysOfWeek"
 
-
-
 export type WeeklyFixedDate = 
 {
     day:                DaysOfWeek;
-    timeRange:          number;
+    timeRange:          string[]; // ['12:30','13:00','13:30']
 }
 
 export type FixedDate = 
 {
     date:               Date;
-    timeRange:          number;    
+    timeRange:          string[];     
 }
 
-// ex) 12300200 => 2:30-2:00
+// ex) 12301400 => 12:30-14:00
 // export function getTimeRangeString(timeRange: number): string
 // {
 //     const start = `${~~(timeRange / 1000000)}:${~~(timeRange % 1000000 / 10000)}`;
