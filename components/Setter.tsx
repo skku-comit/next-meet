@@ -39,7 +39,9 @@ const Setter = (props:any): ReactNode => {
             </div>
         </form>}
         <button className={`items-center ${setterBtnTab.login_btn} grow bg-white rounded text-center p-1 m-2 mr-10 text-sm grow-0`}
-          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); }}
+          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); 
+            props.confirm == 1 ? props.setConfirm(2) : "";
+          }}
         >{props.isLogin ? "로그아웃" : <IoMdLogIn className="w-full h-full" />}</button>
       </div>
 

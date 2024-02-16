@@ -14,12 +14,11 @@ interface MyComponentProps {
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
-    schedule:{schedule :[]};
-    setSchedule:Function;
-    confirm : number;
+    fixedSchedule:{schedule :[]};
+    setFixedSchedule:Function;
 }
 
-const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) => {
+const ScheduleTableConfirm = ({fixedDate, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) => {
   // console.log(isLogin)
 
 
@@ -82,22 +81,22 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
 //   const periodLen = lastTimeHour-startTimeHour;
    
 //    const [schedule, setSchedule] = useState({schedule :[]})
-   const handleChange = (newSchedule:Date[]) => {
-    setSchedule({schedule:newSchedule})
-    // console.log(typeof(schedule.schedule));
+   
+  const handleChange = (newSchedule:Date[]) => {
+    setFixedSchedule({schedule:newSchedule})
+    // console.log(fixedSchedule.schedule);
    }
 
-   useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);
-
+//    console.log(fixedSchedule);
 
   return (
-        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
-          <div className={`w-full ${scheduleTable.table_spacing} border-separate table-scrolling`}>
+        <div className="overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+          <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
-                selection={schedule.schedule}
+                selection={fixedSchedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
                 startDate={dummyDateList[0]}
-                numDays={!week? dateList.length : DayList.length}
+                numDays={week? DayList.length : dateList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}
                 hourlyChunks={2}
@@ -123,14 +122,10 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
                 // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
-                hoveredColor="#fddada"
-                selectedColor="#ffadad"
+                hoveredColor="#a2cffe"
+                selectedColor="#63c5da"
                 rowGap="5px"
                 columnGap="7px"
-                
-                // renderDateCell={(datetime, selected, refSetter) => {
-                //     return <div ref={()=>refSetter} className="w-full h-full" style={{height:'25px', minWidth:"50px"}}></div>
-                // }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
             />
             
@@ -141,4 +136,4 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
   );
 };
 
-export default ScheduleTableSelectoEdit;
+export default ScheduleTableConfirm;

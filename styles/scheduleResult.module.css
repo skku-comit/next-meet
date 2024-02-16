@@ -4,6 +4,12 @@
     overflow-y:scroll;
 }
 
+.result_scrolling2{
+    max-height: 500px;
+    border-spacing: 10px 0px;
+    overflow-y:scroll;
+}
+
 .result_height{
     min-height: 100px;
     border-spacing: 10px 0px;
