@@ -1,17 +1,27 @@
-// import NextAuth from "next-auth/next";
-// import { NextAuthOptions } from "next-auth";
-// import { CredentialsProvider } from "next-auth/providers/credentials";
+import NextAuth from "next-auth/next";
+import CredentialsProvider from "next-auth/providers/credentials";
+const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
+const NEXTAUTH_URL = "http://localhost:3000";
 
+const handler = NextAuth({
+    providers: [
+      CredentialsProvider({
+        name: "credentials",
+        credentials: {},
+        async authorize(credentials, req) {
+          const user = { id: "1" };
+          return user;
+        },
+      }),
+    ],
+    session:{
+        strategy:'jwt'
+    },
+    //   secret:process.env.NEXTAUTH_SECRET
+    secret: NEXTAUTH_SECRET,
+    pages: {
+      signIn: "/",
+    },
+  });
 
-
-// const authOptions:NextAuthOptions = {
-//     session: {
-//         strategy: 
-//     },
-//     providers:[
-        
-//     ]
-    
-// }
-
-// export default NextAuth(authOptions)
+  export {handler as GET, handler as POST}
