@@ -27,7 +27,7 @@ const EventPage = ()=>{
     const [select, setSelect] = useState(0);
 
     const [width, setWidth] = useState();
-    const [week, setWeek] = useState(false);
+    const [week, setWeek] = useState(true);
 
     useEffect(()=>{
         if(typeof window !== "undefined"){

@@ -63,7 +63,7 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ="px-2 min-h-4">
-                    {max_checked_mem_sche ? max_checked_mem_sche.map((sche)=>{
+                    {max_checked_mem_sche ? max_checked_mem_sche.map((sche, index)=>{
                         const schedule = new Date(sche);
                         return(
                             <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{
@@ -90,16 +90,16 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
-                    {fixedSchedule.schedule.map((sche, index)=>{
+                    {fixedSchedule.schedule.map((sche:Date, index)=>{
                         let diffMin = 0;
                         let diffMSec = 0;
-                        const schedule = new Date(sche);
+                        const schedule:Date = sche;
                         if(index == 0 && fixedSchedule.schedule.length > 1){
-                            const post_time = new Date(fixedSchedule.schedule[index+1]);
+                            const post_time:Date = fixedSchedule.schedule[index+1];
                             diffMSec = post_time.getTime() - schedule.getTime();
                         }
                         else if(index != 0 && index != fixedSchedule.schedule.length-1){
-                            const prev_time = new Date(fixedSchedule.schedule[index-1]);
+                            const prev_time:Date = fixedSchedule.schedule[index-1];
                             diffMSec = schedule.getTime() - prev_time.getTime();
                         }
                         diffMin = diffMSec / (60 * 1000);
@@ -107,7 +107,7 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
                             term++;
                             return;
                         }
-                        const start_sche = new Date(fixedSchedule.schedule[index-term]);
+                        const start_sche:Date = fixedSchedule.schedule[index-term];
                         term = 0;
                         return(
                             <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{

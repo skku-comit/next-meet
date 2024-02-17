@@ -89,13 +89,23 @@ const ScheduleTableConfirm = ({fixedDate, fixedTime, isLogin, week, fixedSchedul
 
 //    console.log(fixedSchedule);
 
+    let week_startDate = new Date();
+  while(true){
+    if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
+        break;
+    }
+    week_startDate = new Date(week_startDate.setDate(week_startDate.getDate() + 1));
+  }
+  console.log(week_startDate)
+
+
   return (
         <div className="overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
           <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
                 selection={fixedSchedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
-                startDate={dummyDateList[0]}
+                startDate={!week? dummyDateList[0]: week_startDate}
                 numDays={week? DayList.length : dateList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}

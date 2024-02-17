@@ -25,7 +25,7 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
 
   const selectedWeekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
  
-  const DayList = [] as String[];
+  let DayList = [] as String[];
 
   // const dummyDateList = [] as String[];
   const dummyDateList = [] as Date[];
@@ -89,6 +89,16 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
 
    useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);
 
+   let week_startDate = new Date();
+    while(true){
+        if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
+            break;
+        }
+        week_startDate = new Date(week_startDate.setDate(week_startDate.getDate() + 1));
+    }
+    console.log(week_startDate)
+
+    let dayList = DayList;
 
   return (
         <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
@@ -96,7 +106,7 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
             <ScheduleSelector
                 selection={schedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
-                startDate={dummyDateList[0]}
+                startDate={!week? dummyDateList[0]: week_startDate}
                 numDays={!week? dateList.length : DayList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}
@@ -116,8 +126,9 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
                     </div>
                     }
                     else{
+                        const day = dayList.shift()
                         return <div style={{height:'25px', minWidth:"50px"}}>
-                        {DayList.shift()}
+                        {day}
                     </div>}}
                     }
                 // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}

@@ -31,7 +31,7 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
 
   const selectedWeekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
  
-  const DayList = [] as String[];
+  let DayList = [] as String[];
   
   //   const dummyDateList = [] as String[];
   const dummyDateList = [] as Date[];
@@ -202,12 +202,14 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
   }
   console.log(week_startDate)
 
+  let dayList = DayList;
+
   return (
         <div className="overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
           <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
                 // selection={}
-                startDate={week ? dummyDateList[0] : week_startDate}
+                startDate={!week? dummyDateList[0]: week_startDate}
                 numDays={!week? dateList.length : DayList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}
@@ -227,8 +229,9 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
                     </div>
                     }
                     else{
+                        const day = dayList.shift();
                         return <div>
-                        {DayList.shift()}
+                        {day}
                     </div>}}
                     }
                 // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}
