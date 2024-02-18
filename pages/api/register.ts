@@ -19,7 +19,7 @@ export async function handler(
 
         return res.json({ message: "User registered"});
       } catch(error){
-        return res.json({ message: "error "});
+        return res.json({ message: "Error registering user"});
       }
     }
 }

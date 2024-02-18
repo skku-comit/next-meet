@@ -1,3 +1,4 @@
+'use client';
 import { ReactNode, RefObject } from "react";
 
 type LoginFormProps = {
