@@ -5,11 +5,13 @@ import ScheduleSelector from 'react-schedule-selector';
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
+import { DaysOfWeek } from "@/template/DaysOfWeek";
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     fixedDate:Date[] | null;
+    fixedDay:DaysOfWeek[] | null;
     fixedTime:{startTime:string, lastTime:string} | null;
     isLogin:boolean;
     week:boolean|0;
@@ -26,10 +28,10 @@ interface MyComponentProps {
     fixedSchedule : {schedule :[]};
 }
 
-const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) => {
+const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) => {
   // console.log(isLogin)
 
-  const selectedWeekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
+  const selectedWeekDay = fixedDay ? fixedDay: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
  
   let DayList = [] as String[];
   
@@ -78,6 +80,8 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
     }
    }
 
+//   const pushedDayList = DayList;
+
   const dummyTimePeriod = {startTime : "00:00", lastTime : "24:00"};
 
   const [dateList, setDateList] = useState(!fixedDate ? dummyDateList : fixedDate);
@@ -97,12 +101,12 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
   const [totalMemNum, setTotalMemNum] = useState(totalMem);
   
   const dummyScheduleList:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}} = {
-    checked_num : {"Sun Feb 18 2024 00:00:00 GMT+0900 (한국 표준시)":4/totalMemNum,
-                    "Sun Feb 18 2024 00:30:00 GMT+0900 (한국 표준시)":3/totalMemNum,
-                    "Sun Feb 18 2024 01:00:00 GMT+0900 (한국 표준시)":2/totalMemNum},
-    member : {"Sun Feb 18 2024 00:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "강성대", "송성균"],
-    "Sun Feb 18 2024 00:30:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "송성균"],
-    "Sun Feb 18 2024 01:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전"]}
+    checked_num : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":4/totalMemNum,
+                    "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":3/totalMemNum,
+                    "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":2/totalMemNum},
+    member : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "강성대", "송성균"],
+    "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "송성균"],
+    "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전"]}
   }
 
 //   useEffect(()=>{setScheduleList(dummyScheduleList); console.log(scheduleList)},[]);
@@ -193,19 +197,19 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
 //     //}
 //   },[schedule, commitFixedSchedule])
 
-  let week_startDate = new Date();
-  while(true){
+  let week_startDate:Date = new Date();
+  for(let i=0; i<7; i++){
     if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
         break;
     }
-    week_startDate = new Date(week_startDate.setDate(week_startDate.getDate() + 1));
+    week_startDate.setDate(week_startDate.getDate() + 1)
   }
-  console.log(week_startDate)
+//   console.log(week_startDate)
 
-  let dayList = DayList;
+  let index_dayList = 0;
 
   return (
-        <div className="overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
           <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
                 // selection={}
@@ -221,20 +225,21 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
                         if(index == 1 && date.getDate() == dummyDateList[0].getDate()){
                             index = 0;
                         }
-                        return  <div>
+                        return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
                         {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    else{
-                        const day = dayList.shift();
-                        return <div>
-                        {day}
+                    const day = DayList[date.getDay()-week_startDate.getDay()];
+                    return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
+                    {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
-                    }
-                // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}
+                renderTimeLabel={(time) => {
+                    return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>
+                            {time.getHours()<10?"0"+time.getHours():time.getHours()}:{time.getMinutes()==0?'00':'30'}
+                        </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
                 hoveredColor="none"
@@ -282,7 +287,7 @@ const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, na
                     const fixedScheduleList:string[] = fixedSchedule.schedule;
         
                     if(select == 1){
-                        fixedSchedule.schedule.map((sche)=>{
+                        fixedScheduleList.map((sche)=>{
                             // console.log(sche == datetimeStr)
                             if (sche == datetimeStr){
                                     cellColor = "#63c5da";

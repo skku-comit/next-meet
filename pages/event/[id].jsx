@@ -5,6 +5,7 @@ import eventIdCSS from "@/styles/eventId.module.css";
 import ScheduleResultBottom from "@/components/ScheduleResultBottom";
 import ScheduleResultRight from "@/components/ScheduleResultRight";
 import ScheduleTableConfirm from "@/components/ScheduleTableConfirm";
+import ConfirmBtn from "@/components/ConfirmBtn";
 
 import { FaList } from "react-icons/fa";
 
@@ -58,12 +59,13 @@ const EventPage = ()=>{
     // console.log(commitFixedSchedule);
 
     return <div className="w-screen h-full min-h-screen ">
-        <div className="(header space) w-screen h-20"></div>
-        <Setter isLogin={isLogin} setIsLogin={setIsLogin} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm}/>
+        <div className="(header space) w-screen h-20 bg-[white]"></div>
+        {select ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
+        {!select || confirm==1 ? <Setter isLogin={isLogin} setIsLogin={setIsLogin} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select}/>:<div className="pt-10 pb-5"></div>}
         <div className="w-screen pt-5 px-20 pb-5">
             <div className="flex flex-row flex-nowrap items-center text-center gap-4 justify-center"> 
                 {confirm == 1 ? <ScheduleTableConfirm week={week} isLogin={isLogin} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-                {isLogin? <div className=""><ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} setSchedule={setSchedule} confirm={confirm}/></div> : ""}
+                {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} setSchedule={setSchedule} confirm={confirm}/> : ""}
                 <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name} 
                     setShowMember={setShowMember} setShowResult={setShowResult} 
                     setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
@@ -73,7 +75,7 @@ const EventPage = ()=>{
                 <ScheduleResultRight setShowResult={setShowResult} showResult={showResult} 
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
-                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week}
+                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin}
                 />
                 :"" }
             </div>
@@ -85,7 +87,7 @@ const EventPage = ()=>{
                 setShowResult={setShowResult} showResult={showResult} 
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
-                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week}
+                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin}
                 />
             </div> :
             ""

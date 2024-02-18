@@ -89,19 +89,18 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
 
    useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);
 
-   let week_startDate = new Date();
-    while(true){
-        if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
-            break;
-        }
-        week_startDate = new Date(week_startDate.setDate(week_startDate.getDate() + 1));
+   let week_startDate:Date = new Date();
+   for(let i=0; i<7; i++){
+    if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
+        break;
     }
-    console.log(week_startDate)
+    week_startDate.setDate(week_startDate.getDate() + 1)
+  }
 
-    let dayList = DayList;
+    let index_dayList = 0;
 
   return (
-        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
+        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
           <div className={`w-full ${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
                 selection={schedule.schedule}
@@ -118,20 +117,21 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
                         if(index == 1 && date.getDate() == dummyDateList[0].getDate()){
                             index = 0;
                         }
-                        return  <div>
+                        return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
                         {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    else{
-                        const day = dayList.shift()
-                        return <div style={{height:'25px', minWidth:"50px"}}>
-                        {day}
+                    const day = DayList[index_dayList++];
+                    return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
+                    {day}
                     </div>}}
-                    }
-                // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}
+                renderTimeLabel={(time) => {
+                    return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>
+                            {time.getHours()<10?"0"+time.getHours():time.getHours()}:{time.getMinutes()==0?'00':'30'}
+                        </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
                 hoveredColor="#fddada"
