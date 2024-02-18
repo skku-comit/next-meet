@@ -2,6 +2,7 @@ import scheduleTable from "@/styles/scheduleTable.module.css";
 import React, {useState, useEffect } from "react";
 // import Selecto from "react-selecto";
 import ScheduleSelector from 'react-schedule-selector';
+import { DaysOfWeek } from "@/template/DaysOfWeek";
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
@@ -11,6 +12,7 @@ const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     fixedDate:Date[] | null;
+    fixedDay:DaysOfWeek[] | null;
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
@@ -18,11 +20,13 @@ interface MyComponentProps {
     setFixedSchedule:Function;
 }
 
-const ScheduleTableConfirm = ({fixedDate, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) => {
+const ScheduleTableConfirm = ({fixedDate, fixedDay, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) => {
   // console.log(isLogin)
 
+  const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+  const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+  const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
 
-  const selectedWeekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
  
   const DayList = [] as String[];
 
@@ -31,8 +35,8 @@ const ScheduleTableConfirm = ({fixedDate, fixedTime, isLogin, week, fixedSchedul
   const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
 
   if(week){ // weekday 0-date, 1-week
-    for(let i=0; i<selectedWeekDay.length; i++){
-        switch(selectedWeekDay[i]){
+    for(let i=0; i<sortedSelectedWeekDay.length; i++){
+        switch(sortedSelectedWeekDay[i]){
             case "MON":
                 DayList.push("월");
                 break;
@@ -124,9 +128,9 @@ const ScheduleTableConfirm = ({fixedDate, fixedTime, isLogin, week, fixedSchedul
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    const day = DayList[index_dayList++];
+                    // const day = DayList[index_dayList++];
                     return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
-                    {day}
+                    {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
                 renderTimeLabel={(time) => {
                     return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>

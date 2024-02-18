@@ -7,10 +7,13 @@ import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
 // import { type } from './../template/User';
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
+import { DaysOfWeek } from "@/template/DaysOfWeek";
+
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     fixedDate:Date[] | null;
+    fixedDay:DaysOfWeek[] | null;
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
@@ -19,12 +22,15 @@ interface MyComponentProps {
     confirm : number;
 }
 
-const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) => {
+const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) => {
   // console.log(isLogin)
 
 
-  const selectedWeekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
- 
+  const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+  const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+  const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+
+
   let DayList = [] as String[];
 
   // const dummyDateList = [] as String[];
@@ -32,8 +38,8 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
   const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
 
   if(week){ // weekday 0-date, 1-week
-    for(let i=0; i<selectedWeekDay.length; i++){
-        switch(selectedWeekDay[i]){
+    for(let i=0; i<sortedSelectedWeekDay.length; i++){
+        switch(sortedSelectedWeekDay[i]){
             case "MON":
                 DayList.push("월");
                 break;
@@ -124,9 +130,9 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedTime, isLogin, week, schedule
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    const day = DayList[index_dayList++];
+                    // const day = DayList[index_dayList++];
                     return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
-                    {day}
+                    {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
                 renderTimeLabel={(time) => {
                     return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>

@@ -31,8 +31,10 @@ interface MyComponentProps {
 const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) => {
   // console.log(isLogin)
 
-  const selectedWeekDay = fixedDay ? fixedDay: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
- 
+  const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+  const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+  const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+
   let DayList = [] as String[];
   
   //   const dummyDateList = [] as String[];
@@ -40,8 +42,8 @@ const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, sc
   const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
 
   if(week){ // weekday 0-date, 1-week
-    for(let i=0; i<selectedWeekDay.length; i++){
-        switch(selectedWeekDay[i]){
+    for(let i=0; i<sortedSelectedWeekDay.length; i++){
+        switch(sortedSelectedWeekDay[i]){
             case "MON":
                 DayList.push("월");
                 break;
@@ -232,7 +234,7 @@ const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, sc
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    const day = DayList[date.getDay()-week_startDate.getDay()];
+                    console.log(date.getDay()-week_startDate.getDay());
                     return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
                     {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
