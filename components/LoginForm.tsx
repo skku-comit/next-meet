@@ -1,3 +1,4 @@
+'use client';
 import { ReactNode, RefObject } from "react";
 
 type LoginFormProps = {
@@ -7,9 +8,10 @@ type LoginFormProps = {
     emailRef:RefObject<HTMLInputElement>
     pwRef:RefObject<HTMLInputElement>
     pwcRef:RefObject<HTMLInputElement>
+    resetError:()=>void
 }
 
-const LoginForm = ({isRegistering,nameRef,idRef,emailRef,pwRef,pwcRef}:LoginFormProps): ReactNode => {
+const LoginForm = ({isRegistering,nameRef,idRef,emailRef,pwRef,pwcRef,resetError}:LoginFormProps): ReactNode => {
   return (
     <div className="w-fit">
       <form className="flex flex-col items-end gap-4">
@@ -17,31 +19,36 @@ const LoginForm = ({isRegistering,nameRef,idRef,emailRef,pwRef,pwcRef}:LoginForm
             <label className="w-32 text-center">이름<br/>Name</label>
             <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
               type='text'
-              ref={nameRef}></input>
+              ref={nameRef}
+              onChange={resetError}></input>
           </div>}
         <div className="flex items-center gap-2">
           <label className="w-32 text-center">아이디<br/>ID</label>
           <input className="border-[1px] py-1 indent-2 indent outline-none rounded-md" 
           type='text'
-          ref={idRef}></input>
+          ref={idRef}
+          onChange={resetError}></input>
         </div>
         {isRegistering && <div className="flex items-center gap-2">
           <label className="w-32 text-center">이메일<br/>Email</label>
           <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
           type='email'
-          ref={emailRef}></input>
+          ref={emailRef}
+          onChange={resetError}></input>
         </div>}
         <div className="flex items-center gap-2">
           <label className="w-32 text-center">비밀번호<br/>PW</label>
           <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
           type='password'
-          ref={pwRef}></input>
+          ref={pwRef}
+          onChange={resetError}></input>
         </div>
         {isRegistering && <div className="flex items-center gap-2">
           <label className="w-32 text-center">비밀번호 확인<br/>PW Check</label>
           <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
           type='password'
-          ref={pwcRef}></input>
+          ref={pwcRef}
+          onChange={resetError}></input>
         </div>}
       </form>
     </div>

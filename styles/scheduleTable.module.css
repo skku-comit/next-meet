@@ -107,3 +107,6 @@
     background: var(--color);
 }
 
+.time_label:first-child{
+    padding-top: 100px;
+}

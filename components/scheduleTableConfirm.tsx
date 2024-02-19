@@ -2,13 +2,12 @@ import scheduleTable from "@/styles/scheduleTable.module.css";
 import React, {useState, useEffect } from "react";
 // import Selecto from "react-selecto";
 import ScheduleSelector from 'react-schedule-selector';
+import { DaysOfWeek } from "@/template/DaysOfWeek";
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
 // import { type } from './../template/User';
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
-import { DaysOfWeek } from "@/template/DaysOfWeek";
-
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -17,21 +16,19 @@ interface MyComponentProps {
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
-    schedule:{schedule :[]};
-    setSchedule:Function;
-    confirm : number;
+    fixedSchedule:{schedule :[]};
+    setFixedSchedule:Function;
 }
 
-const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) => {
+const ScheduleTableConfirm = ({fixedDate, fixedDay, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) => {
   // console.log(isLogin)
-
 
   const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
   const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
   const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
 
-
-  let DayList = [] as String[];
+ 
+  const DayList = [] as String[];
 
   // const dummyDateList = [] as String[];
   const dummyDateList = [] as Date[];
@@ -88,31 +85,32 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week
 //   const periodLen = lastTimeHour-startTimeHour;
    
 //    const [schedule, setSchedule] = useState({schedule :[]})
-   const handleChange = (newSchedule:Date[]) => {
-    setSchedule({schedule:newSchedule})
-    // console.log(typeof(schedule.schedule));
+   
+  const handleChange = (newSchedule:Date[]) => {
+    setFixedSchedule({schedule:newSchedule})
+    // console.log(fixedSchedule.schedule);
    }
 
-   useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);
+//    console.log(fixedSchedule);
 
-   let week_startDate:Date = new Date();
-   for(let i=0; i<7; i++){
-    if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
-        break;
-    }
-    week_startDate.setDate(week_startDate.getDate() + 1)
-  }
+    let week_startDate:Date = new Date();
+    for(let i=0; i<7; i++){
+        if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
+            break;
+        }
+        week_startDate.setDate(week_startDate.getDate() + 1)
+      }
 
-    let index_dayList = 0;
+   let index_dayList = 0;
 
   return (
-        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
-          <div className={`w-full ${scheduleTable.table_spacing} border-separate table-scrolling`}>
+        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+          <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
-                selection={schedule.schedule}
+                selection={fixedSchedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
                 startDate={!week? dummyDateList[0]: week_startDate}
-                numDays={!week? dateList.length : DayList.length}
+                numDays={week? DayList.length : dateList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}
                 hourlyChunks={2}
@@ -140,14 +138,10 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week
                         </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
-                hoveredColor="#fddada"
-                selectedColor="#ffadad"
+                hoveredColor="#a2cffe"
+                selectedColor="#63c5da"
                 rowGap="5px"
                 columnGap="7px"
-                
-                // renderDateCell={(datetime, selected, refSetter) => {
-                //     return <div ref={()=>refSetter} className="w-full h-full" style={{height:'25px', minWidth:"50px"}}></div>
-                // }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
             />
             
@@ -158,4 +152,4 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week
   );
 };
 
-export default ScheduleTableSelectoEdit;
+export default ScheduleTableConfirm;

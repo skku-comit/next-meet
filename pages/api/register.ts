@@ -1,11 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import bcrypt from "bcryptjs";
+
 import Member from "@/lib/models/member.model";
 import connectDB from "@/lib/mongodb/connectDB";
 import getID from "@/lib/functions/getID";
+import { NextMeetUser } from "@/template/User";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) =>
 {
-    if (req.method === "POST")
+  if (req.method === "POST")
     {
         try
         {
@@ -22,13 +25,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) =>
             // Register new member
             const members = Member;
             const { userName, loginID, password, email } = req.body;
+            const hashedPassword = await bcrypt.hash(password,10);
+
             await members.create
             ({
-                loginID: loginID,
-                password: password,
+                loginID,
+                password: hashedPassword,
                 memberID: getID(1),
-                userName: userName,
-                email: email,
+                userName,
+                email,
             });
 
             console.log(`${userName} registered as member`);

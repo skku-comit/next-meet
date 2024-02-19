@@ -5,15 +5,18 @@ import ScheduleSelector from 'react-schedule-selector';
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
+import { DaysOfWeek } from "@/template/DaysOfWeek";
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     fixedDate:Date[] | null;
+    fixedDay:DaysOfWeek[] | null;
     fixedTime:{startTime:string, lastTime:string} | null;
     isLogin:boolean;
     week:boolean|0;
     schedule:{schedule :[]};
+    commitFixedSchedule:{schedule :[]};
     name:string;
     setShowResult : Function;
     setShowMember : Function;
@@ -21,21 +24,26 @@ interface MyComponentProps {
     // setScheduleList : Function;
     setTotalScheduleList:Function;
     totalMem:number;
+    select:number;
+    fixedSchedule : {schedule :[]};
 }
 
-const ScheduleTableSelecto = ({fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem}:MyComponentProps) => {
+const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) => {
   // console.log(isLogin)
 
-  const weekDay = fixedDate ? fixedDate: ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]; 
- 
-  const DayList = [] as String[];
-//   const dummyDateList = [] as String[];
-const dummyDateList = [] as Date[];
+  const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+  const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+  const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+
+  let DayList = [] as String[];
+  
+  //   const dummyDateList = [] as String[];
+  const dummyDateList = [] as Date[];
   const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
 
   if(week){ // weekday 0-date, 1-week
-    for(let i=0; i<weekDay.length; i++){
-        switch(weekDay[i]){
+    for(let i=0; i<sortedSelectedWeekDay.length; i++){
+        switch(sortedSelectedWeekDay[i]){
             case "MON":
                 DayList.push("월");
                 break;
@@ -74,6 +82,8 @@ const dummyDateList = [] as Date[];
     }
    }
 
+//   const pushedDayList = DayList;
+
   const dummyTimePeriod = {startTime : "00:00", lastTime : "24:00"};
 
   const [dateList, setDateList] = useState(!fixedDate ? dummyDateList : fixedDate);
@@ -93,12 +103,12 @@ const dummyDateList = [] as Date[];
   const [totalMemNum, setTotalMemNum] = useState(totalMem);
   
   const dummyScheduleList:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}} = {
-    checked_num : {"Mon Feb 12 2024 00:00:00 GMT+0900 (한국 표준시)":4/totalMemNum,
-                    "Mon Feb 12 2024 00:30:00 GMT+0900 (한국 표준시)":3/totalMemNum,
-                    "Mon Feb 12 2024 01:00:00 GMT+0900 (한국 표준시)":2/totalMemNum},
-    member : {"Mon Feb 12 2024 00:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "강성대", "송성균"],
-    "Mon Feb 12 2024 00:30:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "송성균"],
-    "Mon Feb 12 2024 01:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전"]}
+    checked_num : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":4/totalMemNum,
+                    "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":3/totalMemNum,
+                    "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":2/totalMemNum},
+    member : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "강성대", "송성균"],
+    "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "송성균"],
+    "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전"]}
   }
 
 //   useEffect(()=>{setScheduleList(dummyScheduleList); console.log(scheduleList)},[]);
@@ -177,29 +187,61 @@ const dummyDateList = [] as Date[];
     ()=>{setTotalScheduleList(scheduleList)},[scheduleList]
   )
 
+//   let groupedSelect = schedule.schedule.concat(commitFixedSchedule.schedule);
+//   let totalSelect = groupedSelect.filter((sche, pos)=>groupedSelect.indexOf(sche)===pos);
+//   const [totalSelection, setTotalSelection] = useState(totalSelect);
+
+//   useEffect(()=>{
+//     // if(confirm == 1){
+//         groupedSelect = schedule.schedule.concat(commitFixedSchedule.schedule)
+//         totalSelect = groupedSelect.filter((sche, pos)=>groupedSelect.indexOf(sche)===pos);
+//         setTotalSelection(totalSelect);
+//     //}
+//   },[schedule, commitFixedSchedule])
+
+  let week_startDate:Date = new Date();
+  for(let i=0; i<7; i++){
+    if(WEEKDAY[week_startDate.getDay()] == DayList[0]){
+        break;
+    }
+    week_startDate.setDate(week_startDate.getDate() + 1)
+  }
+//   console.log(week_startDate)
+
+  let index_dayList = 0;
+
   return (
-        <div className="overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
           <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
             <ScheduleSelector
-                selection={schedule.schedule}
-                startDate={dummyDateList[0]}
-                numDays={dateList.length}
+                // selection={}
+                startDate={!week? dummyDateList[0]: week_startDate}
+                numDays={!week? dateList.length : DayList.length}
                 minTime={startTimeHour}
                 maxTime={lastTimeHour}
                 hourlyChunks={2}
                 renderDateLabel={(date) => {
-                    let index = Math.abs(date.getTime() - dummyDateList[0].getTime());
-                    index = Math.ceil(index / (1000 * 60 * 60 * 24));
-                    if(index == 1 && date.getDate() == dummyDateList[0].getDate()){
-                        index = 0;
-                    }
-                    return <div>
+                    if(!week){
+                        let index = Math.abs(date.getTime() - dummyDateList[0].getTime());
+                        index = Math.ceil(index / (1000 * 60 * 60 * 24));
+                        if(index == 1 && date.getDate() == dummyDateList[0].getDate()){
+                            index = 0;
+                        }
+                        return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
                         {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
-                </div>}}
-                // renderDateLabel={(date) => {return week ? "ddd" : format(date, 'MM/dd', { locale: ko })}}
+                    </div>
+                    }
+                    console.log(date.getDay()-week_startDate.getDay());
+                    return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
+                    {DayList[date.getDay()-week_startDate.getDay()]}
+                    </div>}}
+                renderTimeLabel={(time) => {
+                    return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>
+                            {time.getHours()<10?"0"+time.getHours():time.getHours()}:{time.getMinutes()==0?'00':'30'}
+                        </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
                 hoveredColor="none"
@@ -208,7 +250,7 @@ const dummyDateList = [] as Date[];
                 columnGap="7px"
                 renderDateCell={(datetime, selected, refSetter) => {
                     let selectedPct = 0;
-                    let datetimeStr = datetime.toString().replace("대한민국", "한국");
+                    let datetimeStr:string = datetime.toString().replace("대한민국", "한국");
                     let cellColor = "#eee";
                     // console.log(datetimeStr, datetimeStr in scheduleList.checked_num);
                     if(datetimeStr in scheduleList.checked_num){
@@ -243,7 +285,39 @@ const dummyDateList = [] as Date[];
                         cellColor = "#eee";
                     }
                 
-                    return <div ref={()=>refSetter} className="w-full h-full" style={{backgroundColor : cellColor, height:'25px'}}
+                    // const fixedScheduleList:string[] = commitFixedSchedule.schedule;
+                    const fixedScheduleList:string[] = fixedSchedule.schedule;
+        
+                    if(select == 1){
+                        fixedScheduleList.map((sche)=>{
+                            // console.log(sche == datetimeStr)
+                            if (sche == datetimeStr){
+                                    cellColor = "#63c5da";
+                                }
+                        })
+                        // for(let i = 0; i < fixedScheduleList.length; i++){
+                        //     const sche = new Date(fixedScheduleList[i]);
+                            
+                        //     // console.log("date",datetime)
+                        //     // console.log("sche", sche);
+                        //     console.log(datetime.toUTCString() == sche.toUTCString());
+                        //     if(datetime.toUTCString() == sche.toUTCString()){
+                        //         cellColor = "#63c5da";
+                        //         console.log(sche==datetime);
+                        //     }
+                        // }
+                    }
+
+                    // if(select == 1 && fixedScheduleList.includes(datetime.toLocaleString)){
+                    //     cellColor = "#63c5da";
+                    //     console.log(typeof fixedScheduleList, 1);
+                    // }
+
+                    // console.log(select == 1 && fixedScheduleList.includes(datetimeStr));
+                    // console.log(fixedScheduleList.includes(datetime))
+                    // console.log("select", select);
+
+                    return <div ref={()=>refSetter} className="w-full h-full" style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
                         onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr])}}
                         onMouseOut={()=>{setShowMember(false)}}></div>
                 }}

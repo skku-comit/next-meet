@@ -19,3 +19,13 @@ import { Mongoose } from "mongoose"
 //         console.log("Error connecting to MongoDB: ",error);
 //     }
 // }
+
+// export const connectMongoDB = async () =>{
+//     try{
+//         await Mongoose.connect(process.env.MONGODB_URI!);
+//         console.log("Connected to MongoDB");
+//     }
+//     catch(error){
+//         console.log("Error connecting to MongoDB: ",error);
+//     }
+// }

@@ -16,7 +16,7 @@ const Setter = (props:any): ReactNode => {
   }
 
   return (
-    <div className="w-screen px-20 pt-20">
+    <div className={`w-screen px-20 ${props.select ? "pt-20" : "pt-6"}`}>
       <div className="flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
           onClick={(e)=>{e.preventDefault();setIsMember(false); props.setIsLogin(false);}}>
@@ -39,7 +39,9 @@ const Setter = (props:any): ReactNode => {
             </div>
         </form>}
         <button className={`items-center ${setterBtnTab.login_btn} grow bg-white rounded text-center p-1 m-2 mr-10 text-sm grow-0`}
-          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); }}
+          onClick={()=>{props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); 
+            props.confirm == 1 ? props.setConfirm(2) : "";
+          }}
         >{props.isLogin ? "로그아웃" : <IoMdLogIn className="w-full h-full" />}</button>
       </div>
 
