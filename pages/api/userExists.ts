@@ -1,4 +1,4 @@
-import { connectMongoDB } from "@/lib/mongodb/mongodb";
+import connectDB from "@/lib/mongodb/connectDB";
 import { NextMeetUser } from "@/template/User";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -6,7 +6,7 @@ export enum REGISTER_FAIL_ERR { "NO_ERROR" = 0, "EXISTING_USERID", "EXISTING_EMA
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    await connectMongoDB();
+    await connectDB();
     const { userID, email } = await req.body;
     let existingUser = await NextMeetUser.findOne({ userID }).select("_id");
     if(existingUser){
