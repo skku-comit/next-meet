@@ -61,7 +61,7 @@ const EventPage = ()=>{
     return <div className="w-screen h-full min-h-screen ">
         <div className="(header space) w-screen h-20 bg-[white]"></div>
         {select ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-        {!select || confirm==1 ? <Setter isLogin={isLogin} setIsLogin={setIsLogin} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select}/>:<div className="pt-10 pb-5"></div>}
+        {!select || confirm==1 ? <Setter isLogin={isLogin} setIsLogin={setIsLogin} name={name} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select}/>:<div className="pt-10 pb-5"></div>}
         <div className="w-screen pt-5 px-20 pb-5">
             <div className="flex flex-row flex-nowrap items-center text-center gap-4 justify-center"> 
                 {confirm == 1 ? <ScheduleTableConfirm week={week} isLogin={isLogin} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}

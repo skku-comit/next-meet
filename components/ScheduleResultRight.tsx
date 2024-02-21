@@ -1,5 +1,5 @@
 import scheduleResultCSS from "@/styles/scheduleResult.module.css";
-import React, {useEffect, useState } from "react";
+import React, {useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
@@ -20,8 +20,8 @@ interface MyComponentProps {
     isLogin:boolean;
 }
 
-const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) => {
+const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -29,13 +29,15 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
     useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
 
     // console.log(scheduleList.checked_num);
-    if(scheduleList.checked_num){
-        checked_mem_num= Object.values(scheduleList.checked_num);
-        
-        max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
-        return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
-        });    
-    }
+    useEffect(()=>{
+        if(scheduleList.checked_num){
+            checked_mem_num= Object.values(scheduleList.checked_num);
+            
+            max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
+            return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
+            });    
+        }
+    }, [scheduleList]);
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
@@ -44,17 +46,26 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
     let term:number = 0;
     let mem_term:number = 0;
 
-    const [sortedList, setSortedList]:[Date[],Function] = useState([]);
+    // const [sortedList, setSortedList]:[Date[],Function] = useState([]);
+    let sortedList:Date[] = [];
 
-    useEffect(()=>{
-        setSortedList(fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime()));
-    },[fixedSchedule])
 
-    const [sortedMemList, setSortedMemList]:[Date[],Function] = useState([]);
+    // useMemo(()=>{
+        useEffect(()=>{
+            sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
+        },[fixedSchedule])
+    // }, [fixedSchedule]);
+    
 
-    useEffect(()=>{
-        setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
-    },[max_checked_mem_sche])
+    // const [sortedMemList, setSortedMemList]:[Date[],Function] = useState([]);
+    let sortedMemList:string[] = [];
+
+    // useMemo(()=>{
+        useEffect(()=>{
+            sortedMemList = max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime());
+        },[max_checked_mem_sche])
+
+    // }, [max_checked_mem_sche])
 
   return (
     <div className="flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
@@ -238,6 +249,6 @@ const ScheduleResultRight = ({setShowResult, showResult,showMember, scheduleList
             {/* </div> */}
         </div>
   );
-};
+});
 
-export default ScheduleResultRight;
+export default React.memo(ScheduleResultRight);

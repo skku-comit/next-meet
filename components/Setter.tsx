@@ -6,10 +6,10 @@ const className_button = 'w-2/4 p-6 py-3 text-white';
 const Setter = (props:any): ReactNode => {
   const [isMember,setIsMember] = useState<boolean>(false);
   // const [isLogin, setIsLogin] = useState<boolean>(false);
-  const [idName, setIdName] = useState<String>("");
+  // const [idName, setIdName] = useState<String>("");
   const [pw, setPw] = useState<String>("");
 
-  props.setName(idName);
+  // props.setName(idName);
   const addTotalNum:Function = ()=>{
     // console.log("islogin", props.isLogin);
     !props.isLogin ? props.setTotalMem(props.totalMem+1):"";
@@ -28,10 +28,10 @@ const Setter = (props:any): ReactNode => {
         </button>
       </div>
       <div className="flex flex-row items-center text-center bg-[#ffadad] rounded-b-lg justify-center">
-        {props.isLogin ? <div className="p-4"><div className="items-center pt-1.5">{idName}</div></div> : <form className={`p-4 flex flex-row items-center grow space-content-around gap-2`}>
+        {props.isLogin ? <div className="p-4"><div className="items-center pt-1.5">{props.name}</div></div> : <form className={`p-4 flex flex-row items-center grow space-content-around gap-2`}>
             <div className="w-1/2 flex items-center gap-3 justify-center">
                 <label className="text-center pt-1">{isMember ? "아이디":"이름"}</label>
-                <input className="w-3/5 border-[1px] h-8 p-2 outline-none rounded" type='text' onChange={(e)=>{setIdName(e.target.value)}}></input>
+                <input className="w-3/5 border-[1px] h-8 p-2 outline-none rounded" type='text' onChange={(e)=>{props.setName(e.target.value)}}></input>
             </div>
             <div className="w-1/2 flex items-center gap-3 justify-center">
                 <label className="text-center pt-1">비밀번호</label>

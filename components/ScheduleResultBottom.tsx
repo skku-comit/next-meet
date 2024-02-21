@@ -21,8 +21,8 @@ interface MyComponentProps {
     isLogin:boolean;
 }
 
-const ScheduleResultBottom = ({setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) => {
+const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowResult, showResult,showMember, scheduleList, totalMem,
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -181,6 +181,6 @@ const ScheduleResultBottom = ({setShowResult, showResult,showMember, scheduleLis
             {/* </div> */}
         </div>
   );
-};
+});
 
-export default ScheduleResultBottom;
+export default React.memo(ScheduleResultBottom);

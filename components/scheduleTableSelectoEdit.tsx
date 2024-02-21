@@ -22,7 +22,7 @@ interface MyComponentProps {
     confirm : number;
 }
 
-const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) => {
+const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({fixedDate, fixedDay, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) {
   // console.log(isLogin)
 
 
@@ -156,6 +156,6 @@ const ScheduleTableSelectoEdit = ({fixedDate, fixedDay, fixedTime, isLogin, week
 
         </div>
   );
-};
+});
 
-export default ScheduleTableSelectoEdit;
+export default React.memo(ScheduleTableSelectoEdit);

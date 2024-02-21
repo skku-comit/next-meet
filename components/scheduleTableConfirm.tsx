@@ -20,7 +20,7 @@ interface MyComponentProps {
     setFixedSchedule:Function;
 }
 
-const ScheduleTableConfirm = ({fixedDate, fixedDay, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) => {
+const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate, fixedDay, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) {
   // console.log(isLogin)
 
   const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
@@ -150,6 +150,6 @@ const ScheduleTableConfirm = ({fixedDate, fixedDay, fixedTime, isLogin, week, fi
 
         </div>
   );
-};
+});
 
-export default ScheduleTableConfirm;
+export default React.memo(ScheduleTableConfirm);

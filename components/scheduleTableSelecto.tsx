@@ -28,7 +28,7 @@ interface MyComponentProps {
     fixedSchedule : {schedule :[]};
 }
 
-const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) => {
+const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) {
   // console.log(isLogin)
 
   const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
@@ -234,7 +234,7 @@ const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, sc
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
                     </div>
                     }
-                    console.log(date.getDay()-week_startDate.getDay());
+                    // console.log(date.getDay()-week_startDate.getDay());
                     return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
                     {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
@@ -317,7 +317,9 @@ const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, sc
                     // console.log(fixedScheduleList.includes(datetime))
                     // console.log("select", select);
 
-                    return <div ref={()=>refSetter} className="w-full h-full" style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
+                    return <div 
+                        // ref={()=>refSetter} 
+                        className="w-full h-full" style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
                         onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr])}}
                         onMouseOut={()=>{setShowMember(false)}}></div>
                 }}
@@ -332,6 +334,6 @@ const ScheduleTableSelecto = ({fixedDay, fixedDate, fixedTime, isLogin, week, sc
 
         </div>
   );
-};
+});
 
-export default ScheduleTableSelecto;
+export default React.memo(ScheduleTableSelecto);
