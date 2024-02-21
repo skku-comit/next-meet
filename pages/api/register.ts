@@ -1,26 +1,49 @@
-import { connectMongoDB } from "@/lib/mongodb/mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
+
+import Member from "@/lib/models/member.model";
+import connectDB from "@/lib/mongodb/connectDB";
+import getID from "@/lib/functions/getID";
 import { NextMeetUser } from "@/template/User";
 
-export async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-)
+const handler = async (req: NextApiRequest, res: NextApiResponse) =>
 {
   if (req.method === "POST")
     {
-      try{
-        const {userName, userID, email, password} = await req.body;
-        const hashedPassword = await bcrypt.hash(password,10);
+        try
+        {
+            await connectDB();
+            // Check if the member is in database
+            const checkQuery = await Member.find({ loginID: req.body.loginID });
 
-        await connectMongoDB();
-        await NextMeetUser.create({userName, userID:userID, loginID:userID, email, password:hashedPassword, eventIDList:[]});
+            // Member already exist
+            if (checkQuery.length !== 0)
+            {
+                res.status(200).json({ isNew: false });
+            }
 
-        return res.json({ message: "User registered"});
-      } catch(error){
-        return res.json({ message: "error "});
-      }
+            // Register new member
+            const members = Member;
+            const { userName, loginID, password, email } = req.body;
+            const hashedPassword = await bcrypt.hash(password,10);
+
+            await members.create
+            ({
+                loginID,
+                password: hashedPassword,
+                memberID: getID(1),
+                userName,
+                email,
+            });
+
+            console.log(`${userName} registered as member`);
+            res.status(201).json({ isNew: true });
+        }
+        catch (error)
+        {
+            console.error(error);
+            res.status(500).json({ message: "Internal server issu occurred" });
+        }
     }
 }
 
