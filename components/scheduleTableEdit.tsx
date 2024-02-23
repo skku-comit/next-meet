@@ -1,4 +1,4 @@
-import scheduleTable from "@/styles/scheduleTable.module.css";
+import scheduleTableCSS from "@/styles/scheduleTable.module.css";
 import React, {useEffect, useState } from "react";
 // import Selecto from "react-selecto";
 import { IoMdLogIn } from "react-icons/io";
@@ -8,9 +8,11 @@ interface MyComponentProps {
     fixedDate:String[] | null;
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
+    scheduleTable:boolean;
+    setScheduleTable:Function;
 }
 
-const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => {
+const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin, scheduleTable, setScheduleTable}:MyComponentProps) => {
   // console.log(isLogin)
 
   var today = new Date();
@@ -46,7 +48,7 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
       isActive ? setSelectedDateTime([key, ...selectedDateTime]) : setSelectedDateTime(removeDateTime)
     },[isActive]);
     
-    return <td className={`${scheduleTable.slot} cursor-pointer ${scheduleTable.btn} ${row_num == 0 && time_block_num==0 ? '': scheduleTable.btn_border_top0} ${isActive ? scheduleTable.selected: scheduleTable.unselected}`}
+    return <td className={`${scheduleTableCSS.slot} cursor-pointer ${scheduleTableCSS.btn} ${row_num == 0 && time_block_num==0 ? '': scheduleTableCSS.btn_border_top0} ${isActive ? scheduleTableCSS.selected: scheduleTableCSS.unselected}`}
       //onClick={()=>{isActive ? setIsActive(false) : setIsActive(true); console.log(isActive)}}
       onMouseDown={()=>{isActive == true ? setIsActive(false) : setIsActive(true); console.log("isActive" , isActive); }}
       onMouseOver={(e)=>{e.buttons == 1 ? isActive == false ? setIsActive(true) : setIsActive(false) : ""; console.log("isActive" , isActive)}}
@@ -68,10 +70,10 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
     const result = [];
     for(let i=0; i < periodLen; i++){
         for(let j=0; j < 4; j++){
-            result.push(<tr className={`${scheduleTable.td} `}>
-            {j == 0 ? <td className={`${scheduleTable.td_hour_col} ${scheduleTable.td_hour} items-center`}>
+            result.push(<tr className={`${scheduleTableCSS.td} `}>
+            {j == 0 ? <td className={`${scheduleTableCSS.td_hour_col} ${scheduleTableCSS.td_hour} items-center`}>
                     <span className="items-center">{((hour+i)<10 ? '0'+(hour+i).toString():(hour+i).toString())+":00"}</span>
-            </td>: <td className={`${scheduleTable.td_hour_col} ${scheduleTable.td}`}></td>}
+            </td>: <td className={`${scheduleTableCSS.td_hour_col} ${scheduleTableCSS.td}`}></td>}
             {hourblock(i,j)}
             </tr>)
       }
@@ -86,12 +88,12 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
     //   <div className="flex flex-row flex-nowrap items-center text-center gap-2 justify-center">
       // {isLogin? 
       <div className="overflow-hidden overflow-x-auto py-3 bg-[#f8f9fa] rounded">
-      <table className={`w-2/4  ${scheduleTable.table_spacing} border-separate table-scrolling`}>
-            <thead className={`${scheduleTable.thead_margin}`}>
+      <table className={`w-2/4  ${scheduleTableCSS.table_spacing} border-separate table-scrolling`}>
+            <thead className={`${scheduleTableCSS.thead_margin}`}>
                 <tr>
-                    <th className={`${scheduleTable.th_width_vacant} ${scheduleTable.td_hour_col}`}></th>
+                    <th className={`${scheduleTableCSS.th_width_vacant} ${scheduleTableCSS.td_hour_col}`}></th>
                     {dateList.map((date:String) => {
-                        return <th className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}>
+                        return <th className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}>
                             {date.split('-')[1]+'/'+date.split('-')[2]}
                             {/* <br/> */}
                             {'('+date.split('-')[3]+")"}
@@ -99,9 +101,9 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
                     })} 
                 </tr>
             </thead>
-                      <tbody className={`${scheduleTable.selecto_area}`}>
+                      <tbody className={`${scheduleTableCSS.selecto_area}`}>
                 <tr>
-                  <td className={`${scheduleTable.td_spacing}`}></td>
+                  <td className={`${scheduleTableCSS.td_spacing}`}></td>
                 </tr>
                 {timeHourBlock(startTimeHour)}
             </tbody>
@@ -110,12 +112,12 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
         // :""}
 
         // <div className="overflow-x-auto overflow-hidden py-3 bg-[#f8f9fa] rounded">
-        // <table className={`w-2/4 ${scheduleTable.table_spacing} border-separate table-scrolling`}>
-        //     <thead className={`${scheduleTable.thead_margin}`}>
+        // <table className={`w-2/4 ${scheduleTableCSS.table_spacing} border-separate table-scrolling`}>
+        //     <thead className={`${scheduleTableCSS.thead_margin}`}>
         //         <tr>
-        //             <th className={`${scheduleTable.th_width_vacant} ${scheduleTable.td_hour_col}`}></th>
+        //             <th className={`${scheduleTableCSS.th_width_vacant} ${scheduleTableCSS.td_hour_col}`}></th>
         //             {dateList.map((date:String) => {
-        //                 return <th className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}>
+        //                 return <th className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}>
         //                     {date.split('-')[1]+'/'+date.split('-')[2]}
         //                     {/* <br/> */}
         //                     {'('+date.split('-')[3]+")"}
@@ -124,8 +126,8 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
         //         </tr>
         //     </thead>
             /* <Selecto
-              dragContainer={`${scheduleTable.slot}`}
-              selectableTargets={[`${scheduleTable.slot} ${scheduleTable.selecto_area}`]}
+              dragContainer={`${scheduleTableCSS.slot}`}
+              selectableTargets={[`${scheduleTableCSS.slot} ${scheduleTableCSS.selecto_area}`]}
               hitRate={0}
               selectByClick={true}
               selectFromInside={true}
@@ -133,17 +135,17 @@ const ScheduleTableEdit = ({fixedDate, fixedTime, isLogin}:MyComponentProps) => 
               ratio={0}
               onSelect={e => {
                   e.added.forEach(el => {
-                      el.classList.add(`${scheduleTable.selected}`);
+                      el.classList.add(`${scheduleTableCSS.selected}`);
                   });
                   e.removed.forEach(el => {
-                      el.classList.remove(`${scheduleTable.selected}`);
+                      el.classList.remove(`${scheduleTableCSS.selected}`);
                   });
               }}
             /> */
 
-        //     <tbody className={`${scheduleTable.selecto_area}`}>
+        //     <tbody className={`${scheduleTableCSS.selecto_area}`}>
         //         <tr>
-        //           <td className={`${scheduleTable.td_spacing}`}></td>
+        //           <td className={`${scheduleTableCSS.td_spacing}`}></td>
         //         </tr>
         //         {timeHourBlock2(startTimeHour)}
         //     </tbody>

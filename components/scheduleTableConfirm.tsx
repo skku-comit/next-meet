@@ -1,8 +1,9 @@
-import scheduleTable from "@/styles/scheduleTable.module.css";
+import scheduleTableCSS from "@/styles/scheduleTable.module.css";
 import React, {useState, useEffect } from "react";
 // import Selecto from "react-selecto";
 import ScheduleSelector from 'react-schedule-selector';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
@@ -18,9 +19,12 @@ interface MyComponentProps {
     week:boolean|0;
     fixedSchedule:{schedule :[]};
     setFixedSchedule:Function;
+    scheduleTable:boolean;
+    setScheduleTable:Function;
+    width:number;
 }
 
-const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate, fixedDay, fixedTime, isLogin, week, fixedSchedule, setFixedSchedule}:MyComponentProps) {
+const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate, fixedDay, fixedTime, isLogin, width, week, fixedSchedule, setFixedSchedule, scheduleTable, setScheduleTable}:MyComponentProps) {
   // console.log(isLogin)
 
   const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
@@ -102,10 +106,15 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate
       }
 
    let index_dayList = 0;
+   const [open, setOpen] = useState(true);
 
   return (
-        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
-          <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
+        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+          <div className={`flex flex-row gap-2 justify-between font-bold items-center cursor-pointer w-full ${!scheduleTable ? "pb-2":""}`} onClick={()=>{setOpen((prevST:boolean)=>!prevST)}}>
+                <p>Check the Schedule to Confirm</p>
+                {width > 768 ? "" : !open ? <FaAngleUp/> : <FaAngleDown/>}
+          </div>
+          {width > 768 || open ? <div className={`w-full animate-[smoothAppear_1s]  ${scheduleTableCSS.table_spacing} border-separate table-scrolling pt-3 border-t-2`}>
             <ScheduleSelector
                 selection={fixedSchedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
@@ -122,7 +131,7 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate
                             index = 0;
                         }
                         return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
-                        {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
+                        {/* <div className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
@@ -145,7 +154,7 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm({fixedDate
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
             />
             
-            </div>
+            </div>:""}
 
 
         </div>

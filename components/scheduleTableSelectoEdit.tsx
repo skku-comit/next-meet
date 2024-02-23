@@ -1,4 +1,4 @@
-import scheduleTable from "@/styles/scheduleTable.module.css";
+import scheduleTableCSS from "@/styles/scheduleTable.module.css";
 import React, {useState, useEffect } from "react";
 // import Selecto from "react-selecto";
 import ScheduleSelector from 'react-schedule-selector';
@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 // import { type } from './../template/User';
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 
 interface MyComponentProps {
@@ -20,9 +21,12 @@ interface MyComponentProps {
     schedule:{schedule :[]};
     setSchedule:Function;
     confirm : number;
+    scheduleTable:boolean;
+    setScheduleTable : Function;
+    width: number;
 }
 
-const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({fixedDate, fixedDay, fixedTime, isLogin, week, schedule, setSchedule, confirm}:MyComponentProps) {
+const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({fixedDate, fixedDay, fixedTime, isLogin, width, week, schedule, setSchedule, confirm, scheduleTable, setScheduleTable}:MyComponentProps) {
   // console.log(isLogin)
 
 
@@ -105,9 +109,15 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({f
 
     let index_dayList = 0;
 
+    const [open, setOpen] = useState(true);
+
   return (
-        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
-          <div className={`w-full ${scheduleTable.table_spacing} border-separate table-scrolling`}>
+        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={confirm==1?true:false}>
+          <div className={`flex flex-row gap-2 justify-between font-bold items-center cursor-pointer text-left w-full ${!scheduleTable ? "pb-2":""}`} onClick={()=>{setOpen((prevST:boolean)=>!prevST)}}>
+                <p>Check or Edit Available Schedule </p>
+                {width > 768 ? "" : !open ? <FaAngleUp/> : <FaAngleDown/>}
+          </div>
+          {width > 768 || open ? <div className={`w-full animate-[smoothAppear_1s]  ${scheduleTableCSS.table_spacing} border-separate table-scrolling pt-3 border-t-2`}>
             <ScheduleSelector
                 selection={schedule.schedule}
                 onChange={(newschedule)=>{handleChange(newschedule)}}
@@ -124,7 +134,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({f
                             index = 0;
                         }
                         return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
-                        {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
+                        {/* <div className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
@@ -151,7 +161,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit({f
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
             />
             
-            </div>
+            </div>:""}
 
 
         </div>

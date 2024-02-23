@@ -2,6 +2,7 @@ import scheduleResultCSS from "@/styles/scheduleResult.module.css";
 import React, {useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { throttle } from "lodash";
 
 
 interface MyComponentProps {
@@ -44,22 +45,23 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
     let term = 0;
     let mem_term = 0;
 
-    const [sortedList, setSortedList]:[Date[],Function] = useState([]);
+    let sortedList:Date[] = [];
 
     useEffect(()=>{
-        setSortedList(fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime()));
+        sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
     },[fixedSchedule])
 
-    const [sortedMemList, setSortedMemList]:[Date[],Function] = useState([]);
+    let sortedMemList:string[] = [];
 
     useEffect(()=>{
-        setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
+        sortedMemList = max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime());
     },[max_checked_mem_sche])
 
+
   return (
-        <div className="overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded">
+        <div className="z-25 overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded ">
           <div className={`flex flex-row`}>
-            <div className="w-2/4 pr-3 pt-2">
+            {/* <div className="w-2/4 pr-3 pt-2">
                 <div className="pl-2 break-all font-bold">Members</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}>
@@ -69,8 +71,8 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                         )
                     }):""}
                 </ul>
-            </div>
-            <div className="w-2/4 pl-3 pb-2 pt-2 border-l-2 mr-1 grid grid-column gap-2">
+            </div> */}
+            <div className="w-full pl-3 pb-2 pt-2 mr-1 grid grid-column gap-2">
                 <div className="pt-2 mr-1">
                     <div className="flex flex-row pl-2 font-bold justify-between items-center">
                         <p>가장 많은 멤버가 참여 가능한 시간대</p>
@@ -140,6 +142,70 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                 </div>
             </div>
                 
+            {sortedList.length > 0 ? <div className="w-full pl-2 pb-2 pt-2 mr-1 grid grid-column gap-2 border-l-2">            
+            <div className="pt-2 mr-1">
+                <div className="pl-2 font-bold justify-between items-center">
+                    <p>확정된 일정</p>
+                </div>
+                <hr className="border-t-2 my-1 mb-2"/>
+                <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
+                    {sortedList.map((sche:Date, index)=>{
+                            let diffMin = 0;
+                            let diffMSec = 0;
+                            const schedule:Date = new Date(sche.getTime());
+                            const post_time:Date = fixedSchedule.schedule[index < fixedSchedule.schedule.length-1 ? index+1:index];
+                            const prev_time:Date = fixedSchedule.schedule[index > 0 ? index-1 : index];
+                            if((term == 0) && fixedSchedule.schedule.length > 1){
+                                diffMin = (post_time.getHours()*60 + post_time.getMinutes()) - (schedule.getHours()*60 + schedule.getMinutes());
+                                // diffMin = diffMSec / (60 * 1000);
+                            }
+                            else{
+                                diffMin = (schedule.getHours()*60 + schedule.getMinutes()) - (prev_time.getHours()*60 + prev_time.getMinutes());
+                                // diffMin = diffMSec / (60 * 1000);
+                            }
+                            
+                            // console.log("diffMin",diffMin);
+                            if(diffMin == 30){  
+                                term = term + 1;
+                                // console.log("sche",sche, term)
+                                diffMin = (post_time.getHours()*60 + post_time.getMinutes()) - (schedule.getHours()*60 + schedule.getMinutes());
+                                // diffMin = diffMSec / (60 * 1000);
+                                if(diffMin == 30){
+                                    return;
+                                }
+                            }
+
+                            let start_sche:Date = new Date(schedule.getTime());
+                            let end_sche:Date = new Date(schedule.getTime());
+                            // console.log("b", start_sche, term)
+                            start_sche.setMinutes(start_sche.getMinutes()-(30*(term != 0 ? term-1 : term)));
+                            // console.log(start_sche)
+                            end_sche.setMinutes(end_sche.getMinutes()+30);
+                            term = 0;
+                            return(
+                                <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{
+                                    //show the member name in row
+                                    // showMember ? setShowMemberList(false) : setShowMemberList(true)
+                                }}>
+                            
+                                    <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
+                                    <div className="inline-block mx-1"> ~ </div>
+                                    <p className="inline-block">{(week ? "" : end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
+                                    
+                                    {/* <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p> */}
+                                    {/* {showMemberList ? <p>
+                                        <hr className="border-black my-1 mb-2"/>
+                                        멤버 : {scheduleList.member[sche].toString()}
+                                    </p> :""} */}
+                                </li>
+                            )
+                        })}
+                </ul>
+            </div>
+        </div>:""}
+
             <div>
                 <IoMdClose className={`${scheduleResultCSS.closeBtn} fixed right-0.5 cursor-pointer`} 
                     onClick={()=>{setShowResult(false)}}/>

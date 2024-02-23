@@ -1,4 +1,5 @@
-import scheduleTable from "@/styles/scheduleTable.module.css";
+import scheduleTableCSS from "@/styles/scheduleTable.module.css";
+import scheduleResultCSS from "@/styles/scheduleResult.module.css";
 import React, {useEffect, useState } from "react";
 // import Selecto from "react-selecto";
 import ScheduleSelector from 'react-schedule-selector';
@@ -6,7 +7,7 @@ import ScheduleSelector from 'react-schedule-selector';
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
-const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -18,6 +19,7 @@ interface MyComponentProps {
     schedule:{schedule :[]};
     commitFixedSchedule:{schedule :[]};
     name:string;
+    showMember:string[];
     setShowResult : Function;
     setShowMember : Function;
     // scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
@@ -26,9 +28,12 @@ interface MyComponentProps {
     totalMem:number;
     select:number;
     fixedSchedule : {schedule :[]};
+    scheduleTable:boolean;
+    setScheduleTable:Function;
+    width:number;
 }
 
-const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay, fixedDate, fixedTime, isLogin, week, schedule, name, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select}:MyComponentProps) {
+const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay, fixedDate, fixedTime, isLogin, width, week, schedule, name, showMember, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select, scheduleTable, setScheduleTable}:MyComponentProps) {
   // console.log(isLogin)
 
   const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
@@ -210,9 +215,26 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
   let index_dayList = 0;
 
+  const [mouseOverDate, setMouseOverDate] = useState(new Date(0));
+
+  const contrastDate = (datetime:Date)=>{
+    let same:boolean = false;
+    // useEffect(()=>{
+        console.log(mouseOverDate , datetime);
+        if(datetime == mouseOverDate){
+            same = true;
+        }
+    // }, [mouseOverDate])
+    return same;
+  }
+
   return (
-        <div className="w-2/4 overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
-          <div className={`${scheduleTable.table_spacing} border-separate table-scrolling`}>
+        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
+          <div className={`flex flex-row gap-2 justify-between font-bold items-center cursor-pointer w-full ${width > 768 || scheduleTable ? "pb-2":""}`} onClick={()=>{setScheduleTable((prevST:boolean)=>!prevST)}}>
+                <p>Total Schedule Table</p>
+                {width > 768 ? "" : !scheduleTable ? <FaAngleUp/> : <FaAngleDown/>}
+          </div>
+          {width > 768 || scheduleTable ? <div className={`w-full animate-[smoothAppear_1s]  ${scheduleTableCSS.table_spacing} border-separate table-scrolling pt-3 border-t-2`}>
             <ScheduleSelector
                 // selection={}
                 startDate={!week? dummyDateList[0]: week_startDate}
@@ -228,7 +250,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                             index = 0;
                         }
                         return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
-                        {/* <div className={`text-center ${scheduleTable.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
+                        {/* <div className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(dummyDateList[index].getMonth()+1)+'/'+dummyDateList[index].getDate()}
                         {/* <br/> */}
                         {'('+WEEKDAY[dummyDateList[index].getDay()]+")"}
@@ -239,7 +261,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
                 renderTimeLabel={(time) => {
-                    return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1`}>
+                    return <div className={`sticky top-0 left-0 bg-[#f8f9fa] pr-1 z-20`}>
                             {time.getHours()<10?"0"+time.getHours():time.getHours()}:{time.getMinutes()==0?'00':'30'}
                         </div>}}
                 timeFormat="h:mma"
@@ -319,20 +341,33 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
                     return <div 
                         // ref={()=>refSetter} 
-                        className="w-full h-full" style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
-                        onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr])}}
-                        onMouseOut={()=>{setShowMember(false)}}></div>
+                        className={`${scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
+                        onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr]);}}
+                        onMouseOut={()=>{setShowMember([]);}}>
+                            
+                            <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
+                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray]`}>
+                               {width <=768 ? scheduleList.member[datetimeStr] ? <ul>
+                            {/* ${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}> */}
+                                {scheduleList.member[datetimeStr].map((member)=>{
+                                    return(
+                                        <li>{member}</li>
+                                    )
+                                })}
+                                </ul>:"":""}
+                            </div>
+                        </div>
                 }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
                 //https://codesandbox.io/p/sandbox/react-schedule-selector-bug-on-11-7-forked-d12j5?file=%2Fsrc%2Findex.js
                 //https://codesandbox.io/p/sandbox/react-schedule-selector-initialization-example-74l03t?file=%2Findex.tsx
                 //https://github.com/bibekg/react-schedule-selector
             />
-            
-            </div>
+          
+            </div>:""}
 
 
-        </div>
+        </div> 
   );
 });
 
