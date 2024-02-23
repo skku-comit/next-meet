@@ -1,7 +1,7 @@
-import { NextMeetUser } from "./User"
+import { NextMeetUser, User } from "./User"
 
 export type Participate = {
     time?:string; //ex) "2024-2-11 11:00"
-    user?:NextMeetUser[]; //member
-    userName?:string[]; //non-member
+    user?:User | NextMeetUser; //member
+    userName?:string; //non-member
 }

@@ -63,9 +63,9 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                 <div className="pl-2 break-all font-bold">Members</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}>
-                    {showMember ? showMember.map((member)=>{
+                    {showMember ? showMember.map((member,idx)=>{
                         return(
-                            <li>{member}</li>
+                            <li key={idx}>{member}</li>
                         )
                     }):""}
                 </ul>
@@ -112,7 +112,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                             end_sche.setMinutes(end_sche.getMinutes()+30);
                             mem_term = 0;
                             return(
-                                <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{
+                                <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" key={index} onClick={()=>{
                                     //show the member name in row
                                     showMaxMember ? setShowMaxMember(false) : setShowMaxMember(true)
                                 }}>

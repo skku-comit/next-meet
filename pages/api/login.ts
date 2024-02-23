@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import Event from "@/lib/models/event.model";
-import Member from "@/lib/models/member.model";
+import Event from "@/template/schema/event.model";
 import connectDB from "@/lib/mongodb/connectDB";
 import getID from "@/lib/functions/getID";
 import bcrypt from "bcryptjs";
+import NextMeetUser from "@/template/schema/user.model";
 
 export enum LOGIN_FAIL_ERR {
   "NO_ERROR" = 0,
@@ -21,14 +21,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) =>
             await connectDB(); 
             
             // Find member
-            const member = await Member.findOne({ loginID: req.body.loginID });
+            const user = await NextMeetUser.findOne({ loginID: req.body.loginID });
 
-            if (member)
+            if (user)
             {
               const { userID, password } = await req.body;
-              const passwordCheck = await bcrypt.compare(password, member.password);
+              const passwordCheck = await bcrypt.compare(password, user.password);
               if (passwordCheck) {
-                const { password, ...dataWithoutPassword } = member._doc;
+                const { password, ...dataWithoutPassword } = user._doc;
                 return res.json({
                   message: LOGIN_FAIL_ERR.NO_ERROR,
                   ...dataWithoutPassword,
@@ -36,8 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) =>
               } else {
                 return res.json({ message: LOGIN_FAIL_ERR.INCORRECT_PW });
               }
-        
-                //res.status(200).json({ userID: member.memberID });
+                //res.status(200).json({ userID: user.userID });
             }
             else
             {
