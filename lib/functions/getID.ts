@@ -1,5 +1,5 @@
 // idType
-// 1: member, 2: user, 3: event
+// 1: member(user), 2: non-member, 3: event
 const getID = (idType: number) => 
 {    
     let id: number = 0;

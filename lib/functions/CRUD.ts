@@ -1,11 +1,11 @@
-export const registerNextMeetUser = async (userName: string, userID: string, email: string, password: string) => {
+export const registerNextMeetUser = async (userName: string, loginID: string, email: string, password: string) => {
   try{
       const res = await fetch('api/register', {
         method:"POST",
         headers:{
           "Content-Type" : "application/json"
         },
-        body: JSON.stringify({userName, userID, email, password})
+        body: JSON.stringify({userName, loginID, email, password})
       });
       
       if(res.ok){
@@ -26,13 +26,13 @@ export const login = async () => {
     
 }
 
-export const existingUserCheck = async (userID:string, email:string) =>{
+export const existingUserCheck = async (loginID:string, email:string) =>{
   const res = await fetch('api/userExists',{
     method:"POST",
     headers:{
         "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userID, email }),
+    body: JSON.stringify({ loginID, email }),
   });
 
   const data = await res.json();
