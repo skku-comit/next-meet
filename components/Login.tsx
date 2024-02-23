@@ -5,11 +5,11 @@ import { existingUserCheck, registerNextMeetUser } from "@/lib/functions/CRUD";
 import isFormValid from "@/lib/functions/isFormValid";
 import { signIn, signOut, useSession } from "next-auth/react";
 
-const className_button = "p-6 py-3 bg-[#ffadad] rounded-xl text-white";
+const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
 const Login = (): ReactNode => {
   //useSession
-  
+
   //useState
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
@@ -58,17 +58,17 @@ const Login = (): ReactNode => {
 
   const onLoginHandler = async () => {
     if (!(idInputRef.current && pwInputRef.current)) return;
-    const userID = idInputRef.current.value;
+    const loginID = idInputRef.current.value;
     const password = pwInputRef.current.value;
 
-    let errorNo = isFormValid("login", "", userID, "", password, "");
+    let errorNo = isFormValid("login", loginID, "", "", password, "");
     if (errorNo !== 0) {
       setError(ERROR_MESSAGE[errorNo as 8 | 9]);
       return;
     }
     try {
       const res = await signIn("credentials", {
-        userID,
+        loginID,
         password,
         redirect: false,
       });
@@ -93,7 +93,7 @@ const Login = (): ReactNode => {
       return;
 
     const userName = nameInputRef.current.value;
-    const userID = idInputRef.current.value;
+    const loginID = idInputRef.current.value;
     const email = emailInputRef.current.value;
     const password = pwInputRef.current.value;
     const passwordCheck = pwcInputRef.current.value;
@@ -102,7 +102,7 @@ const Login = (): ReactNode => {
     let errorNo = isFormValid(
       "register",
       userName,
-      userID,
+      loginID,
       email,
       password,
       passwordCheck
@@ -112,7 +112,7 @@ const Login = (): ReactNode => {
       return;
     }
     try {
-      const errorNo = await existingUserCheck(userID!, email!);
+      const errorNo = await existingUserCheck(loginID!, email!);
       if (errorNo !== 0) {
         setError(ERROR_MESSAGE[errorNo as 1 | 2]);
         return;
@@ -120,14 +120,14 @@ const Login = (): ReactNode => {
     } catch (error) {
       console.log(error);
     }
-    await registerNextMeetUser(userName, userID, email, password);
+    await registerNextMeetUser(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
   };
 
   return (
     <div className="w-screen">
-      {isLoggingIn  && (
+      {isLoggingIn && (
         <div className="flex flex-col items-center mb-10">
           <p className="h-4 m-4 text-md text-red-400">{error}</p>
           <LoginForm
@@ -144,12 +144,13 @@ const Login = (): ReactNode => {
             onClick={(e) => {
               e.preventDefault();
               setIsRegistering((prev) => !prev);
-            }}>
+            }}
+          >
             {isRegistering ? "back to login" : "quick register"}
           </button>
         </div>
       )}
-      <div className="flex flex-col items-center text-center gap-2">
+      <div className="flex flex-col items-center text-center gap-3">
         {isLoggingIn ? (
           <button
             className={`${className_button}`}
@@ -165,12 +166,29 @@ const Login = (): ReactNode => {
               onClick={(e) => {
                 e.preventDefault();
                 setIsLoggingIn(true);
-              }}>
-              Login
+              }}
+            >
+              Login with Email
             </button>
-            <p>to browse your events.</p>
           </>
         )}
+        <button
+          className={`${className_button} py-2`}
+          onClick={(e) => {
+            e.preventDefault();
+            signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
+          }}>
+          Login with Google
+        </button>
+        <p>to browse your events.</p>
+        <button
+          className={`${className_button} py-2`}
+          onClick={(e) => {
+            e.preventDefault();
+            signOut();
+          }}>
+          Logout
+        </button>
       </div>
     </div>
   );

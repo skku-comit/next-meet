@@ -1,7 +1,7 @@
 import mongoose, { Schema, models } from "mongoose";
 
 const NextMeetUserSchema = new Schema({
-  loginID: {
+  loginID: { //id created by user
     type: String,
     required: true,
     unique: true,
@@ -10,7 +10,7 @@ const NextMeetUserSchema = new Schema({
     type: String,
     required: true,
   },
-  userID: {
+  userID: { //id for identification, created by server
     type: Number,
     required: true,
   },

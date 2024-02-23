@@ -11,7 +11,7 @@ import mongoose from "mongoose";
 
 const URI =
   "mongodb+srv://NextMeet:lZV3TPdBrjRuPLWJ@next-meet.xxvqeo1.mongodb.net/Next-Meet";
-
+  // "mongodb+srv://NextMeet:lZV3TPdBrjRuPLWJ@next-meet.xxvqeo1.mongodb.net/Next-Meet?retryWrites=true&w=majority&appName=Next-Meet"
 let cached = global.mongoose;
 
 if (!cached) {

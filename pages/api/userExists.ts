@@ -1,24 +1,25 @@
 import connectDB from "@/lib/mongodb/connectDB";
-import { NextMeetUser } from "@/template/User";
+import NextMeetUser from "@/template/schema/user.model";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export enum REGISTER_FAIL_ERR { "NO_ERROR" = 0, "EXISTING_USERID", "EXISTING_EMAIL" };
+export enum REGISTER_FAIL_ERR { "NO_ERROR" = 0, "EXISTING_LOGINID", "EXISTING_EMAIL", "INTERNAL_SERVER_ERROR" };
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectDB();
-    const { userID, email } = await req.body;
-    let existingUser = await NextMeetUser.findOne({ userID }).select("_id");
+    const { loginID, email } = await req.body;
+    let existingUser = await NextMeetUser.findOne({ loginID }).select("_id");
     if(existingUser){
-      return res.json({ message: REGISTER_FAIL_ERR.EXISTING_USERID });
+      return res.status(400).json({ message: REGISTER_FAIL_ERR.EXISTING_LOGINID });
     }
     existingUser = await NextMeetUser.findOne({ email }).select("_id");
     if(existingUser){
-        return res.json({ message: REGISTER_FAIL_ERR.EXISTING_EMAIL });
+        return res.status(400).json({ message: REGISTER_FAIL_ERR.EXISTING_EMAIL });
     }
-    return res.json({ message: REGISTER_FAIL_ERR.NO_ERROR });
+    return res.status(200).json({ message: REGISTER_FAIL_ERR.NO_ERROR });
   } catch (error) {
     console.error(error);
+    return res.status(500).json({ message: REGISTER_FAIL_ERR.INTERNAL_SERVER_ERROR }); // Handle internal server errors
   }
 };
 

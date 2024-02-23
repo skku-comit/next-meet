@@ -1,5 +1,6 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -11,7 +12,17 @@ const handler = NextAuth({
       }
       return true;
     },
-    
+    async redirect({ url, baseUrl }) { return baseUrl },
+    async jwt({ token, user, account, profile }) {
+      if (account) {
+        token.idToken = account.id_token;
+      }
+      return token;
+    },
+    async session(params) {
+      console.log("sessionUSer", params);
+      return params.session;
+    },
     // async session ({session, token, user} : {session: any, token: any, user: any}) {
 
     //   console.log('session token:',token);
@@ -19,17 +30,26 @@ const handler = NextAuth({
     // },
   },
   providers: [
+    Google({
+      // clientId: process.env.GOOGLE_CLIENT_ID || "",
+      // clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      id:"google",
+      clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',
+      clientSecret:'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',
+      authorization: {
+        params: {},
+      },
+      checks: ['none'],
+    }),
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
       credentials: {
-        userID: { label: "userID", type: "text" },
+        loginID: { label: "loginID", type: "text" },
         password: { label: "password", type: "password" },
       },
 
       async authorize(credentials, req) {
-        // console.log(credentials?.userID);
-        // console.log(credentials?.password);
         if (!credentials) return;
         try {
           const res = await fetch(`${process.env.NEXTAUTH_URL}/api/login`, {
@@ -38,7 +58,7 @@ const handler = NextAuth({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              userID: credentials.userID,
+              loginID: credentials.loginID,
               password: credentials.password,
             }),
           });
@@ -62,6 +82,7 @@ const handler = NextAuth({
   pages: {
     signIn: "/",
   },
+  debug:true
 });
 
 export default handler;

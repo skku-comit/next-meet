@@ -18,9 +18,9 @@ const LogoutButton = (): ReactNode => {
 
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
-
+  console.log( session );
   return (
-    <div className="flex-grow lg:p-20 lg:pb-4 pb-10 h-fit flex flex-col items-center justify-center">
+    <div className="flex-grow lg:p-20 pb-10 h-fit flex flex-col items-center justify-center">
       {!(session && session.user) ? (
         <Login />
       ) : (
