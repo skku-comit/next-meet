@@ -1,6 +1,6 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
+import GoogleProvider from "next-auth/providers/google";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -34,7 +34,7 @@ const handler = NextAuth({
     },
   },
   providers: [
-    Google({
+    GoogleProvider({
       // clientId: process.env.GOOGLE_CLIENT_ID || "",
       // clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
       // clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',

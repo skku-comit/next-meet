@@ -8,14 +8,14 @@ interface MyComponentProps {
     select : number,
     setConfirm : Function;
     setSelect : Function;
-    fixedSchedule:{schedule:[]};
+    fixedSchedule:{schedule:Date[]};
     setFixedSchedule:Function;
 }
 
 const ConfirmBtn = ({select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule }:MyComponentProps) => {
 
   return (
-    <div className={`flex flex-column gap-2 p-5 py-4 fixed w-full bg-[white] z-30`}>
+    <div className={`flex flex-column gap-2 p-5 py-4 fixed top-20 left-0 right-0 w-full bg-[white] z-30`}>
     <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[gray]"} cursor-pointer text-center`}
         onClick={()=>{
             // console.log(fixedSchedule.schedule);

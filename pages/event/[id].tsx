@@ -14,6 +14,9 @@ import { throttle } from "lodash";
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { NextMeetEvent } from '@/template/Event';
+import { useRecoilState } from "recoil";
+import { Participate } from "@/template/Participate";
+import { useSession } from "next-auth/react";
 
 
 export const getServerSideProps = (async () => {
@@ -22,39 +25,57 @@ export const getServerSideProps = (async () => {
         const res = await fetch('api/form');
         
         if(res.ok){
-            const repo: NextMeetEvent = await res.json()
-            console.log(repo.eventName);
-            return { props: { repo } }
+            const data: NextMeetEvent = await res.json()
+            console.log(data.eventName);
+            return { props: { event : data } }
         }
         else{
           console.log("Get Event Data failed.");
         }
       }catch(error){
         console.log(error);
+        return {props:{event : null}};
       }
-    
-      return;
     // Pass data to the page via props
-  }) 
-// })satisfies GetServerSideProps<{ repo: NextMeetEvent }>
+  })
+// })satisfies GetServerSideProps<{ props: { event: NextMeetEvent } } | { props: { event: [] }}>
 
-const EventPage = ({repo}: InferGetServerSidePropsType<typeof getServerSideProps>)=>{
-    const [isLogin, setIsLogin] = useState(false);
-    const [schedule, setSchedule]:[{schedule :[]}, Function] = useState({schedule :[]})
-    const [fixedSchedule, setFixedSchedule]:[{schedule :[]}, Function] = useState({schedule :[]})
-    const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :[]}, Function] = useState({schedule :[]})
+const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProps>)=>{
+    const { data: session } = useSession();
+    console.log( session );
+    
+    const [isLogin, setIsLogin] = useState(session && session.user ? true : false)
+
+    useEffect(()=>{
+        setIsLogin(session && session.user ? true : false)
+    }, session? [session.user] : [])
+
+    let eventParticipate:Participate[]|null = session && isLogin && event && event.participateStatus.length > 0 ? event.participateStatus.filter((participate:Participate) => (participate.user.includes(session.user))) : null;
+    let eventParticiTime:{schedule:Date[]} = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+
+    useEffect(()=>{
+        eventParticipate = session && isLogin && event && event.participateStatus.length > 0 ? event.participateStatus.filter((participate:Participate) => (participate.user.includes(session.user))) : null;
+        eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+    }, [isLogin, event])
+
+    const [schedule, setSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime)
+    const [fixedSchedule, setFixedSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime)
+    const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :Date[]}, Function] = useState({schedule :[]})
+
 
     const [totalScheduleList, setTotalScheduleList]:[{checked_num: {[key: string]: number;}, member:{[key:string]:string[]}}, Function] = useState({checked_num: {}, member:{}})
-    const [name, setName] = useState("");
+    const [name, setName] = useState(session && isLogin ? session.user : "");
     const [showMember, setShowMember]:[[], Function] = useState([]);
     const [showResult, setShowResult] = useState(false);
-    const [totalMem, setTotalMem] = useState(4);
+    
+    let indexOfLongestUserParti:Participate|null = event && event.participateStatus ? event.participateStatus.reduce((previousValue: Participate, currentValue: Participate)=>previousValue.user.length > currentValue.user.length ? previousValue : currentValue) : null;
+    const [totalMem, setTotalMem] = useState(indexOfLongestUserParti ? indexOfLongestUserParti.user.length : 0);
 
     const [confirm, setConfirm] = useState(0);
     const [select, setSelect] = useState(0);
 
     const [width, setWidth]:[number, Function] = useState(0);
-    const [week, setWeek]:[boolean, Function] = useState(true);
+    const [week, setWeek]:[boolean, Function] = useState(event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly);
 
     const [scheduleTable, setScheduleTable] = useState(true);
 
@@ -88,18 +109,35 @@ const EventPage = ({repo}: InferGetServerSidePropsType<typeof getServerSideProps
 
     return <div className="w-screen h-full min-h-screen ">
         <div className="(header space) w-screen h-20 bg-[white]"></div>
+        {!select || confirm==1 ? "":<div className="pt-10 pb-10"></div>}
+        <div className={`w-screen ${select ? "" : "pt-6"} ${width < 768 ? "px-10":"px-20"}`}>
+          <div className="rounded w-full bg-[#eee] min-h-10 pt-2.5 text-center font-bold">{event ? event.eventName : "이벤트 제목"}</div>
+        </div>
         {select ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}/>:<div className="pt-10 pb-5"></div>}
+        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}/>:""}
         <div className={`w-screen pt-5 ${width < 768 ? "px-10":"px-20"} pb-5`}>
             <div className={`flex ${width < 768 ? "flex-col" : "flex-row"} flex-nowrap items-start text-center gap-4 justify-center`}> 
-                {confirm == 1 ? <ScheduleTableConfirm week={week} isLogin={isLogin} width={width} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable} fixedDate={null} fixedDay={null} fixedTime={null}/> : ""}
-                {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} width={width} setSchedule={setSchedule} confirm={confirm} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable} fixedDate={null} fixedDay={null} fixedTime={null}/> : ""}
-                <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name} showMember={showMember}
-                setShowMember={setShowMember} setShowResult={setShowResult}
+                {confirm == 1 ? 
+                    <ScheduleTableConfirm week={week} isLogin={isLogin} width={width} 
+                        fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}
+                        select={select} totalMem={totalMem} schedule={schedule} setShowMember={setShowMember}
+                        setTotalScheduleList={setTotalScheduleList} confirm={confirm} name={name}
+                        eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}/> : ""}
+                {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
+                            width={width} setSchedule={setSchedule} confirm={confirm}  
+                            // fixedDate={null} fixedDay={null} fixedTime={null}
+                            name={name} setShowMember={setShowMember} select={select} 
+                            fixedSchedule = {fixedSchedule}
+                            setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
+                            eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}/> : ""}
+                <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
+                setShowMember={setShowMember} 
                 setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
-                fixedSchedule={fixedSchedule} week={week}
-                commitFixedSchedule={commitFixedSchedule} select={select} width={width}
-                scheduleTable={scheduleTable} setScheduleTable={setScheduleTable} fixedDate={null} fixedDay={null} fixedTime={null}/>
+                fixedSchedule={fixedSchedule} week={week} confirm={confirm}
+                select={select} width={width} eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
+                state={undefined} handleChange={()=>{}}
+                // fixedDate={null} fixedDay={null} fixedTime={null}
+                />
                 {!isLogin && width > 768 && confirm != 1?
                 <ScheduleResultRight setShowResult={setShowResult} showResult={showResult} 
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
@@ -110,17 +148,17 @@ const EventPage = ({repo}: InferGetServerSidePropsType<typeof getServerSideProps
             </div>
         </div>
         {showResult ?
-            width <= 768 || isLogin || confirm == 1 ? 
+            width <= 768 && (isLogin || confirm == 1) ? 
             <div className={`z-30 w-full fixed bottom-0 border-gray border-t-2`}>
                 <ScheduleResultBottom 
-                setShowResult={setShowResult} showResult={showResult} 
+                setShowResult={setShowResult} showResult={showResult} width={width}
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin}
                 />
             </div> :
             ""
-        : <div className="fixed bottom-2.5 right-2 rounded-full bg-[#eee] w-fit p-4 cursor-pointer">
+        : <div className="fixed bottom-5 right-5 rounded-full bg-[#eee] w-fit p-4 cursor-pointer">
             <FaList className="w-5 h-5"
                 onClick={()=>setShowResult(true)}/>
         </div>}

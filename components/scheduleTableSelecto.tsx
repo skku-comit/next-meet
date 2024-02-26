@@ -8,35 +8,45 @@ import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { TimeInfo } from "@/template/TimeInfo";
+import { Participate } from "@/template/Participate";
+import { User } from "next-auth";
+import { NextMeetUser } from "@/template/User";
+
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
-    fixedDate:Date[] | null;
-    fixedDay:DaysOfWeek[] | null;
-    fixedTime:{startTime:string, lastTime:string} | null;
+    // fixedDate:Date[] | null;
+    // fixedDay:DaysOfWeek[] | null;
+    // fixedTime:{startTime:string, endTime:string} | null;
     isLogin:boolean;
     week:boolean|0;
-    schedule:{schedule :[]};
-    commitFixedSchedule:{schedule :[]};
+    schedule:{schedule :Date[]};
+    // commitFixedSchedule:{schedule :Date[]};
     name:string;
-    showMember:string[];
-    setShowResult : Function;
+    // showMember:string[];
+    // setShowResult : Function;
     setShowMember : Function;
     // scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
     // setScheduleList : Function;
     setTotalScheduleList:Function;
     totalMem:number;
     select:number;
-    fixedSchedule : {schedule :[]};
-    scheduleTable:boolean;
-    setScheduleTable:Function;
+    fixedSchedule : {schedule :Date[]};
     width:number;
+    eventTimeInfo:TimeInfo | undefined;
+    eventParti : Participate[] | undefined;
+    state : string | undefined;
+    handleChange : Function;
+    confirm : number;
 }
 
-const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay, fixedDate, fixedTime, isLogin, width, week, schedule, name, showMember, setShowResult, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, commitFixedSchedule, select, scheduleTable, setScheduleTable}:MyComponentProps) {
+const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
+    {eventParti, eventTimeInfo, isLogin, width, week, state, handleChange, 
+    schedule, name, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, select,confirm}:MyComponentProps) {
   // console.log(isLogin)
 
-  const selectedWeekDay = fixedDay ? fixedDay: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
+  const selectedWeekDay = eventTimeInfo ? eventTimeInfo.dayList: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
   const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
   const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
 
@@ -89,14 +99,14 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
 //   const pushedDayList = DayList;
 
-  const dummyTimePeriod = {startTime : "00:00", lastTime : "24:00"};
+  const dummyTimePeriod = {startTime : "00:00", endTime : "24:00"};
 
-  const [dateList, setDateList] = useState(!fixedDate ? dummyDateList : fixedDate);
+  const [dateList, setDateList] = useState(eventTimeInfo ? eventTimeInfo.dateList : dummyDateList);
   // console.log(dateList);
-  const [timePeriod, setTimePeriod] = useState(!fixedTime ? dummyTimePeriod : fixedTime);
+  const [timePeriod, setTimePeriod] = useState(eventTimeInfo ? {startTime: eventTimeInfo.startTime, endTime : eventTimeInfo.endTime} : dummyTimePeriod);
   const startTimeHour:number = parseInt(timePeriod.startTime.split(':')[0])+parseFloat(timePeriod.startTime.split(':')[1]=='30'?'0.5':'0');
-  const lastTimeHour:number = parseInt(timePeriod.lastTime.split(':')[0])+parseFloat(timePeriod.lastTime.split(':')[1]=='30'?'0.5':'0');
-//   const periodLen = lastTimeHour-startTimeHour;
+  const endTimeHour:number = parseInt(timePeriod.endTime.split(':')[0])+parseFloat(timePeriod.endTime.split(':')[1]=='30'?'0.5':'0');
+//   const periodLen = endTimeHour-startTimeHour;
    
 //    const [schedule, setSchedule] = useState({schedule :[]})
 //    const handleChange = (newSchedule:[]) => {
@@ -117,7 +127,18 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
   }
 
 //   useEffect(()=>{setScheduleList(dummyScheduleList); console.log(scheduleList)},[]);
-  const [scheduleList, setScheduleList] = useState(dummyScheduleList);
+let givenEventScheList:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}} = {checked_num:{}, member:{}};
+if(eventParti) {
+    for(let i = 0; i < eventParti.length; i++){
+        const time_str = eventParti[i].time.toString().replace("대한민국", "한국");
+        givenEventScheList.checked_num[time_str] = eventParti[i].user.length / totalMemNum;
+        givenEventScheList.member[time_str] = eventParti[i].user.map((user)=>user.userName);
+    }
+}
+const sumValues = (obj:{[key:string]:number}) => Object.values(obj).reduce((a, b) => a + b, 0);
+const givenEventScheList_checked_num_sum = givenEventScheList.checked_num ? sumValues(givenEventScheList.checked_num) : 0;
+const [scheduleList, setScheduleList] = useState(
+    givenEventScheList_checked_num_sum > 0 ? givenEventScheList : dummyScheduleList);
   useEffect(()=>setTotalScheduleList(scheduleList), []);
   useEffect(()=>{
     let revisedScheduleList = scheduleList;
@@ -132,17 +153,18 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
   useEffect(()=>{
         if(isLogin){
-            preMySelected.map((sche:string)=>{
+            preMySelected.map((sche:Date)=>{
                 // if(schedule.schedule.includes(sche)==false){
-                    const new_member = scheduleList.member[sche].filter((element) => element !== name);
+                    const sche_str = sche.toString().replace("대한민국", "한국");
+                    const new_member = scheduleList.member[sche_str].filter((element) => element !== name);
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]: (prevSche.checked_num[sche]*totalMemNum-1)/totalMemNum
+                            [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum-1)/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: new_member
+                            [sche_str]: new_member
                         }
                     }))
                 // }
@@ -150,18 +172,19 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
         setPreMySelected(schedule.schedule);
 
-        schedule.schedule.map((sche)=>{
+        schedule.schedule.map((sche:Date)=>{
+            const sche_str = sche.toString().replace("대한민국", "한국");
             for(let i=0; i<Object.keys(scheduleList.checked_num).length; i++){
                 // console.log(sche, sche);
-                if(sche in scheduleList.checked_num){
+                if(sche_str in scheduleList.checked_num){
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]: (prevSche.checked_num[sche]*totalMemNum+1)/totalMemNum
+                            [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum+1)/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: [...prevSche.member[sche], name]
+                            [sche_str]: [...prevSche.member[sche_str], name]
                         }
                     }))
                     
@@ -170,11 +193,11 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]:1/totalMemNum
+                            [sche_str]:1/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: [name]
+                            [sche_str]: [name]
                         }
                     }))
                 }
@@ -213,34 +236,38 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
   }
 //   console.log(week_startDate)
 
-  let index_dayList = 0;
+//   let index_dayList = 0;
 
-  const [mouseOverDate, setMouseOverDate] = useState(new Date(0));
+//   const [mouseOverDate, setMouseOverDate] = useState(new Date(0));
 
-  const contrastDate = (datetime:Date)=>{
-    let same:boolean = false;
-    // useEffect(()=>{
-        console.log(mouseOverDate , datetime);
-        if(datetime == mouseOverDate){
-            same = true;
-        }
-    // }, [mouseOverDate])
-    return same;
-  }
+//   const contrastDate = (datetime:Date)=>{
+//     let same:boolean = false;
+//     // useEffect(()=>{
+//         console.log(mouseOverDate , datetime);
+//         if(datetime == mouseOverDate){
+//             same = true;
+//         }
+//     // }, [mouseOverDate])
+//     return same;
+//   }
+
+    const [open, setOpen] = useState(true);
 
   return (
-        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded">
-          <div className={`flex flex-row gap-2 justify-between font-bold items-center cursor-pointer w-full ${width > 768 || scheduleTable ? "pb-2":""}`} onClick={()=>{setScheduleTable((prevST:boolean)=>!prevST)}}>
-                <p>Total Schedule Table</p>
-                {width > 768 ? "" : !scheduleTable ? <FaAngleUp/> : <FaAngleDown/>}
+        <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={state=="EDIT" && confirm==1?true:false}>
+          <div className={`flex flex-row gap-2 justify-between font-bold items-center cursor-pointer w-full ${width > 768 || open ? "pb-2":""}`} onClick={()=>{setOpen((prevOP:boolean)=>!prevOP)}}>
+                <p>{state=="EDIT" ? "Check or Edit Available Schedule": 
+                    state=="CONFIRM" ? "Check the Schedule to Confirm" : "Total Schedule Table"}</p>
+                {width > 768 ? "" : !open ? <FaAngleUp/> : <FaAngleDown/>}
           </div>
-          {width > 768 || scheduleTable ? <div className={`w-full animate-[smoothAppear_1s]  ${scheduleTableCSS.table_spacing} border-separate table-scrolling pt-3 border-t-2`}>
+          {width > 768 || open ? <div className={`w-full animate-[smoothAppear_1s]  ${scheduleTableCSS.table_spacing} border-separate table-scrolling pt-3 border-t-2`}>
             <ScheduleSelector
-                // selection={}
+                selection={state=="EDIT" ? schedule.schedule : state=="CONFIRM" ? fixedSchedule.schedule : undefined}
+                onChange={state=="EDIT" || state=="CONFIRM" ? (newschedule)=>{handleChange(newschedule)}:undefined}
                 startDate={!week? dummyDateList[0]: week_startDate}
                 numDays={!week? dateList.length : DayList.length}
                 minTime={startTimeHour}
-                maxTime={lastTimeHour}
+                maxTime={endTimeHour}
                 hourlyChunks={2}
                 renderDateLabel={(date) => {
                     if(!week){
@@ -257,7 +284,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     </div>
                     }
                     // console.log(date.getDay()-week_startDate.getDay());
-                    return <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
+                    return <div className={`${width > 600 ? "w-full" : scheduleTableCSS.date_label} h-full`} style={{height:'25px', minWidth:"50px"}}>
                     {DayList[date.getDay()-week_startDate.getDay()]}
                     </div>}}
                 renderTimeLabel={(time) => {
@@ -266,11 +293,11 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                         </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
-                hoveredColor="none"
-                selectedColor="none"
+                hoveredColor={state=="EDIT" ? "#fddada" : state=="CONFIRM" ? "#a2cffe" : "none"}
+                selectedColor={state=="EDIT" ? "#ffadad" : state=="CONFIRM" ? "#63c5da" : "none"}
                 rowGap="5px"
                 columnGap="7px"
-                renderDateCell={(datetime, selected, refSetter) => {
+                renderDateCell={state=="EDIT" || state=="CONFIRM" ? undefined:(datetime, selected, refSetter) => {
                     let selectedPct = 0;
                     let datetimeStr:string = datetime.toString().replace("대한민국", "한국");
                     let cellColor = "#eee";
@@ -308,12 +335,13 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     }
                 
                     // const fixedScheduleList:string[] = commitFixedSchedule.schedule;
-                    const fixedScheduleList:string[] = fixedSchedule.schedule;
+                    const fixedScheduleList:Date[] = fixedSchedule.schedule;
         
                     if(select == 1){
-                        fixedScheduleList.map((sche)=>{
+                        fixedScheduleList.map((sche:Date)=>{
                             // console.log(sche == datetimeStr)
-                            if (sche == datetimeStr){
+                            const sche_str = sche.toString().replace("대한민국", "한국");
+                            if (sche_str == datetimeStr){
                                     cellColor = "#63c5da";
                                 }
                         })
@@ -341,21 +369,21 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
                     return <div 
                         // ref={()=>refSetter} 
-                        className={`${scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
+                        className={`${width > 600 ? "w-full": scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
                         onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr]);}}
                         onMouseOut={()=>{setShowMember([]);}}>
                             
-                            <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
-                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray]`}>
-                               {width <=768 ? scheduleList.member[datetimeStr] ? <ul>
+                            {width <=768 ? <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
+                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray] rounded text-left`}>
+                               {scheduleList.member[datetimeStr] ? <ul>
                             {/* ${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}> */}
                                 {scheduleList.member[datetimeStr].map((member)=>{
                                     return(
                                         <li>{member}</li>
                                     )
                                 })}
-                                </ul>:"":""}
-                            </div>
+                                </ul>:""}
+                            </div>:""}
                         </div>
                 }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}

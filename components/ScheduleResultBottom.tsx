@@ -16,13 +16,14 @@ interface MyComponentProps {
     select : number,
     setConfirm : Function;
     setSelect : Function;
-    fixedSchedule:{schedule:[]};
+    fixedSchedule:{schedule:Date[]};
     setFixedSchedule:Function;
     week: boolean;
     isLogin:boolean;
+    width:number;
 }
 
-const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowResult, showResult,showMember, scheduleList, totalMem,
+const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
     select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
@@ -61,7 +62,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
   return (
         <div className="z-25 overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded ">
           <div className={`flex flex-row`}>
-            {/* <div className="w-2/4 pr-3 pt-2">
+            {width > 768 ? <div className="w-2/4 pr-3 pt-2">
                 <div className="pl-2 break-all font-bold">Members</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}>
@@ -71,8 +72,9 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                         )
                     }):""}
                 </ul>
-            </div> */}
-            <div className="w-full pl-3 pb-2 pt-2 mr-1 grid grid-column gap-2">
+            </div> :""}
+            <div className={`${width > 768 ? "w-2/4 grid-column border-l-2" : "w-full grid-row"} mr-1 grid gap-2`}>
+                <div className={`w-full mr-1 grid grid-column gap-2 ${width > 768 ? "pl-3":''}`}>
                 <div className="pt-2 mr-1">
                     <div className="flex flex-row pl-2 font-bold justify-between items-center">
                         <p>가장 많은 멤버가 참여 가능한 시간대</p>
@@ -142,14 +144,14 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                 </div>
             </div>
                 
-            {sortedList.length > 0 ? <div className="w-full pl-2 pb-2 pt-2 mr-1 grid grid-column gap-2 border-l-2">            
+            <div className={`w-full pb-2 pt-2 mr-1 grid grid-column gap-2 ${width > 768 ? "pl-3" : "border-l-3"}`}>            
             <div className="pt-2 mr-1">
                 <div className="pl-2 font-bold justify-between items-center">
                     <p>확정된 일정</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
-                    {sortedList.map((sche:Date, index)=>{
+                    {sortedList.length > 0 ? sortedList.map((sche:Date, index)=>{
                             let diffMin = 0;
                             let diffMSec = 0;
                             const schedule:Date = new Date(sche.getTime());
@@ -201,17 +203,18 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({setShowRe
                                     </p> :""} */}
                                 </li>
                             )
-                        })}
+                        }):""}
                 </ul>
             </div>
-        </div>:""}
+            </div>
+        </div>
 
             <div>
                 <IoMdClose className={`${scheduleResultCSS.closeBtn} fixed right-0.5 cursor-pointer`} 
                     onClick={()=>{setShowResult(false)}}/>
             </div>
           </div>
-            {select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
+            {isLogin && select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
             <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);

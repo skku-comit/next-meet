@@ -111,9 +111,13 @@
     padding-top: 100px;
 }
 
+.date_label{
+    width:100px;
+}
+
 .date_cell{
     position:relative;
-    width:100%;
+    width:100px;
     height:100%;
 }
 

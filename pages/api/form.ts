@@ -53,6 +53,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).json({ message: "Internal server issue occurred" });
     }
   }
+  else if(req.method === "GET"){
+    try {
+      await connectDB();
+
+      const {eventID} = req.query;
+
+      const event = await Event.findOne({ eventID: eventID });
+
+      res.status(201).json({ event : event });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server issue occurred" });
+    }
+
+
+    res.status(200).json({});
+  }
 };
 
 export default handler;
