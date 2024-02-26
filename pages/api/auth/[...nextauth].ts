@@ -10,9 +10,20 @@ const handler = NextAuth({
       if (user.message != 0) {
         throw new Error(user.message + "");
       }
+      else if (user?.error === "error in nextauth.ts line 51") {
+        throw new Error("error in nextauth.ts line 51")
+      }
       return true;
     },
-    async redirect({ url, baseUrl }) { return baseUrl },
+    async redirect({ url, baseUrl }) { 
+      // Allows relative callback URLs
+      console.log(`url: ${url}, baseurl: ${baseUrl}`);
+      return baseUrl;
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same originpm
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+     },
     async jwt({ token, user }) {
       user && (token.user = user);
       return token;
@@ -26,8 +37,10 @@ const handler = NextAuth({
     Google({
       // clientId: process.env.GOOGLE_CLIENT_ID || "",
       // clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',
-      clientSecret:'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',
+      // clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',
+      // clientSecret:'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',
+      clientId: "431038164286-8f9s7ntq69fn2dmdqgieqj5335uqboep.apps.googleusercontent.com",
+      clientSecret: "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",
     }),
     CredentialsProvider({
       id: "credentials",
@@ -38,9 +51,9 @@ const handler = NextAuth({
       },
 
       async authorize(credentials, req) {
-        if (!credentials) return;
+        if (!credentials) return { error: "error in nextauth.ts line 51" };
         try {
-          const res = await fetch(`${process.env.NEXTAUTH_URL}/api/login`, {
+          const res = await fetch(`${NEXTAUTH_URL}/api/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -51,10 +64,19 @@ const handler = NextAuth({
             }),
           });
           const user = await res.json();
-          return { 
-            ...user, 
-            name: user.userName,
-          };
+          if (user) {
+            return {
+              ...user,
+              name: user.userName,
+            };
+          }
+          else {
+            return { error: "error in nextauth.ts line 71"};
+          }
+          // return { 
+          //   ...user, 
+          //   name: user.userName,
+          // };
         } catch (error) {
           console.log(error);
         }

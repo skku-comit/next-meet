@@ -9,7 +9,7 @@ export default async function RootLayout({
   return (
     <RecoilRoot>
       <AuthProvider>
-        {children}
+        <main>{children}</main>
       </AuthProvider>
     </RecoilRoot>
   );

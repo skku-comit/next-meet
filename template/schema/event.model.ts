@@ -18,7 +18,7 @@ const eventSchema = new Schema({
     required: true,
   },
   participateStatus: {
-    type: Array<Participate>,
+    type: Array<Array<Participate>>,
     default: [],
   },
   fixedMeeting: {
