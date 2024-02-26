@@ -14,7 +14,7 @@ interface MyComponentProps {
     select : number,
     setConfirm : Function;
     setSelect : Function;
-    fixedSchedule:{schedule:[]};
+    fixedSchedule:{schedule:Date[]};
     setFixedSchedule:Function;
     week:boolean;
     isLogin:boolean;

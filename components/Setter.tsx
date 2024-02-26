@@ -16,7 +16,7 @@ const Setter = (props:any): ReactNode => {
   }
 
   return (
-    <div className={`w-screen ${props.select ? "" : "pt-6"} ${props.width < 768 ? "px-10":"px-20"}`}>
+    <div className={`w-screen px-20 mt-6 `}>
       <div className="w-full flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
           onClick={(e)=>{e.preventDefault();setIsMember(false); props.setIsLogin(false); props.setScheduleTable(true); props.setConfirm(false);}}>
@@ -27,8 +27,8 @@ const Setter = (props:any): ReactNode => {
         회원
         </button>
       </div>
-      <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 pt-2.5 overflow-hidden gap-0`}>
-        {props.isLogin ? <div className="w-full"><div className="items-center">{props.name}</div></div> 
+      <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 overflow-hidden gap-0`}>
+        {props.isLogin ? props.name ? <div className="w-full"><div className="items-center pt-1.5">{props.name}</div></div> : ""
         : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
             <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex flex-row items-center gap-3 justify-end overflow-hidden`}>
                 <label className="text-center pt-1 min-w-[26px] whitespace-nowrap text-right">{isMember ? "ID":"이름"}</label>
@@ -39,7 +39,7 @@ const Setter = (props:any): ReactNode => {
                 <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='password' onChange={(e)=>{setPw(e.target.value)}}/>
             </div>
         </div>}
-        <button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
+        <button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
           onClick={()=>{props.isLogin ? props.setScheduleTable(true) : props.setScheduleTable(false);
             props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true); addTotalNum(); 
             props.isLogin ? props.setName(""):"";

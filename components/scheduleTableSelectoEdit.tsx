@@ -18,7 +18,7 @@ interface MyComponentProps {
     fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
-    schedule:{schedule :[]};
+    schedule:{schedule :Date[]};
     setSchedule:Function;
     confirm : number;
     scheduleTable:boolean;

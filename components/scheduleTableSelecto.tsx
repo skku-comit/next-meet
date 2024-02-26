@@ -16,8 +16,8 @@ interface MyComponentProps {
     fixedTime:{startTime:string, lastTime:string} | null;
     isLogin:boolean;
     week:boolean|0;
-    schedule:{schedule :[]};
-    commitFixedSchedule:{schedule :[]};
+    schedule:{schedule :Date[]};
+    commitFixedSchedule:{schedule :Date[]};
     name:string;
     showMember:string[];
     setShowResult : Function;
@@ -27,7 +27,7 @@ interface MyComponentProps {
     setTotalScheduleList:Function;
     totalMem:number;
     select:number;
-    fixedSchedule : {schedule :[]};
+    fixedSchedule : {schedule :Date[]};
     scheduleTable:boolean;
     setScheduleTable:Function;
     width:number;
@@ -132,17 +132,18 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
   useEffect(()=>{
         if(isLogin){
-            preMySelected.map((sche:string)=>{
+            preMySelected.map((sche:Date)=>{
                 // if(schedule.schedule.includes(sche)==false){
-                    const new_member = scheduleList.member[sche].filter((element) => element !== name);
+                    const sche_str = sche.toString().replace("대한민국", "한국");
+                    const new_member = scheduleList.member[sche_str].filter((element) => element !== name);
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]: (prevSche.checked_num[sche]*totalMemNum-1)/totalMemNum
+                            [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum-1)/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: new_member
+                            [sche_str]: new_member
                         }
                     }))
                 // }
@@ -150,18 +151,19 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
 
         setPreMySelected(schedule.schedule);
 
-        schedule.schedule.map((sche)=>{
+        schedule.schedule.map((sche:Date)=>{
+            const sche_str = sche.toString().replace("대한민국", "한국");
             for(let i=0; i<Object.keys(scheduleList.checked_num).length; i++){
                 // console.log(sche, sche);
-                if(sche in scheduleList.checked_num){
+                if(sche_str in scheduleList.checked_num){
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]: (prevSche.checked_num[sche]*totalMemNum+1)/totalMemNum
+                            [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum+1)/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: [...prevSche.member[sche], name]
+                            [sche_str]: [...prevSche.member[sche_str], name]
                         }
                     }))
                     
@@ -170,11 +172,11 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche]:1/totalMemNum
+                            [sche_str]:1/totalMemNum
                         },
                         member:{
                             ...prevSche.member,
-                            [sche]: [name]
+                            [sche_str]: [name]
                         }
                     }))
                 }
@@ -308,12 +310,13 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                     }
                 
                     // const fixedScheduleList:string[] = commitFixedSchedule.schedule;
-                    const fixedScheduleList:string[] = fixedSchedule.schedule;
+                    const fixedScheduleList:Date[] = fixedSchedule.schedule;
         
                     if(select == 1){
-                        fixedScheduleList.map((sche)=>{
+                        fixedScheduleList.map((sche:Date)=>{
                             // console.log(sche == datetimeStr)
-                            if (sche == datetimeStr){
+                            const sche_str = sche.toString().replace("대한민국", "한국");
+                            if (sche_str == datetimeStr){
                                     cellColor = "#63c5da";
                                 }
                         })
@@ -345,17 +348,17 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({fixedDay,
                         onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr]);}}
                         onMouseOut={()=>{setShowMember([]);}}>
                             
-                            <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
-                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray]`}>
-                               {width <=768 ? scheduleList.member[datetimeStr] ? <ul>
+                            {width <=768 ? <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
+                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray] rounded text-left`}>
+                               {scheduleList.member[datetimeStr] ? <ul>
                             {/* ${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}> */}
                                 {scheduleList.member[datetimeStr].map((member)=>{
                                     return(
                                         <li>{member}</li>
                                     )
                                 })}
-                                </ul>:"":""}
-                            </div>
+                                </ul>:""}
+                            </div>:""}
                         </div>
                 }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}
