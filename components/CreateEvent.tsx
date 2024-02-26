@@ -22,8 +22,8 @@ const CreateEvent = (): ReactNode => {
     isWeekly: false,
     dateList: [],
   });
-  const [startTime, setStartTime] = useState<string | "">("");
-  const [endTime, setEndTime] = useState<string | "">("");
+  const [startTime, setStartTime] = useState<string | "">("00:00");
+  const [endTime, setEndTime] = useState<string | "">("00:00");
   const [canProceed, setCanProceed] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
@@ -53,15 +53,17 @@ const CreateEvent = (): ReactNode => {
     }
     const timeInfo: TimeInfo = {
       isWeekly: dateSelection.isWeekly,
-      startHour: startTime,
-      endHour: endTime,
+      startTime: startTime,
+      endTime: endTime,
+      dateList:[],
+      dayList:[]
     };
 
     const eventID = await createEvent(
       eventName,
       description,
       timeInfo,
-      hostUserInfo
+      hostUserInfo,
     );
     router.push(`/event/${eventID}`);
   };

@@ -4,11 +4,15 @@ import connectDB from "@/lib/mongodb/connectDB";
 import { User } from "@/template/User";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
+import { TimeInfo } from "@/template/TimeInfo";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
       await connectDB();
+
+      //check input
+      console.log(req.body);
       
       //assign new eventID
       const newEventID = getID(3);
@@ -16,6 +20,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       //define host
       let { userID, userName, password } = req.body.hostUserInfo as User;
       const host: User = { userID, userName, password };
+
+      //define timeInfo
+      const { isWeekly, startTime, endTime, dayList, dateList } = req.body.timeInfo as TimeInfo;
+      const timeInfo: TimeInfo = { isWeekly, startTime, endTime, dayList, dateList };
 
       if (userID === 0) {
         // If userID == 0, this host is not a member so ID should be generated.
@@ -33,8 +41,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         eventID: newEventID,
         eventName: req.body.eventName,
         description: req.body.description,
-        startTime: req.body.timeInfo.startHour,
-        endTime: req.body.timeInfo.endHour,
+        timeInfo: timeInfo,
         participateStatus: [],
         fixedMeeting: [],
         hostUserInfo: host,

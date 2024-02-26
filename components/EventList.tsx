@@ -7,8 +7,12 @@ const dummyEventList: NextMeetEvent[] = [
     eventName: "회의 1",
     description: "example event",
     eventID: 12345,
-    startTime: "12:30",
-    endTime: "19:00",
+    timeInfo:{
+      isWeekly: true,
+      startTime: "12:30",
+      endTime: "15:00",
+      dateList:[],
+    },
     participateStatus: [],
     fixedMeeting: [],
     hostUserInfo: {
@@ -21,8 +25,12 @@ const dummyEventList: NextMeetEvent[] = [
     eventName: "모임 1",
     description: "example event",
     eventID: 12345,
-    startTime: "12:30",
-    endTime: "19:00",
+    timeInfo:{
+      isWeekly: false,
+      startTime: "12:30",
+      endTime: "18:00",
+      dateList:[],
+    },
     participateStatus: [],
     fixedMeeting: [{ date: new Date(), timeRange: ["12:30"] }],
     hostUserInfo: {
@@ -35,8 +43,12 @@ const dummyEventList: NextMeetEvent[] = [
     eventName: "모임 2",
     description: "example event",
     eventID: 12345,
-    startTime: "12:30",
-    endTime: "19:00",
+    timeInfo:{
+      isWeekly: true,
+      startTime: "12:30",
+      endTime: "15:00",
+      dateList:[],
+    },
     participateStatus: [],
     fixedMeeting: [],
     hostUserInfo: {

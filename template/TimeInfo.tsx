@@ -1,9 +1,9 @@
 import { DaysOfWeek } from "./DaysOfWeek";
 
 export interface TimeInfo {
-    isWeekly:boolean,
-    startHour:string|null,
-    endHour:string|null,
-    dateList?:Date[],
-    dayList?:DaysOfWeek[],
+    isWeekly:       boolean,
+    startTime:      string,
+    endTime:        string,
+    dateList:       Date[],
+    dayList:        DaysOfWeek[],
 }
