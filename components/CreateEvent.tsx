@@ -3,115 +3,245 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import CalendarInput from "./CalendarInput";
 import TimeInput from "./TimeInput";
 import { className_button } from "@/styles/button";
-import { v4 as uuidv4 } from 'uuid';
 import { DateSelection } from "@/template/DateSelection";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
+import { createEvent } from "@/lib/functions/CRUD";
+import { useSession } from "next-auth/react";
+import { TimeInfo } from "@/template/TimeInfo";
+import { User } from "@/template/User";
+import { useRouter } from "next/navigation";
 
-const CreateEvent = ():ReactNode =>{
-    //useState
-    const [isCreatingEvent,setIsCreatingEvent] = useState<boolean>(false);
-    const [dateSelection,setDateSelection] = useState<DateSelection>({isWeekly:false,dateList:[]});
-    const [startTime,setStartTime] = useState<string|''>('');
-    const [endTime,setEndTime] = useState<string|''>('');
-    const [canProceed,setCanProceed] = useState<boolean>(false);
+const CreateEvent = (): ReactNode => {
+  //useRouter
+  const router = useRouter();
+  //useSession
+  const { data: session } = useSession();
+  //useState
+  const [isCreatingEvent, setIsCreatingEvent] = useState<boolean>(false);
+  const [dateSelection, setDateSelection] = useState<DateSelection>({
+    isWeekly: false,
+    dateList: [],
+  });
+  const [startTime, setStartTime] = useState<string | "">("00:00");
+  const [endTime, setEndTime] = useState<string | "">("00:00");
+  const [canProceed, setCanProceed] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
-    //useRefs
-    const hostIDRef = useRef<HTMLInputElement>(null);
-    const hostPWRef = useRef<HTMLInputElement>(null);
+  //useRefs
+  const eventNameRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const hostNameRef = useRef<HTMLInputElement>(null);
+  const hostPWRef = useRef<HTMLInputElement>(null);
 
-    //functions
-    const onProceed = () =>{
-      //generate unique id for an event
-      const uniqueID = uuidv4().replaceAll('-','');
-      console.log(uniqueID);
-    }
-    const dateClickHandler = (value: Date | DaysOfWeek) => {
-      if(dateSelection.isWeekly){ //week mode
-        if(value instanceof Date) setDateSelection({isWeekly:false,dateList:[value]});
-          else{
-            if (!dateSelection.dateList.includes(value)){
-              setDateSelection(prev => (
-                {isWeekly:true,dateList:[...prev.dateList as DaysOfWeek[],value]})); // add new date
-            } else {
-              setDateSelection(prev => ({isWeekly:true,dateList:(prev.dateList as DaysOfWeek[]).filter(date => date!== value)})); // remove date
-            }
-          };
-        }
-        else{ //specific days mode
-          if(value instanceof Date){
-            if (dateSelection.dateList.find(date => date.getTime() === value.getTime()) === undefined) {
-              setDateSelection(prev => ({isWeekly:false,dateList:[...prev.dateList as Date[], value]})); // add new date
-          } else {
-              setDateSelection(prev=>({isWeekly:false,dateList:(prev.dateList as Date[]).filter(date => date.getTime() !== value.getTime())})); // remove date
-          }
-          }
-          else setDateSelection({isWeekly:true,dateList:[value]});
-        }
+  //functions
+  const onProceed = async () => {
+    const eventName = eventNameRef.current!.value;
+    const description = descriptionRef.current!.value;
+    let hostUserInfo: User;
+    if (session && session.user) {
+      hostUserInfo = {
+        userName: session.user.userName,
+        userID: session.user.userID,
+        password: session.user.password,
       };
-
-    const onToggleDateMode = (isWeekly:boolean) =>{
-      isWeekly ? setDateSelection({isWeekly:true, dateList:[]}) : setDateSelection({isWeekly:false,dateList:[]});
+    } else {
+      hostUserInfo = {
+        userName: hostNameRef.current!.value,
+        userID: 0, //dummy
+        password: hostPWRef.current!.value,
+      };
     }
-    const proceedCheck = () =>{
-      if(!hostIDRef.current || !hostPWRef.current) return;
-      if(hostIDRef.current.value.trim().length > 2 
-        && hostPWRef.current.value.trim().length > 4
-        ) setCanProceed(true);
-      else setCanProceed(false); 
+    const timeInfo: TimeInfo = {
+      isWeekly: dateSelection.isWeekly,
+      startTime: startTime,
+      endTime: endTime,
+      dateList:[],
+      dayList:[]
+    };
+
+    const eventID = await createEvent(
+      eventName,
+      description,
+      timeInfo,
+      hostUserInfo,
+    );
+    router.push(`/event/${eventID}`);
+  };
+
+  const dateClickHandler = (value: Date | DaysOfWeek) => {
+    if (dateSelection.isWeekly) {
+      //week mode
+      if (value instanceof Date)
+        setDateSelection({ isWeekly: false, dateList: [value] });
+      else {
+        if (!dateSelection.dateList.includes(value)) {
+          setDateSelection((prev) => ({
+            isWeekly: true,
+            dateList: [...(prev.dateList as DaysOfWeek[]), value],
+          })); // add new date
+        } else {
+          setDateSelection((prev) => ({
+            isWeekly: true,
+            dateList: (prev.dateList as DaysOfWeek[]).filter(
+              (date) => date !== value
+            ),
+          })); // remove date
+        }
+      }
+    } else {
+      //specific days mode
+      if (value instanceof Date) {
+        if (
+          dateSelection.dateList.find(
+            (date) => date.getTime() === value.getTime()
+          ) === undefined
+        ) {
+          setDateSelection((prev) => ({
+            isWeekly: false,
+            dateList: [...(prev.dateList as Date[]), value],
+          })); // add new date
+        } else {
+          setDateSelection((prev) => ({
+            isWeekly: false,
+            dateList: (prev.dateList as Date[]).filter(
+              (date) => date.getTime() !== value.getTime()
+            ),
+          })); // remove date
+        }
+      } else setDateSelection({ isWeekly: true, dateList: [value] });
+    }
+  };
+
+  const onToggleDateMode = (isWeekly: boolean) => {
+    isWeekly
+      ? setDateSelection({ isWeekly: true, dateList: [] })
+      : setDateSelection({ isWeekly: false, dateList: [] });
+  };
+
+  const proceedCheck = () => {
+    console.log(dateSelection.dateList);
+    if (!eventNameRef.current || !descriptionRef.current) return;
+
+    //check session
+    if (session && session.user) {
+    } else if (
+      hostNameRef.current!.value.trim().length > 2 &&
+      hostPWRef.current!.value.trim().length > 4
+    ) {
+    } else {
+      setCanProceed(false);
+      return;
     }
 
-    const onStartTimeChange = (startTime:string) =>{
-      setStartTime(startTime);
+    //check date selection
+    if (dateSelection.dateList.length === 0) {
+      setCanProceed(false);
+      return;
     }
 
-    const onEndTimeChange = (endTime:string) =>{
-      setEndTime(endTime);
-    }
+    //check eventName
+    if (eventNameRef.current.value.trim().length > 0) setCanProceed(true);
+    else setCanProceed(false);
+  };
 
-    return <div className="w-screen h-max mb-40 flex flex-col items-center">
-        {!isCreatingEvent && <button className={`(New Event Button) ${className_button} mt-60 text-2xl flex items-center`}
-          onClick={(e)=>{
+  const onStartTimeChange = (startTime: string) => {
+    setStartTime(startTime);
+  };
+
+  const onEndTimeChange = (endTime: string) => {
+    setEndTime(endTime);
+  };
+
+  return (
+    <div className="w-screen h-max mb-40 flex flex-col items-center">
+      {!isCreatingEvent && (
+        <button
+          className={`(New Event Button) ${className_button} mt-60 text-2xl flex items-center`}
+          onClick={(e) => {
             e.preventDefault();
             setIsCreatingEvent(true);
-          }}>
-          <IoMdAddCircleOutline className="mr-2 w-8 h-8"/>
-          Create New Event</button>}
+          }}
+        >
+          <IoMdAddCircleOutline className="mr-2 w-8 h-8" />새 이벤트 만들기
+        </button>
+      )}
 
-        {isCreatingEvent && <div className="w-screen mt-10 flex flex-col items-center">
-          <CalendarInput 
-            onToggleDateMode={onToggleDateMode} 
+      {isCreatingEvent && (
+        <div className="w-screen mt-10 flex flex-col items-center">
+          <form className="w-[70%] flex flex-col mb-12 items-center">
+            <label className="text-2xl font-bold py-4">이벤트 이름</label>
+            <input
+              type="text"
+              className="w-full h-12 p-2 text-xl border-2 border-solid border-black rounded-md"
+              ref={eventNameRef}
+              onChange={proceedCheck}
+            />
+            <p className="m-2 text-red-400 text-sm">
+              * 이벤트 이름은 필수 항목입니다.
+            </p>
+            <label className="text-xl font-bold py-4">이벤트 설명</label>
+            <textarea
+              className="w-full h-20 p-2 resize-none border-2 border-solid border-black rounded-md"
+              ref={descriptionRef}
+            />
+          </form>
+          <CalendarInput
+            onToggleDateMode={onToggleDateMode}
             onClickDate={dateClickHandler}
-            selectedDates={dateSelection}/>
+            selectedDates={dateSelection}
+            onChange={proceedCheck}
+          />
           <TimeInput
             onStartTimeChange={onStartTimeChange}
             onEndTimeChange={onEndTimeChange}
-            />
-          <p className="mt-16 text-2xl">Not member yet?</p>
-          <div className="m-8 mb-24 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <label className="w-32 text-center">호스트 이름<br/>Host Name</label>
-              <input className="border-[1px] py-1 indent-2 indent outline-none rounded-md" 
-              type='text'
-              ref={hostIDRef}
-              onChange={proceedCheck}
-              ></input>
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="w-32 text-center">비밀번호<br/>PW</label>
-              <input className="border-[1px] py-1 indent-2 outline-none rounded-md" 
-              type='password'
-              ref={hostPWRef}
-              onChange={proceedCheck}
-              ></input>
-            </div>
-          </div>
-          
-          <button className={`${className_button} text-xl mb-10 ${!canProceed && 'bg-gray-300 cursor-auto'}`}
-            onClick={canProceed ? onProceed : ()=>{}}>
-            Proceed!  
-            </button>
-        </div>}
+          />
+          {!(session && session.user) && (
+            <>
+              <p className="mt-16 text-2xl">아직 회원이 아니신가요?</p>
+              <form className="m-8 mb-24 flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <label className="w-32 text-center">
+                    호스트 이름
+                    <br />
+                    Host Name
+                  </label>
+                  <input
+                    className="border-[1px] py-1 indent-2 indent outline-none rounded-md"
+                    type="text"
+                    ref={hostNameRef}
+                    onChange={proceedCheck}
+                  ></input>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="w-32 text-center">
+                    비밀번호
+                    <br />
+                    PW
+                  </label>
+                  <input
+                    className="border-[1px] py-1 indent-2 outline-none rounded-md"
+                    type="password"
+                    ref={hostPWRef}
+                    onChange={proceedCheck}
+                    placeholder="6자리 이상 입력해주세요"
+                  ></input>
+                </div>
+              </form>
+            </>
+          )}
 
+          <button
+            className={`${className_button} text-xl mb-10 ${
+              !canProceed && "bg-gray-300 cursor-auto"
+            }`}
+            onClick={onProceed}
+            disabled={!canProceed}
+          >
+            이벤트 생성하기
+          </button>
+        </div>
+      )}
     </div>
-}
+  );
+};
 export default CreateEvent;

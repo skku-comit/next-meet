@@ -1,10 +1,6 @@
 import CreateEvent from "@/components/CreateEvent";
 import MyPage from "@/components/MyPage";
-import { useSession } from "next-auth/react";
-
 import { ReactNode } from "react";
-
-
 
 const MainPage = (): ReactNode => {
   return (

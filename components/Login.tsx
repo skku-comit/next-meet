@@ -3,13 +3,12 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import LoginForm from "./LoginForm";
 import { existingUserCheck, registerNextMeetUser } from "@/lib/functions/CRUD";
 import isFormValid from "@/lib/functions/isFormValid";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 
 const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
 const Login = (): ReactNode => {
-  //useSession
-
+  
   //useState
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
@@ -160,7 +159,7 @@ const Login = (): ReactNode => {
           </button>
         ) : (
           <>
-            <p>or</p>
+            <p>또는</p>
             <button
               className={`${className_button} py-2`}
               onClick={(e) => {
@@ -168,7 +167,7 @@ const Login = (): ReactNode => {
                 setIsLoggingIn(true);
               }}
             >
-              Login with Email
+              이메일로 로그인
             </button>
           </>
         )}
@@ -178,16 +177,16 @@ const Login = (): ReactNode => {
             e.preventDefault();
             signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
           }}>
-          Login with Google
+          구글로 로그인
         </button>
-        <p>to browse your events.</p>
+        <p>하여 이벤트를 둘러보세요.</p>
         <button
           className={`${className_button} py-2`}
           onClick={(e) => {
             e.preventDefault();
             signOut();
           }}>
-          Logout
+          로그아웃
         </button>
       </div>
     </div>

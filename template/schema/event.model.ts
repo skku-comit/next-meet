@@ -13,12 +13,8 @@ const eventSchema = new Schema({
   description: {
     type: String,
   },
-  startTime: {
-    type: String,
-    required: true,
-  },
-  endTime: {
-    type: String,
+  timeInfo: {
+    type: Schema.Types.Mixed,
     required: true,
   },
   participateStatus: {

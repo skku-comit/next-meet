@@ -68,7 +68,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     // }, [max_checked_mem_sche])
 
   return (
-    <div className="flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
+    <div className="w-5/12 flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
         <div className="p-5 bg-[#f8f9fa] rounded place-self-start w-full">
             <div className="">
                 <div className="pl-2 break-all font-bold">Members</div>

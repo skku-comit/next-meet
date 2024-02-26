@@ -1,6 +1,6 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
+import GoogleProvider from "next-auth/providers/google";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -13,33 +13,21 @@ const handler = NextAuth({
       return true;
     },
     async redirect({ url, baseUrl }) { return baseUrl },
-    async jwt({ token, user, account, profile }) {
-      if (account) {
-        token.idToken = account.id_token;
-      }
+    async jwt({ token, user }) {
+      user && (token.user = user);
       return token;
     },
-    async session(params) {
-      console.log("sessionUSer", params);
-      return params.session;
+    async session ({session, token }) {
+      session.user = token.user;
+      return session;
     },
-    // async session ({session, token, user} : {session: any, token: any, user: any}) {
-
-    //   console.log('session token:',token);
-    //   return await session;
-    // },
   },
   providers: [
-    Google({
+    GoogleProvider({
       // clientId: process.env.GOOGLE_CLIENT_ID || "",
       // clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      id:"google",
       clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',
       clientSecret:'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',
-      authorization: {
-        params: {},
-      },
-      checks: ['none'],
     }),
     CredentialsProvider({
       id: "credentials",

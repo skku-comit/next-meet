@@ -214,7 +214,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     onClick={()=>{setShowResult(false)}}/>
             </div>
           </div>
-            {select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
+            {isLogin && select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
             <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);

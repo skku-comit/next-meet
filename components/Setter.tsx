@@ -16,7 +16,7 @@ const Setter = (props:any): ReactNode => {
   }
 
   return (
-    <div className={`w-screen px-20 mt-6 `}>
+    <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
       <div className="w-full flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
           onClick={(e)=>{e.preventDefault();setIsMember(false); props.setIsLogin(false); props.setScheduleTable(true); props.setConfirm(false);}}>
