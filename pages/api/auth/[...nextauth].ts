@@ -35,12 +35,8 @@ const handler = NextAuth({
   },
   providers: [
     GoogleProvider({
-      // clientId: process.env.GOOGLE_CLIENT_ID || "",
-      // clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      // clientId:'961303261034-dk8qjjmbsi381540bpkn3pm975slb9qv.apps.googleusercontent.com',
-      // clientSecret:'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',
-      clientId: "431038164286-8f9s7ntq69fn2dmdqgieqj5335uqboep.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
     CredentialsProvider({
       id: "credentials",
