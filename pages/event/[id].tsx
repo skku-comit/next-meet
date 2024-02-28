@@ -17,12 +17,18 @@ import { NextMeetEvent } from '@/template/Event';
 import { useRecoilState } from "recoil";
 import { Participate } from "@/template/Participate";
 import { useSession } from "next-auth/react";
+import { NextMeetUser, User } from "@/template/User";
+import { useSearchParams } from "next/navigation";
 
 
 export const getServerSideProps = (async () => {
     // Fetch data from external API    
     try{
-        const res = await fetch('api/form');
+        const params = useSearchParams();
+        const id = params.get('id');
+        const res = await fetch('api/form',{
+            method: "GET"
+        });
         
         if(res.ok){
             const data: NextMeetEvent = await res.json()
@@ -44,11 +50,13 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
     const { data: session } = useSession();
     console.log( session );
     
-    const [isLogin, setIsLogin] = useState(session && session.user ? true : false)
-
+    const [nonMemLogin, setNonMemLogin] = useState(false);
+    const [loginNonMem, setLoginNonMem]:[User|undefined,Function] = useState();
+    const [isLogin, setIsLogin] = useState(nonMemLogin || session && session.user ? true : false)
+    const [isHost, setIsHost] = useState(false);
     useEffect(()=>{
-        setIsLogin(session && session.user ? true : false)
-    }, session? [session.user] : [])
+        setIsLogin(nonMemLogin || session && session.user ? true : false)
+    }, session? [session.user, nonMemLogin] : [nonMemLogin])
 
     let eventParticipate:Participate[]|null = session && isLogin && event && event.participateStatus.length > 0 ? event.participateStatus.filter((participate:Participate) => (participate.user.includes(session.user))) : null;
     let eventParticiTime:{schedule:Date[]} = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
@@ -68,7 +76,7 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
     const [showMember, setShowMember]:[[], Function] = useState([]);
     const [showResult, setShowResult] = useState(false);
     
-    let indexOfLongestUserParti:Participate|null = event && event.participateStatus ? event.participateStatus.reduce((previousValue: Participate, currentValue: Participate)=>previousValue.user.length > currentValue.user.length ? previousValue : currentValue) : null;
+    const indexOfLongestUserParti:Participate|null = event && event.participateStatus ? event.participateStatus.reduce((previousValue: Participate, currentValue: Participate)=>previousValue.user.length > currentValue.user.length ? previousValue : currentValue) : null;
     const [totalMem, setTotalMem] = useState(indexOfLongestUserParti ? indexOfLongestUserParti.user.length : 0);
 
     const [confirm, setConfirm] = useState(0);
@@ -114,7 +122,12 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
           <div className="rounded w-full bg-[#eee] min-h-10 pt-2.5 text-center font-bold">{event ? event.eventName : "이벤트 제목"}</div>
         </div>
         {select ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name} setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}/>:""}
+        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name} 
+                                    setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
+                                    setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
+                                    eventUsers={indexOfLongestUserParti?.user} eventHost={event?.hostUserInfo} 
+                                    setIsHost={setIsHost} setNonMemLogin={setNonMemLogin}
+                                    setLoginNonMem={setLoginNonMem}/>:""}
         <div className={`w-screen pt-5 ${width < 768 ? "px-10":"px-20"} pb-5`}>
             <div className={`flex ${width < 768 ? "flex-col" : "flex-row"} flex-nowrap items-start text-center gap-4 justify-center`}> 
                 {confirm == 1 ? 
@@ -122,39 +135,44 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
                         fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}
                         select={select} totalMem={totalMem} schedule={schedule} setShowMember={setShowMember}
                         setTotalScheduleList={setTotalScheduleList} confirm={confirm} name={name}
-                        eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}/> : ""}
+                        eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
+                        nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost}
+                        /> : ""}
                 {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
                             width={width} setSchedule={setSchedule} confirm={confirm}  
                             // fixedDate={null} fixedDay={null} fixedTime={null}
                             name={name} setShowMember={setShowMember} select={select} 
                             fixedSchedule = {fixedSchedule}
                             setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
-                            eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}/> : ""}
+                            eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
+                            nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost}
+                            /> : ""}
                 <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
                 setShowMember={setShowMember} 
                 setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
                 fixedSchedule={fixedSchedule} week={week} confirm={confirm}
                 select={select} width={width} eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
                 state={undefined} handleChange={()=>{}}
+                nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost}
                 // fixedDate={null} fixedDay={null} fixedTime={null}
                 />
                 {!isLogin && width > 768 && confirm != 1?
                 <ScheduleResultRight setShowResult={setShowResult} showResult={showResult} 
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
-                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin}
+                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
                 />
                 :"" }
             </div>
         </div>
         {showResult ?
-            width <= 768 && (isLogin || confirm == 1) ? 
+            width <= 768 || (isLogin || confirm == 1) ? 
             <div className={`z-30 w-full fixed bottom-0 border-gray border-t-2`}>
                 <ScheduleResultBottom 
                 setShowResult={setShowResult} showResult={showResult} width={width}
                 showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
-                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin}
+                fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
                 />
             </div> :
             ""

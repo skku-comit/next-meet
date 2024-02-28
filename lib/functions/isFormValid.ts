@@ -11,7 +11,7 @@ enum FORM_INPUT_ERR {
 const email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
 
 const isFormValid = (
-  mode: 'login' | 'register',
+  mode: 'login' | 'register' | 'non-mem-login',
   loginID: string,
   userName: string,
   email: string,
@@ -20,6 +20,7 @@ const isFormValid = (
 ): number => {
   //for login
   if (loginID.trim().length == 0) return FORM_INPUT_ERR.EMPTY_ID;
+  if(mode == 'non-mem-login') return FORM_INPUT_ERR.NO_ERROR;
   if (password.trim().length == 0) return FORM_INPUT_ERR.EMPTY_PW;
   if(mode == 'login') return FORM_INPUT_ERR.NO_ERROR;
   

@@ -5,6 +5,7 @@ import { User } from "@/template/User";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
 import { TimeInfo } from "@/template/TimeInfo";
+import { Participate } from "@/template/Participate";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -53,13 +54,50 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).json({ message: "Internal server issue occurred" });
     }
   }
+  else if(req.method === "PUT"){
+    try {
+      await connectDB();
+      // If member, add the ID of new event to member's event list
+      const reqBody = JSON.parse(req.body);
+      const user = await NextMeetUser.findOne({ userID: reqBody.userID });
+      if(user.eventIDList.includes(reqBody.eventID)){
+        (user.eventIDList as number[]).push(reqBody.eventID);
+        await user.save();
+      }
+    
+      res.status(201).json({ userEventIDList: user.eventIDList });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server issue occurred" });
+    }
+  }
+  else if(req.method === "PATCH"){
+    try {
+      await connectDB();
+      const reqBody = JSON.parse(req.body);
+
+      //check input
+      console.log(reqBody);
+      
+      //check present eventID
+      // const {eventID} = req.query;
+      const event = await Event.findOne({ eventID: reqBody.eventID });
+
+      Event.updateOne({eventID:reqBody.eventID}, {$set:{participateStatus: reqBody.participateStatus}})
+
+      res.status(201).json({ eventID: reqBody.eventID });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server issue occurred" });
+    }
+  }
   else if(req.method === "GET"){
     try {
       await connectDB();
 
       const {eventID} = req.query;
 
-      const event = await Event.findOne({ eventID: eventID });
+      const event = await Event.findOne({ eventID: parseInt(eventID) });
 
       res.status(201).json({ event : event });
     } catch (error) {
@@ -73,3 +111,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default handler;
+

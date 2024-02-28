@@ -1,5 +1,7 @@
+import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
 import { User } from "@/template/User";
+import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 
 export const registerNextMeetUser = async (
   userName: string,
@@ -44,6 +46,41 @@ export const createEvent = async (
         eventName,
         description,
         timeInfo,
+        hostUserInfo
+      }),
+    });
+    console.log(res);
+    const data = await res.json();
+    const eventID = data.eventID;
+
+    return eventID;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const editEvent = async (
+  eventName: string,
+  description: string,
+  timeInfo: TimeInfo,
+  hostUserInfo:User,
+  participateStatus:Participate[],
+  fixedMeeting:FixedDate[] | WeeklyFixedDate[],
+):Promise<string|undefined> => {
+  
+  try {
+    const res = await fetch("api/form", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({      
+        eventName,
+        description,
+        timeInfo,
+        participateStatus,
+        fixedMeeting,
         hostUserInfo
       }),
     });

@@ -21,10 +21,11 @@ interface MyComponentProps {
     week: boolean;
     isLogin:boolean;
     width:number;
+    isHost:boolean;
 }
 
 const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) {
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost}:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -214,7 +215,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     onClick={()=>{setShowResult(false)}}/>
             </div>
           </div>
-            {isLogin && select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
+            {isHost && select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
             <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);

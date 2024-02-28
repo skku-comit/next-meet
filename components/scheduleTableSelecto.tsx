@@ -10,8 +10,7 @@ import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from "@/template/Participate";
-import { User } from "next-auth";
-import { NextMeetUser } from "@/template/User";
+import { NextMeetUser, User } from "@/template/User";
 
 
 interface MyComponentProps {
@@ -39,11 +38,15 @@ interface MyComponentProps {
     state : string | undefined;
     handleChange : Function;
     confirm : number;
+    nonMemLogin:boolean;
+    loginNonMem:User|undefined;
+    isHost:boolean;
 }
 
 const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     {eventParti, eventTimeInfo, isLogin, width, week, state, handleChange, 
-    schedule, name, setShowMember, setTotalScheduleList, totalMem, fixedSchedule, select,confirm}:MyComponentProps) {
+    schedule, name, setShowMember, setTotalScheduleList, totalMem, 
+    fixedSchedule, select,confirm, nonMemLogin, loginNonMem, isHost}:MyComponentProps) {
   // console.log(isLogin)
 
   const selectedWeekDay = eventTimeInfo ? eventTimeInfo.dayList: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]; 
@@ -154,7 +157,7 @@ const [scheduleList, setScheduleList] = useState(
   useEffect(()=>{
         if(isLogin){
             preMySelected.map((sche:Date)=>{
-                // if(schedule.schedule.includes(sche)==false){
+                if(schedule.schedule.includes(sche)==false){
                     const sche_str = sche.toString().replace("대한민국", "한국");
                     const new_member = scheduleList.member[sche_str].filter((element) => element !== name);
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
@@ -167,42 +170,42 @@ const [scheduleList, setScheduleList] = useState(
                             [sche_str]: new_member
                         }
                     }))
-                // }
-        });
-
-        setPreMySelected(schedule.schedule);
-
-        schedule.schedule.map((sche:Date)=>{
-            const sche_str = sche.toString().replace("대한민국", "한국");
-            for(let i=0; i<Object.keys(scheduleList.checked_num).length; i++){
-                // console.log(sche, sche);
-                if(sche_str in scheduleList.checked_num){
-                    setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
-                        checked_num:{
-                            ...prevSche.checked_num,
-                            [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum+1)/totalMemNum
-                        },
-                        member:{
-                            ...prevSche.member,
-                            [sche_str]: [...prevSche.member[sche_str], name]
-                        }
-                    }))
-                    
                 }
-                else{
-                    setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
-                        checked_num:{
-                            ...prevSche.checked_num,
-                            [sche_str]:1/totalMemNum
-                        },
-                        member:{
-                            ...prevSche.member,
-                            [sche_str]: [name]
-                        }
-                    }))
+            });
+
+            setPreMySelected(schedule.schedule);
+
+            schedule.schedule.map((sche:Date)=>{
+                const sche_str = sche.toString().replace("대한민국", "한국");
+                for(let i=0; i<Object.keys(scheduleList.checked_num).length; i++){
+                    // console.log(sche, sche);
+                    if(sche_str in scheduleList.checked_num){
+                        setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
+                            checked_num:{
+                                ...prevSche.checked_num,
+                                [sche_str]: (prevSche.checked_num[sche_str]*totalMemNum+1)/totalMemNum
+                            },
+                            member:{
+                                ...prevSche.member,
+                                [sche_str]: [...prevSche.member[sche_str], name]
+                            }
+                        }))
+                        
+                    }
+                    else{
+                        setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
+                            checked_num:{
+                                ...prevSche.checked_num,
+                                [sche_str]:1/totalMemNum
+                            },
+                            member:{
+                                ...prevSche.member,
+                                [sche_str]: [name]
+                            }
+                        }))
+                    }
+                    break;
                 }
-                break;
-            }
         })}
         else{
             setPreMySelected([]);
@@ -369,12 +372,11 @@ const [scheduleList, setScheduleList] = useState(
 
                     return <div 
                         // ref={()=>refSetter} 
-                        className={`${width > 600 ? "w-full": scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"50px"}}
+                        className={`relative w-full h-full ${scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"100px"}}
                         onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr]);}}
                         onMouseOut={()=>{setShowMember([]);}}>
                             
-                            {width <=768 ? <div className ={`absolute -right-2 -bottom-2 ${scheduleTableCSS.date_cell_popup}
-                            border-separate px-2 min-h-8 w-12 z-10 p-2 bg-[lightgray] rounded text-left`}>
+                            {width <=768 ? <div className ={`${scheduleTableCSS.date_cell_popup}`}>
                                {scheduleList.member[datetimeStr] ? <ul>
                             {/* ${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}> */}
                                 {scheduleList.member[datetimeStr].map((member)=>{

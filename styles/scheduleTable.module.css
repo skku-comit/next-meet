@@ -112,26 +112,29 @@
 }
 
 .date_label{
-    width:100px;
+    width:fit-content;
 }
 
 .date_cell{
-    position:relative;
-    width:100px;
+    /* position:relative; */
+    min-width:100px;
     height:100%;
 }
 
 .date_cell .date_cell_popup{
-    display: none;
+    display:none;
     transition: all 1s ease-in-out;
     position: absolute;
-    left: 20px;
+    left: 30px;
+    /* right:-20px; */
     bottom:-20px;
     padding: 2px;
     min-height: 30px;
     min-width:80px;
-    width: fit-content;
+    width: 100%;
     background-color: lightgray;
+    z-index:15;
+    border-radius: 5px;
 }
 
 .date_cell:hover .date_cell_popup{

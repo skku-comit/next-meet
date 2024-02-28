@@ -10,6 +10,7 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import {ko} from 'date-fns/locale';
 import { format } from 'date-fns';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
+import { NextMeetUser, User } from "@/template/User";
 // import { type } from './../template/User';
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
@@ -31,12 +32,16 @@ interface MyComponentProps {
     eventParti : Participate[] | undefined;
     confirm : number;
     name:string;
+    nonMemLogin:boolean;
+    loginNonMem:User|undefined;
+    isHost:boolean;
+
 }
 
 const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
     {isLogin, width, week, schedule, totalMem, select, confirm, name,
     fixedSchedule, setFixedSchedule, setShowMember, setTotalScheduleList, 
-    eventTimeInfo, eventParti}:MyComponentProps) {
+    eventTimeInfo, eventParti, nonMemLogin, loginNonMem, isHost}:MyComponentProps) {
 
   const handleChange = (newSchedule:Date[]) => {
     setFixedSchedule({schedule:newSchedule})
@@ -54,6 +59,7 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
         fixedSchedule={fixedSchedule} week={week}
         select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti}
         state={state} handleChange={handleChange} confirm={confirm}
+        nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost}
         // fixedDate={null} fixedDay={null} fixedTime={null}
     />
   );

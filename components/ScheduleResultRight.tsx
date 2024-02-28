@@ -18,10 +18,11 @@ interface MyComponentProps {
     setFixedSchedule:Function;
     week:boolean;
     isLogin:boolean;
+    isHost:boolean;
 }
 
 const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin }:MyComponentProps) {
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost }:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -215,7 +216,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
             </div>
         </div>
         {/* <div className={`mt-4 flex flex-column gap-2`}> */}
-            {isLogin && !select ? <div className={`w-full mt-1 p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
+            {isHost && !select ? <div className={`w-full mt-1 p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);
                     // console.log(confirm)

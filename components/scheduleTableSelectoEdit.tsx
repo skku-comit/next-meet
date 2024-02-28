@@ -13,6 +13,7 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { Participate } from '@/template/Participate';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { useSession } from "next-auth/react";
+import { User, NextMeetUser } from "@/template/User";
 
 
 interface MyComponentProps {
@@ -39,19 +40,25 @@ interface MyComponentProps {
     eventParti : Participate[] | undefined;
     setSchedule:Function;
     confirm : number;
+    nonMemLogin:boolean;
+    loginNonMem:User|undefined;
+    isHost:boolean;
+
 }
 
 const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     {eventTimeInfo, eventParti, isLogin, width, week, schedule, 
         setSchedule, confirm,
         setShowMember, setTotalScheduleList, name, totalMem, 
-        fixedSchedule, select}:MyComponentProps) {
+        fixedSchedule, select,
+        nonMemLogin, loginNonMem, isHost
+      }:MyComponentProps) {
   
 //    const [schedule, setSchedule] = useState({schedule :[]})
    const { data: session } = useSession();
    const handleChange = (newSchedule:Date[]) => {
     setSchedule({schedule:newSchedule})
-
+    
     // console.log(typeof(schedule.schedule));
    }
 
@@ -66,6 +73,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         fixedSchedule={fixedSchedule} week={week} confirm={confirm}
         select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti} 
         state={state} handleChange={handleChange}
+        nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost}
         // fixedDate={null} fixedDay={null} fixedTime={null}
     />
   );
