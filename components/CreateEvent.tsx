@@ -55,8 +55,8 @@ const CreateEvent = (): ReactNode => {
       isWeekly: dateSelection.isWeekly,
       startTime: startTime,
       endTime: endTime,
-      dateList:[],
-      dayList:[]
+      dateList:dateSelection.isWeekly ? []: dateSelection.dateList,
+      dayList:dateSelection.isWeekly ? dateSelection.dateList:[]
     };
 
     const eventID = await createEvent(

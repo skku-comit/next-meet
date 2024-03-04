@@ -1,4 +1,6 @@
 import scheduleResultCSS from "@/styles/scheduleResult.module.css";
+import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
+import { useSearchParams } from "next/navigation";
 import React, {useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 
@@ -40,7 +42,29 @@ const ConfirmBtn = ({select, setSelect, confirm, setConfirm, fixedSchedule, setF
         </div>
         {select == 1 ?
         <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
-            onClick={()=>{
+            onClick={async ()=>{
+                const state = "CONFIRM";
+
+                const params = useSearchParams();
+                const eventID = params.get('id');
+                let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
+                try {
+                    const res = await fetch("api/form", {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({      
+                        eventID, fixedMeeting, state
+                      }),
+                    });
+                    console.log(res);
+                    const data = await res.json();
+                    console.log(data);
+                  } catch (error) {
+                    console.log(error);
+                  } 
+                
                 setConfirm(0);
                 setSelect(0);
                 setFixedSchedule({schedule:[]});

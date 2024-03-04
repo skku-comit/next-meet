@@ -25,7 +25,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       if (user) {
         const passwordCheck = await bcrypt.compare(req.body.password, user.password);
         if (passwordCheck) {
-          const { password, ...dataWithoutPassword } = user._doc;
+          const { password, ...dataWithoutPassword } = user._doc;          
           return res.status(200).json({
             message: LOGIN_FAIL_ERR.NO_ERROR,
             ...dataWithoutPassword,

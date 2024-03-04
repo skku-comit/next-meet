@@ -3,6 +3,10 @@ import React, {useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { throttle } from "lodash";
+import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
+import { TimeInfo } from "@/template/TimeInfo";
+import { DaysOfWeek } from "@/template/DaysOfWeek";
+import { useSearchParams } from "next/navigation";
 
 
 interface MyComponentProps {
@@ -22,10 +26,16 @@ interface MyComponentProps {
     isLogin:boolean;
     width:number;
     isHost:boolean;
+    eventTimeInfo:TimeInfo;
+    week_startDate:Date;
 }
 
 const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost}:MyComponentProps) {
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, eventTimeInfo, week_startDate}:MyComponentProps) {
+    
+    const params = useSearchParams();
+    const eventID = params.get('id');
+    
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -59,6 +69,87 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         sortedMemList = max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime());
     },[max_checked_mem_sche])
 
+
+    const handleConfirm = async (newSchedule:Date[]) => {
+    
+        const state = "CONFIRM";
+
+        const getDateDiff = (date1:Date, date2:Date) => {
+        
+          if(date1.getMonth() == date2.getMonth()){
+            return date1.getDate() - date2.getDate();
+          }
+          else{
+            const dayOfMonth = new Date(date2.getFullYear(), date2.getMonth(), 0);
+            return dayOfMonth.getDate() - date2.getDate() + date1.getDate()
+          }
+          
+        }
+    
+        const dateList = eventTimeInfo?.dateList.sort((a:Date,b:Date)=>(a.getTime()- b.getTime()))
+        const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+        const sortedSelectedWeekDay = eventTimeInfo?.dayList.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+        const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    
+        let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
+    
+        newSchedule.map((sche)=>{
+          let fixedSche:WeeklyFixedDate | FixedDate;
+    
+          const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
+          const real_sche = week ? (sortedSelectedWeekDay as DaysOfWeek[])[index] : (dateList as Date[])[index];
+          const time = sche.getHours + ":" + sche.getMinutes;
+    
+          const existedDate = week ? (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day == real_sche))
+                              : (fixedMeeting as FixedDate[]).filter((FM)=>(FM.date.getFullYear() == (real_sche as Date).getFullYear()
+                                                                            && FM.date.getMonth() == (real_sche as Date).getMonth()
+                                                                            && FM.date.getDate() == (real_sche as Date).getDate()))
+          
+          if(existedDate){
+            if(week){
+              fixedMeeting = (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day != real_sche))
+              existedDate[0].timeRange.push(time);
+              (fixedMeeting as WeeklyFixedDate[]).push(existedDate[0] as WeeklyFixedDate);
+            }
+            else{
+              fixedMeeting = (fixedMeeting as FixedDate[]).filter((FM)=>(!(FM.date.getFullYear() == (real_sche as Date).getFullYear()
+                                                                                && FM.date.getMonth() == (real_sche as Date).getMonth()
+                                                                                && FM.date.getDate() == (real_sche as Date).getDate())))
+              existedDate[0].timeRange.push(time);
+              (fixedMeeting as FixedDate[]).push(existedDate[0] as FixedDate);
+            }
+          }
+          else{
+            if(week){
+              (fixedMeeting as WeeklyFixedDate[]).push({day : (sortedSelectedWeekDay as DaysOfWeek[])[index], timeRange:[time]})
+            }
+            else{
+              (fixedMeeting as FixedDate[]).push({date : (dateList as Date[])[index], timeRange:[time]})
+            }
+          }
+          
+        })
+    
+        try {
+          const res = await fetch("api/form", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({      
+              eventID, fixedMeeting, state
+            }),
+          });
+          console.log(res);
+          const data = await res.json();
+          console.log(data);
+        } catch (error) {
+          console.log(error);
+        } 
+        // console.log(fixedSchedule.schedule);
+       }
+    
 
   return (
         <div className="z-25 overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded ">
@@ -215,7 +306,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     onClick={()=>{setShowResult(false)}}/>
             </div>
           </div>
-            {isHost && select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
+            {isHost ? select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
             <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);
@@ -223,6 +314,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
 
                     if(confirm == 0 || confirm == 2){
                         setConfirm(1);
+                        handleConfirm(fixedSchedule.schedule);
                     }
                     else if(confirm == 1){ //select 중
                         setConfirm(0); 
@@ -238,7 +330,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     {confirm == 1 ? "일정 확정완료" : "일정 확정하기"}
                     {/* {confirm == 1 ? "일정 확정완료" : select==1 ? "일정 수정하기" : "일정 확정하기"} */}
                 </div>
-                </div>}
+                </div> : ""}
                 {/* {select == 1 ?
                 <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                     onClick={()=>{

@@ -1,9 +1,12 @@
+import { postUser } from "@/lib/functions/CRUD";
 import getID from "@/lib/functions/getID";
 import isFormValid from "@/lib/functions/isFormValid";
 import setterBtnTab from "@/styles/setterbtntab.module.css";
+import { Participate } from "@/template/Participate";
 import { User, NextMeetUser } from "@/template/User";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
 import { IoMdLogIn } from "react-icons/io";
 
@@ -17,8 +20,9 @@ const Setter = (props:any): ReactNode => {
   const pwInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>("");
 
-  const params = useSearchParams();
-  const eventID = params.get('id');
+  const router = useRouter();
+  const eventID = router.query['id'];
+  console.log("eventID",eventID);
 
   // props.setName(idName);
   // const addTotalNum:Function = ()=>{
@@ -47,10 +51,6 @@ const Setter = (props:any): ReactNode => {
       return;
     }
     try {
-      if (loginID == props.eventHost.userName && password == props.eventHost.password){
-        props.setIsHost(true);
-      }
-
       const res = await signIn("credentials", {
         loginID,
         password,
@@ -60,7 +60,9 @@ const Setter = (props:any): ReactNode => {
         setError(ERROR_MESSAGE[6]);
       }
 
-      const res2 = await fetch('api/form',{
+      console.log(res);
+
+      const res2 = await fetch('../api/form',{
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -71,27 +73,42 @@ const Setter = (props:any): ReactNode => {
       });
 
       console.log(res2)
+
+      const data = await res2.json();
+
+      if (data.userID == props.eventHost.userID && loginID == props.eventHost.userName && password == props.eventHost.password){
+        props.setIsHost(true);
+      }
+
+      const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? loginID == eventUser.userName && password == eventUser.password : false) : false;
+      if(!existedUser){
+        props.setTotalMem((prev:number)=>(prev+1));
+      }
     } catch (error) {
       console.error("error:", error);
     }
   };
 
-  const onNonMemLoginHandler = ()=>{
-    if (!(nameIdInputRef.current && pwInputRef.current)) return;
+  const onNonMemLoginHandler = async ()=>{
+    if (!(nameIdInputRef.current)) return;
     const loginName = nameIdInputRef.current.value;
-    const password = pwInputRef.current.value;
+    const password = pwInputRef.current ? pwInputRef.current.value : "";
+    let user:User;
+    console.log("input",loginName, password);
 
     let errorNo = isFormValid("non-mem-login", loginName, "", "", password, "");
+    console.log("nonMem", errorNo)
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo as 4 | 5]);
+      setError(ERROR_MESSAGE[errorNo as 4]);
       return;
     }
     try {
-      if (loginName == props.eventHost.userName && password == props.eventHost.password){
+      if (props.eventHost.userID == 0 && loginName == props.eventHost.userName && password == props.eventHost.password){
         props.setIsHost(true);
       }
-      const existedUser = props.eventUsers.filter((eventUser: User|NextMeetUser) => loginName == eventUser.userName && password == eventUser.password)
-      if(existedUser){
+      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password ? password == eventUser.password : true : false):null;
+      console.log("existedUser", existedUser)
+      if(existedUser.length > 0){
         props.setLoginNonMem(existedUser);
       }
       else{
@@ -99,13 +116,44 @@ const Setter = (props:any): ReactNode => {
         const newNonMem:User = {userID: newUserId,
           userName: loginName,
           password: password};
+        user = newNonMem;
         props.setLoginNonMem(newNonMem);
+        console.log("newNonMem",newNonMem, user);
+        props.setTotalMem((prev:number)=>(prev+1));
+        
+        await postUser(eventID, newNonMem);
+        // const res = await fetch("../api/form", {
+        //   method: "POST_USER",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        //   body: JSON.stringify({      
+        //     eventID, newNonMem
+        //   }),
+        // });
+        // console.log("post_user",res);
+        // const data = await res.json();
+        // console.log(data);
       }
       props.setNonMemLogin(true);
+      const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
+            for(let i = 0; i<participate.user.length; i++){
+                console.log("eventParticiTime v", participate.user[i].userID, user?.userID)
+                if(participate.user[i].userID == user?.userID){
+                    return true;
+                }
+            }
+            return false}) : null;
+      const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+      console.log("eventParticiTime",eventParticiTime,eventParticipate)
+      props.setSchedule(eventParticiTime);
+
     } catch (error) {
-      console.error("error:", error);
+      // console.error("error:", error);
+      return null;
     }
   }
+  console.log("isMember",isMember)
 
   return (
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
@@ -139,11 +187,13 @@ const Setter = (props:any): ReactNode => {
           onClick={()=>{
             if(props.isLogin){
               props.setScheduleTable(true);
-              props.setIsLogin(false);
-              props.setName("")
-              props.setIsHost(false);
-              props.setLoginNonMem(undefined);
-              props.setNonMemLogin(false)
+              setTimeout(()=>{props.setIsLogin(false)
+                props.setName("")
+                props.setIsHost(false);
+                props.setLoginNonMem(undefined);
+                props.setNonMemLogin(false)
+              }, 3000);
+              signOut();
             }
             else{
               props.setScheduleTable(false);

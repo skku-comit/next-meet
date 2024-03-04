@@ -1,7 +1,10 @@
+import { NextMeetEvent } from "@/template/Event";
 import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
 import { User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
+const NEXTAUTH_URL = "http://localhost:3000";
+
 
 export const registerNextMeetUser = async (
   userName: string,
@@ -106,3 +109,70 @@ export const existingUserCheck = async (loginID: string, email: string) => {
   const data = await res.json();
   return data.message;
 };
+
+export const existingEventCheck = async (eventID: string|null) => {
+  const res = await fetch("api/eventExists", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ eventID }),
+  });
+
+  const data = await res.json();
+  console.log(data);
+  return data.message;
+};
+
+
+export const getEventData = async(context:any) => {
+  try{
+    // const params = useSearchParams();
+    // const eventID = params.get('id');
+    // console.log("eventID",eventID)
+    // const existenceOfEvent = await existingEventCheck(eventID);
+    // console.log("existenceOfEvent",existenceOfEvent);
+    // if(existenceOfEvent != 1){
+    //     redirect(`/404`);
+    // }
+
+    const { id } = context.params;
+    const res = await fetch('api/form',{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({      
+                id
+            }),
+        }
+    );
+    
+    if(res.ok){
+        const data: NextMeetEvent = await res.json()
+        console.log("eventName",data.eventName);
+        return data;
+    }
+    else{
+      console.log("Get Event Data failed.");
+    }
+  }catch(error){
+    console.log("event data", error);
+    return null;
+  }
+}
+
+export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{
+    const res = await fetch(`${NEXTAUTH_URL}/api/postUser?id=${eventID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({      
+        eventID, newNonMem
+      }),
+    });
+    console.log("post_user",res);
+    const data = await res.json();
+    console.log(data);
+}

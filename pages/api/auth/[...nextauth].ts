@@ -17,8 +17,8 @@ const handler = NextAuth({
     },
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs
-      console.log(`url: ${url}, baseurl: ${baseUrl}`);
-      return baseUrl;
+      console.log(`url: ${url}, baseurl: ${url == baseUrl ? baseUrl : url}`);
+      return url == baseUrl ? baseUrl : url;
       if (url.startsWith("/")) return `${baseUrl}${url}`
       // Allows callback URLs on the same originpm
       else if (new URL(url).origin === baseUrl) return url

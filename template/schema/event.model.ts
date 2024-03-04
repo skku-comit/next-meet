@@ -1,5 +1,6 @@
 import mongoose, { Schema, models } from "mongoose";
 import { Participate } from "@/template/Participate";
+import { NextMeetUser, User } from "../User";
 
 const eventSchema = new Schema({
   eventID: {
@@ -29,6 +30,10 @@ const eventSchema = new Schema({
     type: Schema.Types.Mixed,
     required: true,
   },
+  userList:{
+    type: Array<(User|NextMeetUser)[]>,
+    required: true,
+  }
 });
 
 const Event = models.Event || mongoose.model("Event", eventSchema);
