@@ -21,8 +21,7 @@ import { NextMeetUser, User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { useSearchParams } from "next/dist/client/components/navigation";
 import { useRouter } from "next/router";
-import { existingEventCheck } from "@/lib/functions/CRUD";
-import { language } from "@/lib/recoil/Language";
+import { language } from "@/lib/recoil/language";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from 'next/navigation'
@@ -45,7 +44,7 @@ export const getServerSideProps = async (context:any) => {
         );
         
         if(res.ok){
-            const data: {event:NextMeetEvent} = await res.json()
+            const data: {event:NextMeetEvent} = await res.json();
             console.log("data", data);
             console.log("eventName",data.event.eventName);
             return { props: { event : data.event } }
@@ -96,10 +95,10 @@ export const getServerSideProps = async (context:any) => {
 //     return;
 // }
 
-const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProps>)=>{
+const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSideProps>)=>{
     // const params = useSearchParams();
     // const eventID = params.get('id');
-    // const res = await fetch("api/eventExists", {
+    // const res = await fetch("api/getEvent", {
     //     method: "POST",
     //     headers: {
     //         "Content-Type": "application/json",

@@ -36,9 +36,10 @@ export const createEvent = async (
   eventName: string,
   description: string,
   timeInfo: TimeInfo,
-  hostUserInfo:User
+  hostUserInfo: User
 ):Promise<string|undefined> => {
-  
+  console.log('createEvent with');
+  console.log(eventName,description,timeInfo,hostUserInfo);
   try {
     const res = await fetch("api/form", {
       method: "POST",
@@ -55,8 +56,8 @@ export const createEvent = async (
     console.log(res);
     const data = await res.json();
     const eventID = data.eventID;
-
     return eventID;
+
   } catch (error) {
     console.log(error);
   }
@@ -110,8 +111,8 @@ export const existingUserCheck = async (loginID: string, email: string) => {
   return data.message;
 };
 
-export const existingEventCheck = async (eventID: string|null) => {
-  const res = await fetch("api/eventExists", {
+export const getEvent = async (eventID: string|null) => {
+  const res = await fetch("api/getEvent", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -119,48 +120,49 @@ export const existingEventCheck = async (eventID: string|null) => {
     body: JSON.stringify({ eventID }),
   });
 
-  const data = await res.json();
-  console.log(data);
-  return data.message;
+  const { existingEvent } = await res.json();
+  console.log(existingEvent);
+  return existingEvent;
 };
 
 
-export const getEventData = async(context:any) => {
-  try{
-    // const params = useSearchParams();
-    // const eventID = params.get('id');
-    // console.log("eventID",eventID)
-    // const existenceOfEvent = await existingEventCheck(eventID);
-    // console.log("existenceOfEvent",existenceOfEvent);
-    // if(existenceOfEvent != 1){
-    //     redirect(`/404`);
-    // }
+// export const getEventData = async (context: any) => {
 
-    const { id } = context.params;
-    const res = await fetch('api/form',{
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({      
-                id
-            }),
-        }
-    );
+//   try{
+//     // const params = useSearchParams();
+//     // const eventID = params.get('id');
+//     // console.log("eventID",eventID)
+//     // const existenceOfEvent = await existingEventCheck(eventID);
+//     // console.log("existenceOfEvent",existenceOfEvent);
+//     // if(existenceOfEvent != 1){
+//     //     redirect(`/404`);
+//     // }
+
+//     const { id } = context.params;
+//     const res = await fetch('api/form',{
+//             method: "GET",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({      
+//                 id
+//             }),
+//         }
+//     );
     
-    if(res.ok){
-        const data: NextMeetEvent = await res.json()
-        console.log("eventName",data.eventName);
-        return data;
-    }
-    else{
-      console.log("Get Event Data failed.");
-    }
-  }catch(error){
-    console.log("event data", error);
-    return null;
-  }
-}
+//     if(res.ok){
+//         const data: NextMeetEvent = await res.json()
+//         console.log("eventName",data.eventName);
+//         return data;
+//     }
+//     else{
+//       console.log("Get Event Data failed.");
+//     }
+//   }catch(error){
+//     console.log("event data", error);
+//     return null;
+//   }
+// }
 
 export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{
     const res = await fetch(`${NEXTAUTH_URL}/api/postUser?id=${eventID}`, {

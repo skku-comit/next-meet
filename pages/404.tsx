@@ -1,7 +1,9 @@
-
 const Custom404 = () => {
   return (
-    <h1 className="w-full h-full text-center font-bold z-40 absolute top-1/2 text-3xl">404 - Page Not Found</h1>
+    <div className="w-full text-center font-bold absolute top-1/2">
+      <h1 className="text-3xl">Oops!</h1>
+      <h1 className="text-2xl mt-10">Event Not Found</h1>
+    </div>
   );
 };
 

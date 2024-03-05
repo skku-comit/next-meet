@@ -11,7 +11,7 @@ import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from "@/template/Participate";
 import { NextMeetUser, User } from "@/template/User";
-import { language } from './../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 
 
