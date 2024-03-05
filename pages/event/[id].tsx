@@ -21,7 +21,7 @@ import { NextMeetUser, User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { useSearchParams } from "next/dist/client/components/navigation";
 import { useRouter } from "next/router";
-import { language } from "@/lib/recoil/language";
+import { language } from "@/lib/recoil/Language";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from 'next/navigation'
