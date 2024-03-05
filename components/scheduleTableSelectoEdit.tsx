@@ -161,7 +161,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       }
     })  
 
-    // console.log("participateStatus before newSchedule", participateStatus)
+    console.log("participateStatus before newSchedule", participateStatus)
 
     newSchedule.map((sche:Date, idx)=>{
       // const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
@@ -187,17 +187,17 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
       let participate2 = eventParti ? eventParti.filter((part)=>(new Date(part.time).getTime() == new Date(sche).getTime())):null;
       let part2= participate2 && participate2.length > 0 ? participate2[0] : null;
-      // console.log("part2",idx, part2, participate2);
+      console.log("part2",idx, part2, participate2);
       if(part2){
-        if(!(part2!.user.filter((user)=>(user.userID == (session ? session.user.userID : loginNonMem?.userID))).length > 0)){
+        if(!(part2!.user.filter((user)=>(user.userID == (session && session.user ? session.user.userID : loginNonMem?.userID))).length > 0)){
           participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche).getTime()));
-          (session && session.user) || loginNonMem ? part2!.user.push(session ? session.user : loginNonMem) : "";
+          (session && session.user) || loginNonMem ? part2!.user.push(session && session.user ? session.user : loginNonMem) : "";
           participateStatus?.push(part2)
         }
       }
       else{
-        const new_participate:Participate = {time : sche, user : session ? session.user : [loginNonMem]}
-        // console.log("part2", new_participate, new_participate.user, new_participate.user.length > 0)
+        const new_participate:Participate = {time : sche, user : session && session.user ? [session.user] : [loginNonMem]}
+        console.log("part2", new_participate, new_participate.user, session?.user, new_participate.user.length > 0)
         if(new_participate.user.length > 0) {
           // console.log("part2 push")
           participateStatus?.push(new_participate)
@@ -205,7 +205,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       }      
     })    
 
-    // console.log("final participateStatus",participateStatus)
+    console.log("final participateStatus",participateStatus)
 
     setSchedule({schedule:newSchedule})
 

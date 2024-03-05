@@ -178,3 +178,18 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
     const data = await res.json();
     console.log(data);
 }
+
+export const addUserEventID = async (eventID:string  | string[] | undefined, userID : string)=>{
+  const res2 = await fetch(`${NEXTAUTH_URL}/api/form`,{
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body : JSON.stringify({      
+      eventID, userID
+    })
+  });
+
+  console.log("res2", res2)
+  return res2;
+}

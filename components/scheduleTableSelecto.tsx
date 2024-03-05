@@ -517,7 +517,6 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                                         <li>{member}</li>
                                     )
                                 })}
-                                {/* {isLogin && schedule.schedule.filter((sche)=>{console.log("schedule in label",schedule.schedule); return(new Date(datetime).getTime() == new Date(sche).getTime())}).length > 0 ? <li>{name}</li> : ""} */}
                                 </ul>:""}
                             </div>:""}
                         </div>

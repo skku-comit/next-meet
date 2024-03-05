@@ -47,13 +47,17 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
 
     // console.log(scheduleList.checked_num);
-    if(scheduleList.checked_num){
-        checked_mem_num= Object.values(scheduleList.checked_num);
-        
-        max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
-        return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
-        });    
-    }
+    useEffect(()=>{
+        console.log("checked_num", scheduleList.checked_num)
+        if(scheduleList.checked_num.length > 0){
+            checked_mem_num= Object.values(scheduleList.checked_num);
+            
+            max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
+            return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
+            });    
+            console.log("checked_num max", max_checked_mem_sche)
+        }
+    }, [scheduleList])
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
@@ -64,7 +68,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     let sortedList:Date[] = [];
 
     useEffect(()=>{
-        sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
+        sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime());
     },[fixedSchedule])
 
     let sortedMemList:string[] = [];

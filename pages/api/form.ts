@@ -50,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         userList:[host],
       });
 
-      res.status(201).json({ eventID: newEventID });
+      res.status(201).json({ eventID: newEventID});
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server issue occurred" });
@@ -58,16 +58,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   else if(req.method === "PUT"){
     try {
+      console.log("put Connect")
       await connectDB();
       // If member, add the ID of new event to member's event list
       const reqBody = req.body;
+      console.log("put reqBody", reqBody);
       const user = await NextMeetUser.findOne({ userID: reqBody.userID });
-      if(!(user.eventIDList.includes(reqBody.eventID))){
-        (user.eventIDList as number[]).push(reqBody.eventID);
+      // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
+      if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){
+        (user.eventIDList as number[]).push(parseInt(reqBody.eventID));
         await user.save();
       }
       const event = await Event.findOne({ eventID: reqBody.eventID });
-      if(!(event.userList.includes(user))){
+      const existedUser = event.userList.filter((eventuser:any)=>(eventuser.userID == reqBody.userID))
+      if(!(existedUser.length > 0)){
         event.userList.push(user);
         await event.save();
       }

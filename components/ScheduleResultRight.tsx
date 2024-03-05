@@ -38,6 +38,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
             max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
+            console.log("max_checked_mem_sche",max_checked_mem_sche)
         }
     }, [scheduleList]);
     
@@ -60,11 +61,12 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     
 
     // const [sortedMemList, setSortedMemList]:[Date[],Function] = useState([]);
-    let sortedMemList:string[] = [];
+    const [sortedMemList, setSortedMemList]:[string[], Function] = useState([]);
 
     // useMemo(()=>{
         useEffect(()=>{
-            sortedMemList = max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime());
+            setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
+            console.log("sortedMemList",sortedMemList)
         },[max_checked_mem_sche])
 
     // }, [max_checked_mem_sche])
@@ -91,8 +93,9 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ="px-2 min-h-4">
-                    {sortedMemList ? sortedMemList.map((sche, index)=>{
+                    {sortedMemList.length > 0 ? sortedMemList.map((sche, index)=>{
                         // const schedule = new Date(sche);
+                        console.log("sortedMemList Map")
                         let diffMin = 0;
                         let diffMSec = 0;
                         const schedule:Date = new Date(sche);
@@ -144,7 +147,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                               <div>
                                     {showMaxMember ? <p>
                                         <hr className="border-black my-1 mb-2"/>
-                                        멤버 : {scheduleList.member[sche.toLocaleString()].toString()}
+                                        멤버 : {scheduleList.member[new Date(sche).toLocaleString()].toString()}
                                     </p> :""}
                               </div>
                             </li>

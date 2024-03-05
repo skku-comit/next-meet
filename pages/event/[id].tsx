@@ -25,6 +25,7 @@ import { language } from "@/lib/recoil/Language";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from 'next/navigation'
+import { addUserEventID } from "@/lib/functions/CRUD";
 
 export const getServerSideProps = async (context:any) => {
     // Fetch data from external API   
@@ -126,9 +127,65 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
     const [nonMemLogin, setNonMemLogin] = useState(false);
     const [loginNonMem, setLoginNonMem]:[User|undefined,Function] = useState();
     const [isLogin, setIsLogin] = useState(nonMemLogin || session && session.user ? true : false)
-    const [isHost, setIsHost] = useState(false);
+    const [isHost, setIsHost] = useState(session ? session.user.userID == event.hostUserInfo.userID : false);
+    
+    console.log("login", isLogin)
+
     let eventParticipate:Participate[]|null = null;
     let eventParticiTime:{schedule:Date[]} = {schedule:[]};
+
+    const [week, setWeek]:[boolean, Function] = useState(event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly);
+    let fixedMeeting:{schedule :Date[]} = {schedule :[]};
+
+    if(week){
+        event?.fixedMeeting.map((sche)=>{
+            const date = new Date(week_startDate);
+            for(let i=0; i<7; i++){
+                if(date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]){
+                    break;
+                }
+                date.setDate(week_startDate.getDate() + 1)
+            }
+            sche.timeRange.map((time:string)=>{
+                date.setHours(parseInt(time.split(":")[0]))
+                date.setMinutes(parseInt(time.split(":")[1]))
+                fixedMeeting.schedule.push(date);
+            })
+        })
+    }
+    else{
+        event?.fixedMeeting.map((sche)=>{
+            const date = new Date((sche as FixedDate).date);
+            sche.timeRange.map((time:string)=>{
+                date.setHours(parseInt(time.split(":")[0]))
+                date.setMinutes(parseInt(time.split(":")[1]))
+                fixedMeeting.schedule.push(date);
+            })
+        })
+    }
+
+
+    const [schedule, setSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime);    
+    const [preMySelected, setPreMySelected] = useState(schedule.schedule);
+    const [fixedSchedule, setFixedSchedule]:[{schedule :Date[]}, Function] = useState(fixedMeeting);
+    const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :Date[]}, Function] = useState({schedule :[]})
+    
+    useEffect(() => {
+        if(session && session.user){
+            eventParticipate = event.participateStatus.length > 0 ? event.participateStatus.filter((participate:Participate) =>{ 
+                for(let i = 0; i<participate.user.length; i++){
+                    console.log("eventParticiTime v", participate.user, session.user.userID)
+                    if(participate.user[i].userID == session.user.userID){
+                        return true;
+                    }
+                }
+                return false}) : null;
+          eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+          console.log("eventParticiTime",eventParticiTime,eventParticipate)
+          setSchedule(eventParticiTime);
+          setPreMySelected(eventParticiTime.schedule);
+        }
+    },[isLogin, session])
 
     useEffect(()=>{
         setIsLogin(nonMemLogin || session && session.user ? true : false)
@@ -161,44 +218,10 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
         }
     }
 
-    const [week, setWeek]:[boolean, Function] = useState(event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly);
-    let fixedMeeting:{schedule :Date[]} = {schedule :[]};
-
-    if(week){
-        event?.fixedMeeting.map((sche)=>{
-            const date = new Date(week_startDate);
-            for(let i=0; i<7; i++){
-                if(date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]){
-                    break;
-                }
-                date.setDate(week_startDate.getDate() + 1)
-            }
-            sche.timeRange.map((time:string)=>{
-                date.setHours(parseInt(time.split(":")[0]))
-                date.setMinutes(parseInt(time.split(":")[1]))
-                fixedMeeting.schedule.push(date);
-            })
-        })
-    }
-    else{
-        event?.fixedMeeting.map((sche)=>{
-            const date = new Date((sche as FixedDate).date);
-            sche.timeRange.map((time:string)=>{
-                date.setHours(parseInt(time.split(":")[0]))
-                date.setMinutes(parseInt(time.split(":")[1]))
-                fixedMeeting.schedule.push(date);
-            })
-        })
-    }
-
-    const [schedule, setSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime);    
-    const [preMySelected, setPreMySelected] = useState(schedule.schedule);
-    const [fixedSchedule, setFixedSchedule]:[{schedule :Date[]}, Function] = useState(fixedMeeting);
-    const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :Date[]}, Function] = useState({schedule :[]})
-
 
     const [totalScheduleList, setTotalScheduleList]:[{checked_num: {[key: string]: number;}, member:{[key:string]:string[]}}, Function] = useState({checked_num: {}, member:{}})
-    const [name, setName] = useState(session && isLogin ? session.user : "");
+    const [name, setName] = useState(session && isLogin ? session.user.userName : loginNonMem ? loginNonMem.userName : "");
+    useEffect(()=>{setName(session && isLogin ? session.user.userName:loginNonMem ? loginNonMem.userName : "")},[isLogin])
     const [showMember, setShowMember]:[boolean, Function] = useState(false);
     const [showMemberList, setShowMemberList] = useState([]);
     // const [showMemberList, setShowMemberList] = useReducer((state:string[], action:{list:string[]})=>(action.list), []);
@@ -295,7 +318,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
           
         </div>
         {select && isHost ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name} 
+        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
                                     setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
                                     setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
                                     eventUsers={event?.userList} eventHost={event?.hostUserInfo} setSchedule={setSchedule}

@@ -1,10 +1,11 @@
-import { postUser } from "@/lib/functions/CRUD";
+import { addUserEventID, postUser } from "@/lib/functions/CRUD";
 import getID from "@/lib/functions/getID";
 import isFormValid from "@/lib/functions/isFormValid";
 import setterBtnTab from "@/styles/setterbtntab.module.css";
 import { Participate } from "@/template/Participate";
 import { User, NextMeetUser } from "@/template/User";
-import { signIn, signOut } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
@@ -12,7 +13,11 @@ import { IoMdLogIn } from "react-icons/io";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
 const Setter = (props:any): ReactNode => {
-  const [isMember,setIsMember] = useState<boolean>(false);
+  const { data: session } = useSession();
+  console.log( "session", session );
+
+  const [isMember,setIsMember] = useState<boolean>(session && session.user ? true : false);
+  useEffect(()=>{if(props.isLogin){setIsMember(session && session.user ? true : false)}},[props.isLogin])
   // const [isLogin, setIsLogin] = useState<boolean>(false);
   // const [idName, setIdName] = useState<String>("");
   const [pw, setPw] = useState<String>("");
@@ -46,57 +51,64 @@ const Setter = (props:any): ReactNode => {
     const password = pwInputRef.current.value;
 
     let errorNo = isFormValid("login", loginID, "", "", password, "");
+    console.log("memLogin errorNo")
     if (errorNo !== 0) {
       setError(ERROR_MESSAGE[errorNo as 4 | 5]);
       return;
     }
     try {
+      console.log("memLogin login");
       const res = await signIn("credentials", {
         loginID,
         password,
         redirect: false,
       });
+
       if (res && +res.error! != 0) {
         setError(ERROR_MESSAGE[6]);
       }
+      
+      let session: any = await getSession();
 
-      console.log(res);
+      // console.log("res", res);
+      // console.log( "Ssession", session );
+      // console.log("Ssession user", session?.user);
 
-      const res2 = await fetch('../api/form',{
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body : JSON.stringify({      
-          eventID, loginID
-        })
-      });
+      props.setIsLogin(true);
+      props.setName(session?.user.userName);
+      setIsMember(true);
 
-      console.log(res2)
+      // console.log("signin", isMember, props.name, session);
+
+      const res2 = await addUserEventID(eventID, session.user.userID);
 
       const data = await res2.json();
 
-      if (data.userID == props.eventHost.userID && loginID == props.eventHost.userName && password == props.eventHost.password){
+      console.log("put data", data);
+
+      if (data.userID == props.eventHost.userID){
         props.setIsHost(true);
       }
 
-      const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? loginID == eventUser.userName && password == eventUser.password : false) : false;
+      const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? data.userID == eventUser.userID : false) : false;
       if(!(existedUser.length > 0)){
+        console.log("increased total mem")
         props.setTotalMem((prev:number)=>(prev+1));
       }
       const user = existedUser.length > 0 ? existedUser[0] : null;
       console.log("props.eventParti", props.eventParti)
       const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
             for(let i = 0; i<participate.user.length; i++){
-                console.log("eventParticiTime v", participate.user, user?.userID)
+                console.log("eventParticiTime put v", participate.user, user?.userID)
                 if(participate.user[i].userID == user?.userID){
                     return true;
                 }
             }
             return false}) : null;
       const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
-      console.log("eventParticiTime",eventParticiTime,eventParticipate)
+      console.log("eventParticiTime put",eventParticiTime,eventParticipate)
       props.setSchedule(eventParticiTime);
+      props.setPreMySelected(eventParticiTime.schedule);
     } catch (error) {
       console.error("error:", error);
     }
@@ -149,6 +161,7 @@ const Setter = (props:any): ReactNode => {
         // const data = await res.json();
         // console.log(data);
       }
+      props.setIsLogin(true);
       props.setNonMemLogin(true);
       console.log("props.eventParti", props.eventParti)
       const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
@@ -176,11 +189,33 @@ const Setter = (props:any): ReactNode => {
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
       <div className="w-full flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(false); props.setIsLogin(false); props.setScheduleTable(true); props.setConfirm(false);}}>
+          onClick={(e)=>{e.preventDefault();setIsMember(false); props.setScheduleTable(true); props.setConfirm(false); 
+            if(props.isLogin){
+              props.setScheduleTable(true);
+              setTimeout(()=>{props.setIsLogin(false)
+                props.setName("")
+                props.setIsHost(false);
+                props.setLoginNonMem(undefined);
+                props.setNonMemLogin(false)
+              }, 5000);
+              signOut({ redirect: false });
+              props.setIsLogin(false); 
+            }}}>
         비회원
         </button>
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(true); props.setIsLogin(false); props.setScheduleTable(true); props.setConfirm(false);}}>
+          onClick={(e)=>{e.preventDefault();setIsMember(true); props.setScheduleTable(true); props.setConfirm(false);
+            if(props.isLogin){
+              props.setScheduleTable(true);
+              setTimeout(()=>{props.setIsLogin(false)
+                props.setName("")
+                props.setIsHost(false);
+                props.setLoginNonMem(undefined);
+                props.setNonMemLogin(false);
+              }, 5000);
+              signOut({ redirect: false });
+              props.setIsLogin(false); 
+            }}}>
         회원
         </button>
       </div>
@@ -209,13 +244,12 @@ const Setter = (props:any): ReactNode => {
                 props.setIsHost(false);
                 props.setLoginNonMem(undefined);
                 props.setNonMemLogin(false)
-              }, 3000);
+              }, 5000);
               signOut();
             }
             else{
               props.setScheduleTable(false);
-              props.setIsLogin(true);
-              isMember ? onMemLoginHandler():onNonMemLoginHandler()
+              isMember ? onMemLoginHandler():onNonMemLoginHandler();
             }
             props.confirm == 1 ? props.setConfirm(2) : "";
             // props.isLogin ? props.setScheduleTable(true) : props.setScheduleTable(false);
