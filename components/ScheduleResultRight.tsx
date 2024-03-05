@@ -24,8 +24,11 @@ interface MyComponentProps {
 
 const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
     select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, showMemberList }:MyComponentProps) {
-    let checked_mem_num: number[] = [];
-    let max_checked_mem_sche:string[]=[];
+    let checked_mem_num: number[] = Object.values(scheduleList.checked_num);
+    let max_checked_mem_sche:string[]=Object.keys(scheduleList.checked_num).filter((key: string) => {
+        return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
+        });    ;
+    const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
 
     const [totalMemNum, setTotalMemNum] = useState(totalMem);
     useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
@@ -39,8 +42,10 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
             console.log("max_checked_mem_sche",max_checked_mem_sche)
+            setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
         }
     }, [scheduleList]);
+
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
@@ -61,15 +66,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     
 
     // const [sortedMemList, setSortedMemList]:[Date[],Function] = useState([]);
-    const [sortedMemList, setSortedMemList]:[string[], Function] = useState([]);
 
-    // useMemo(()=>{
-        useEffect(()=>{
-            setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
-            console.log("sortedMemList",sortedMemList)
-        },[max_checked_mem_sche])
-
-    // }, [max_checked_mem_sche])
 
   return (
     <div className="w-5/12 flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
@@ -138,7 +135,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                                     <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
                                     <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                     <div className="inline-block mx-1"> ~ </div>
-                                    <p className="inline-block">{(week ? "" : end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
                                     <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                     <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p>
                                 </div>

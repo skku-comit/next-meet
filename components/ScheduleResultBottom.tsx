@@ -42,22 +42,23 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
+    const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
 
     const [totalMemNum, setTotalMemNum] = useState(totalMem);
     useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
 
     // console.log(scheduleList.checked_num);
     useEffect(()=>{
-        console.log("checked_num", scheduleList.checked_num)
-        if(scheduleList.checked_num.length > 0){
+        if(scheduleList.checked_num){
             checked_mem_num= Object.values(scheduleList.checked_num);
             
             max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
-            console.log("checked_num max", max_checked_mem_sche)
+            console.log("max_checked_mem_sche",max_checked_mem_sche)
+            setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
         }
-    }, [scheduleList])
+    }, [scheduleList]);
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
@@ -70,12 +71,6 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     useEffect(()=>{
         sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime());
     },[fixedSchedule])
-
-    let sortedMemList:string[] = [];
-
-    useEffect(()=>{
-        sortedMemList = max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime());
-    },[max_checked_mem_sche])
 
 
     const handleConfirm = async (newSchedule:Date[]) => {
@@ -231,7 +226,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                         <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
                                         <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                         <div className="inline-block mx-1"> ~ </div>
-                                        <p className="inline-block">{(week ? "" : end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')'}</p>
+                                        <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
                                         <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                         <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p>
                                     </div>
