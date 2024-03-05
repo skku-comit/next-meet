@@ -30,6 +30,8 @@ interface MyComponentProps {
     // showMember:string[];
     // setShowResult : Function;
     setShowMember : Function;
+    setShowMemberList : Function;
+    setShowDateTime : Function;
     // scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
     // setScheduleList : Function;
     setTotalScheduleList:Function;
@@ -46,15 +48,17 @@ interface MyComponentProps {
     isHost:boolean;
     week_startDate:Date;
     eventID:number;
-
+    preMySelected : Date[];
+    setPreMySelected : Function;
 }
 
 const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     {eventTimeInfo, eventParti, isLogin, width, week, schedule, 
-        setSchedule, confirm,
+        setSchedule, confirm, setShowMemberList,setShowDateTime,
         setShowMember, setTotalScheduleList, name, totalMem, 
         fixedSchedule, select,
-        nonMemLogin, loginNonMem, isHost, week_startDate, eventID
+        nonMemLogin, loginNonMem, isHost, week_startDate, eventID,
+        preMySelected, setPreMySelected
       }:MyComponentProps) {
   
 //    const [schedule, setSchedule] = useState({schedule :[]})
@@ -74,12 +78,15 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
   }
 
   const dateList = eventTimeInfo?.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime()))
-  console.log("eventTimeInfo",eventTimeInfo);
-  console.log("dateList",dateList);
+  // console.log("eventTimeInfo",eventTimeInfo);
+  // console.log("dateList",dateList);
   const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7}
   const sortedSelectedWeekDay = eventTimeInfo?.dayList.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
   const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  useEffect(()=>{
+    // console.log("schedule.schedule", schedule.schedule)
+  },[schedule]);
   // const params = useParams();
   // const eventID = params.get('id');
   // console.log("eventID EDIT", params)
@@ -94,17 +101,17 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     // console.log(eventParticiTime);
 
     // useEffect(()=>{
-      const eventParticipate = eventParti && eventParti.length > 0 ? eventParti?.filter((participate:Participate) =>{ 
-        for(let i = 0; i<participate.user.length; i++){
-            console.log("eventParticiTime v", participate.user[i].userID, loginNonMem?.userID)
-            if(participate.user[i].userID == loginNonMem?.userID){
-                return true;
-            }
-        }
-        return false}) : null;
-      const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
-      console.log("eventParticiTime",eventParticiTime,eventParticipate)
-      setSchedule(eventParticiTime);    
+      // const eventParticipate = eventParti && eventParti.length > 0 ? eventParti?.filter((participate:Participate) =>{ 
+      //   for(let i = 0; i<participate.user.length; i++){
+      //       console.log("eventParticiTime v", participate.user[i].userID, loginNonMem?.userID)
+      //       if(participate.user[i].userID == loginNonMem?.userID){
+      //           return true;
+      //       }
+      //   }
+      //   return false}) : null;
+      // const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+      // console.log("eventParticiTime",eventParticiTime,eventParticipate)
+      // setSchedule(eventParticiTime);    
     // }, [])
     
    const handleChange = async (newSchedule:Date[]) => {
@@ -117,76 +124,88 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     console.log("preSelected",preSelected)
     preSelected?.map((sche:Participate, idx)=>{
-      const index = getDateDiff(sche.time, week ? week_startDate : (dateList as Date[])[0]);
-      let real_sche:Date;
-      if(week){
-          real_sche = new Date(week_startDate);
-          for(let i=0; i<7; i++){
-              if(WEEKDAY[real_sche.getDay()] == (sortedSelectedWeekDay as DaysOfWeek[])[index]){
-                  break;
-              }
-              real_sche.setDate(real_sche.getDate() + 1)
-          }
-          real_sche.setHours(new Date(sche.time).getHours());
-          real_sche.setMinutes(new Date(sche.time).getMinutes());
-      }
-      else{
-          real_sche = new Date((dateList as Date[])[index]);
-          real_sche.setHours(new Date(sche.time).getHours());
-          real_sche.setMinutes(new Date(sche.time).getMinutes());
-      }
+      // const index = getDateDiff(sche.time, week ? week_startDate : (dateList as Date[])[0]);
+      // let real_sche:Date;
+      // if(week){
+      //     real_sche = new Date(week_startDate);
+      //     for(let i=0; i<7; i++){
+      //         if(WEEKDAY[real_sche.getDay()] == (sortedSelectedWeekDay as DaysOfWeek[])[index]){
+      //             break;
+      //         }
+      //         real_sche.setDate(real_sche.getDate() + 1)
+      //     }
+      //     real_sche.setHours(new Date(sche.time).getHours());
+      //     real_sche.setMinutes(new Date(sche.time).getMinutes());
+      // }
+      // else{
+      //     real_sche = new Date((dateList as Date[])[index]);
+      //     real_sche.setHours(new Date(sche.time).getHours());
+      //     real_sche.setMinutes(new Date(sche.time).getMinutes());
+      // }
 
-      if(newSchedule.includes(sche.time) == false){
-        let participate = (eventParti ? eventParti : []).filter((part)=>(new Date(part.time).getTime() == new Date(real_sche).getTime()));
-        const part:Participate = participate[0];
-        participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(real_sche).getTime()));
+      const newIncludePre = newSchedule.filter((newSche)=>{
+          // console.log("includes new", new Date(newSche), new Date(sche.time) )
+          return(new Date(sche.time).getTime() == new Date(newSche).getTime())});
+      // console.log("includes", newSchedule, newIncludePre.length, !(newIncludePre.length > 0));
+      if(!(newIncludePre.length > 0)){
+        let participate = (eventParti ? eventParti : []).filter((part)=>(new Date(part.time).getTime() == new Date(sche.time).getTime()));
+        let part:Participate = participate[0];
+        // console.log("includes new", part);
+        participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche.time).getTime()));
         if(part){
-          const users = part.user.filter((user)=>(user!= (session ? session.user : loginNonMem)));
+          const users = part.user.filter((user)=>(user.userID != (session ? session.user.userID : loginNonMem?.userID)));
           part.user = users;
+          // console.log("includes part user", part.user, users, session ? session.user : loginNonMem);
           participateStatus?.push(part)
         }
       }
     })  
 
+    // console.log("participateStatus before newSchedule", participateStatus)
+
     newSchedule.map((sche:Date, idx)=>{
-      const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
-      let real_sche:Date;
-      if(week){
-          real_sche = new Date(week_startDate);
-          for(let i=0; i<7; i++){
-              if(WEEKDAY[real_sche.getDay()] == (sortedSelectedWeekDay as DaysOfWeek[])[index]){
-                  break;
-              }
-              real_sche.setDate(real_sche.getDate() + 1)
-          }
-          real_sche.setHours(new Date(sche).getHours());
-          real_sche.setMinutes(new Date(sche).getMinutes());
-      }
-      else{
-          real_sche = new Date((dateList as Date[])[index]);
-          real_sche.setHours(new Date(sche).getHours());
-          real_sche.setMinutes(new Date(sche).getMinutes());
-      }
+      // const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
+      // let real_sche:Date;
+      // if(week){
+      //     real_sche = new Date(week_startDate);
+      //     for(let i=0; i<7; i++){
+      //         if(WEEKDAY[real_sche.getDay()] == (sortedSelectedWeekDay as DaysOfWeek[])[index]){
+      //             break;
+      //         }
+      //         real_sche.setDate(real_sche.getDate() + 1)
+      //     }
+      //     real_sche.setHours(new Date(sche).getHours());
+      //     real_sche.setMinutes(new Date(sche).getMinutes());
+      // }
+      // else{
+      //     real_sche = new Date((dateList as Date[])[index]);
+      //     real_sche.setHours(new Date(sche).getHours());
+      //     real_sche.setMinutes(new Date(sche).getMinutes());
+      // }
       
       // console.log("part2 eventParti",idx, eventParti);
 
-      let participate2 = eventParti ? eventParti.filter((part)=>(new Date(part.time).getTime() == new Date(real_sche).getTime())):null;
-      const part2= participate2 && participate2.length > 0 ? participate2[0] : null;
+      let participate2 = eventParti ? eventParti.filter((part)=>(new Date(part.time).getTime() == new Date(sche).getTime())):null;
+      let part2= participate2 && participate2.length > 0 ? participate2[0] : null;
       // console.log("part2",idx, part2, participate2);
       if(part2){
         if(!(part2!.user.filter((user)=>(user.userID == (session ? session.user.userID : loginNonMem?.userID))).length > 0)){
-          participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(real_sche).getTime()));
+          participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche).getTime()));
           (session && session.user) || loginNonMem ? part2!.user.push(session ? session.user : loginNonMem) : "";
           participateStatus?.push(part2)
         }
       }
       else{
-        const new_participate:Participate = {time : sche, user : session ? session.user : loginNonMem}
-        if(new_participate.user.length > 0) {participateStatus?.push(new_participate)}
+        const new_participate:Participate = {time : sche, user : session ? session.user : [loginNonMem]}
+        // console.log("part2", new_participate, new_participate.user, new_participate.user.length > 0)
+        if(new_participate.user.length > 0) {
+          // console.log("part2 push")
+          participateStatus?.push(new_participate)
+        }
       }      
     })    
 
-    console.log("final participateStatus",participateStatus)
+    // console.log("final participateStatus",participateStatus)
 
     setSchedule({schedule:newSchedule})
 
@@ -211,18 +230,20 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     
    }
 
-   useEffect(()=>{if(isLogin){setSchedule({schedule:[]})}}, [isLogin]);
+  //  useEffect(()=>{if(!isLogin){setSchedule({schedule:[]})}}, [isLogin]);
 
 
 
   return (
     <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
-        setShowMember={setShowMember} eventID={eventID}
+        setShowMember={setShowMember} eventID={eventID} setShowMemberList={setShowMemberList}
+        setShowDateTime={setShowDateTime}
         setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
         fixedSchedule={fixedSchedule} week={week} confirm={confirm}
         select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti} 
         state={state} handleChange={handleChange}
         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
+        preMySelected={preMySelected} setPreMySelected={setPreMySelected}
         // fixedDate={null} fixedDay={null} fixedTime={null}
     />
   );

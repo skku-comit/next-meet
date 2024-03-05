@@ -28,6 +28,8 @@ interface MyComponentProps {
     // showMember:string[];
     // setShowResult : Function;
     setShowMember : Function;
+    setShowMemberList : Function;
+    setShowDateTime : Function;
     // scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
     // setScheduleList : Function;
     setTotalScheduleList:Function;
@@ -45,12 +47,15 @@ interface MyComponentProps {
     isHost:boolean;
     week_startDate:Date;
     eventID : number;
+    preMySelected: Date[];
+    setPreMySelected:Function;
 }
 
 const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     {eventParti, eventTimeInfo, isLogin, width, week, state, handleChange, 
-    schedule, name, setShowMember, setTotalScheduleList, totalMem, eventID,
-    fixedSchedule, select,confirm, nonMemLogin, loginNonMem, isHost, week_startDate}:MyComponentProps) {
+    schedule, name, setShowMember, setTotalScheduleList, totalMem, eventID,setShowMemberList,
+    fixedSchedule, select,confirm, nonMemLogin, loginNonMem, isHost, week_startDate,
+    preMySelected, setPreMySelected, setShowDateTime}:MyComponentProps) {
   // console.log(isLogin)
 
   const [lang, setLang] = useRecoilState(language);
@@ -207,12 +212,12 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
     setTotalMemNum(totalMem);
   }, [totalMem]);
   
-  const [preMySelected, setPreMySelected] = useState(schedule.schedule);
+//   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
 
   useEffect(()=>{
         if(isLogin){
-            console.log("update")
-            preMySelected.map((sche:Date)=>{
+            console.log("update", preMySelected)
+            preMySelected?.map((sche:Date)=>{
                 // const index = getDateDiff(sche, week ? week_startDate : dateList[0]);
                 // let real_sche:Date;
                 // if(week){
@@ -235,7 +240,17 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                 //     const sche_str = new Date(real_sche).toString().replace("대한민국", "한국");
                     const sche_str = realScheStr(sche);
                     console.log("updatedSchedule", sche_str)
-                    const new_member = scheduleList.member[sche_str] ? scheduleList.member[sche_str].filter((element) => element !== name) : [];
+                    let new_member = scheduleList.member[sche_str];
+                    console.log("newMem", new_member)
+                    for(let i = 0; i < new_member?.length; i++) {
+                        console.log("name contrast",new_member[i], name)
+                        if(new_member[i] == name)  {
+                            new_member.splice(i, 1);
+                            console.log("name contrast 1",new_member)
+                            break;
+                        }
+                      }
+                    
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
@@ -390,7 +405,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                         if(index == 1 && date.getDate() == new Date(dateList[0]).getDate()){
                             index = 0;
                         }
-                        return  <div className="w-full h-full" style={{height:'25px', minWidth:"50px"}}>
+                        return  <div className="w-full h-full" style={{height:'25px', minWidth:"70px"}}>
                         {/* <div className={`text-center ${scheduleTableCSS.th_width} ${className_div_theadtd} ${'bg-[#d9d9d9] h-fit'}`}> */}
                         {(new Date(dateList[index]).getMonth()+1)+'/'+new Date(dateList[index]).getDate()}
                         {/* <br/> */}
@@ -401,7 +416,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                     }
                     // console.log("index",date.getDay()-week_startDate.getDay() < 0 ? -1 : date.getDay()-week_startDate.getDay())
                     // console.log("index",DayList[date.getDay()-week_startDate.getDay() < 0 ? DayList.length-1 : date.getDay()-week_startDate.getDay()] )
-                    return <div className={`${width > 600 ? "w-full" : scheduleTableCSS.date_label} h-full`} style={{height:'25px', minWidth:"50px"}}>
+                    return <div className={`${width > 600 ? "w-full" : scheduleTableCSS.date_label} h-full`} style={{height:'25px', minWidth:"70px"}}>
                     {lang == "ko" ? DayList[date.getDay()-week_startDate.getDay() < 0 ? DayList.length-1 : date.getDay()-week_startDate.getDay()] : sortedSelectedWeekDay[date.getDay()-week_startDate.getDay() < 0 ? sortedSelectedWeekDay.length-1 : date.getDay()-week_startDate.getDay()]}
                     </div>}}
                 renderTimeLabel={(time) => {
@@ -486,11 +501,13 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                     // console.log(fixedScheduleList.includes(datetime))
                     // console.log("select", select);
 
+                    const memberList = scheduleList.member[datetimeStr];
+
                     return <div 
                         // ref={()=>refSetter} 
-                        className={`relative w-full h-full ${scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"60px"}}
-                        onMouseOver={()=>{setShowMember(scheduleList.member[datetimeStr]);}}
-                        onMouseOut={()=>{setShowMember([]);}}>
+                        className={`relative w-full h-full ${scheduleTableCSS.date_cell}`} style={{backgroundColor : cellColor, height:'25px', minWidth:"70px"}}
+                        onMouseOver={()=>{setShowMember(true); setShowMemberList(memberList); setShowDateTime(datetimeStr)}}
+                        onMouseOut={()=>{setShowMember(false); setShowMemberList([]);}}>
                             
                             {width <=768 ? <div className ={`${scheduleTableCSS.date_cell_popup}`}>
                                {scheduleList.member[datetimeStr] ? <ul>
@@ -500,6 +517,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                                         <li>{member}</li>
                                     )
                                 })}
+                                {/* {isLogin && schedule.schedule.filter((sche)=>{console.log("schedule in label",schedule.schedule); return(new Date(datetime).getTime() == new Date(sche).getTime())}).length > 0 ? <li>{name}</li> : ""} */}
                                 </ul>:""}
                             </div>:""}
                         </div>

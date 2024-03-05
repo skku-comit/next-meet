@@ -13,7 +13,9 @@ interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     showResult:boolean;
     setShowResult:Function;
-    showMember:[];
+    showMember:boolean;
+    showMemberList:string[];
+    showDateTime:string;
     scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
     totalMem:number;
     confirm : number;
@@ -28,10 +30,12 @@ interface MyComponentProps {
     isHost:boolean;
     eventTimeInfo:TimeInfo;
     week_startDate:Date;
+    schedule:{schedule:Date[]};
 }
 
 const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, eventTimeInfo, week_startDate}:MyComponentProps) {
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, eventTimeInfo, week_startDate, showDateTime,
+    showMemberList, schedule}:MyComponentProps) {
     
     const params = useSearchParams();
     const eventID = params.get('id');
@@ -150,6 +154,10 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         // console.log(fixedSchedule.schedule);
        }
     
+    useEffect(()=>{
+        console.log("show showMemberList", showMemberList);
+    }, [showMemberList])
+
 
   return (
         <div className="z-25 overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded ">
@@ -158,11 +166,13 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                 <div className="pl-2 break-all font-bold">Members</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}>
-                    {showMember ? showMember.map((member,idx)=>{
+                    {showMember ? scheduleList.member[showDateTime]?.map((member,idx)=>{
+                        console.log("show memberlist")
                         return(
                             <li key={idx}>{member}</li>
                         )
                     }):""}
+
                 </ul>
             </div> :""}
             <div className={`${width > 768 ? "w-2/4 grid-column border-l-2" : "w-full grid-row"} mr-1 grid gap-2`}>

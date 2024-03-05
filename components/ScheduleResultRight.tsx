@@ -7,7 +7,8 @@ interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
     showResult:boolean;
     setShowResult:Function;
-    showMember:[];
+    showMember:boolean;
+    showMemberList:string[];
     scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
     totalMem:number;
     confirm : number;
@@ -22,7 +23,7 @@ interface MyComponentProps {
 }
 
 const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost }:MyComponentProps) {
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, showMemberList }:MyComponentProps) {
     let checked_mem_num: number[] = [];
     let max_checked_mem_sche:string[]=[];
 
@@ -42,7 +43,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
-    const [showMemberList, setShowMemberList] = useState(false);
+    // const [showMemberList, setShowMemberList] = useState(false);
 
     let term:number = 0;
     let mem_term:number = 0;
@@ -75,7 +76,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                 <div className="pl-2 break-all font-bold">Members</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_height} border-separate px-2 min-h-4`}>
-                    {showMember ? showMember.map((member)=>{
+                    {showMember ? showMemberList?.map((member)=>{
                         return(
                             <li>{member}</li>
                         )
@@ -230,7 +231,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
 
                         if(fixedSchedule.schedule.length > 0){
                             setSelect(1); 
-                            console.log(fixedSchedule.schedule.length);
+                            // console.log(fixedSchedule.schedule.length);
                         }
                     
                     }

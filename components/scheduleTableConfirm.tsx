@@ -29,6 +29,8 @@ interface MyComponentProps {
     setFixedSchedule:Function;
     width:number;
     setShowMember : Function;
+    setShowMemberList : Function;
+    setShowDateTime : Function;
     setTotalScheduleList:Function;
     eventTimeInfo:TimeInfo | undefined;
     eventParti : Participate[] | undefined;
@@ -39,12 +41,15 @@ interface MyComponentProps {
     isHost:boolean;
     week_startDate:Date;
     eventID:number;
+    preMySelected: Date[];
+    setPreMySelected : Function;
 }
 
 const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
-    {isLogin, width, week, schedule, totalMem, select, confirm, name,
-    fixedSchedule, setFixedSchedule, setShowMember, setTotalScheduleList, eventID,
-    eventTimeInfo, eventParti, nonMemLogin, loginNonMem, isHost, week_startDate}:MyComponentProps) {
+    {isLogin, width, week, schedule, totalMem, select, confirm, name, setShowDateTime,
+    fixedSchedule, setFixedSchedule, setShowMember, setShowMemberList, setTotalScheduleList, eventID,
+    eventTimeInfo, eventParti, nonMemLogin, loginNonMem, isHost, week_startDate,
+    preMySelected, setPreMySelected}:MyComponentProps) {
 
   const state = "CONFIRM";
 
@@ -133,12 +138,14 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
 
   return(
     <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
-        setShowMember={setShowMember} eventID={eventID}
+        setShowMember={setShowMember} eventID={eventID} setShowMemberList={setShowMemberList}
+        setShowDateTime={setShowDateTime}
         setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
         fixedSchedule={fixedSchedule} week={week}
         select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti}
         state={state} handleChange={handleChange} confirm={confirm}
         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
+        preMySelected={preMySelected} setPreMySelected={setPreMySelected}
         // fixedDate={null} fixedDay={null} fixedTime={null}
     />
   );

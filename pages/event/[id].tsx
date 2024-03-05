@@ -9,7 +9,7 @@ import ConfirmBtn from "@/components/ConfirmBtn";
 
 import { FaList } from "react-icons/fa";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import { throttle } from "lodash";
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -193,18 +193,23 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
     }
 
     const [schedule, setSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime);    
+    const [preMySelected, setPreMySelected] = useState(schedule.schedule);
     const [fixedSchedule, setFixedSchedule]:[{schedule :Date[]}, Function] = useState(fixedMeeting);
     const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :Date[]}, Function] = useState({schedule :[]})
 
 
     const [totalScheduleList, setTotalScheduleList]:[{checked_num: {[key: string]: number;}, member:{[key:string]:string[]}}, Function] = useState({checked_num: {}, member:{}})
     const [name, setName] = useState(session && isLogin ? session.user : "");
-    const [showMember, setShowMember]:[[], Function] = useState([]);
+    const [showMember, setShowMember]:[boolean, Function] = useState(false);
+    const [showMemberList, setShowMemberList] = useState([]);
+    // const [showMemberList, setShowMemberList] = useReducer((state:string[], action:{list:string[]})=>(action.list), []);
+    const [showDateTime, setShowDateTime] = useState("");
+
     const [showResult, setShowResult] = useState(false);
     
     const indexOfLongestUserParti = event && event.participateStatus.length>0 ? event.participateStatus.reduce((previousValue: Participate, currentValue: Participate)=>previousValue.user.length > currentValue.user.length ? previousValue : currentValue) : null;
     const longestUser = indexOfLongestUserParti?.user;
-    console.log("event_userList",event.userList?.length);
+    // console.log("event_userList",event.userList?.length);
     // const userList:(User|NextMeetUser)[]=[];
     // useEffect(()=>{
         // if(event && event.participateStatus.length>0){
@@ -266,7 +271,9 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
     }, [fixedSchedule])
 
 
-    useEffect(()=>{console.log(loginNonMem)}, [loginNonMem])
+    useEffect(()=>{
+        console.log(loginNonMem)
+    }, [loginNonMem])
 
     const [showDescription, setShowDescription] = useState(false);
 
@@ -293,40 +300,43 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
                                     setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
                                     setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
                                     eventUsers={event?.userList} eventHost={event?.hostUserInfo} setSchedule={setSchedule}
-                                    setIsHost={setIsHost} setNonMemLogin={setNonMemLogin}
-                                    eventParti = {event?.participateStatus}
+                                    setIsHost={setIsHost} setNonMemLogin={setNonMemLogin} 
+                                    eventParti = {event?.participateStatus} preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                                     setLoginNonMem={setLoginNonMem} />:""}
         <div className={`w-screen pt-5 ${width < 768 ? "px-10":"px-20"} pb-5`}>
             <div className={`flex ${width < 768 ? "flex-col" : "flex-row"} flex-nowrap items-start text-center gap-4 justify-center`}> 
                 {confirm == 1 ? 
                     <ScheduleTableConfirm week={week} isLogin={isLogin} width={width} 
                         fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}
-                        select={select} totalMem={totalMem} schedule={schedule} setShowMember={setShowMember}
+                        select={select} totalMem={totalMem} schedule={schedule} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime}
                         setTotalScheduleList={setTotalScheduleList} confirm={confirm} name={name}
                         eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
                         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
+                        preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                         /> : ""}
                 {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
                             width={width} setSchedule={setSchedule} confirm={confirm}  
                             // fixedDate={null} fixedDay={null} fixedTime={null}
-                            name={name} setShowMember={setShowMember} select={select} 
+                            name={name} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} select={select} 
                             fixedSchedule = {fixedSchedule} eventID={event.eventID}
                             setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
                             eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus} 
                             nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
+                            preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                             /> : ""}
                 <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
-                setShowMember={setShowMember} eventID={event.eventID}
+                setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} eventID={event.eventID}
                 setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
                 fixedSchedule={fixedSchedule} week={week} confirm={confirm}
                 select={select} width={width} eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus}
                 state={undefined} handleChange={()=>{}}
                 nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
+                preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                 // fixedDate={null} fixedDay={null} fixedTime={null}
                 />
                 {!isLogin && width > 768 && confirm != 1?
                 <ScheduleResultRight setShowResult={setShowResult} showResult={showResult} 
-                showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
+                showMember={showMember} showMemberList={showMemberList} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
                 />
@@ -337,8 +347,8 @@ const EventPage = ({event}: InferGetServerSidePropsType<typeof getServerSideProp
             showResult ? 
             <div className={`z-30 w-full fixed bottom-0 border-gray border-t-2`}>
                 <ScheduleResultBottom 
-                setShowResult={setShowResult} showResult={showResult} width={width}
-                showMember={showMember} scheduleList={totalScheduleList} totalMem={totalMem}
+                setShowResult={setShowResult} showResult={showResult} width={width} schedule={schedule}
+                showMember={showMember} showMemberList={showMemberList} scheduleList={totalScheduleList} totalMem={totalMem} showDateTime={showDateTime}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
                 eventTimeInfo={event.timeInfo} week_startDate={week_startDate}
