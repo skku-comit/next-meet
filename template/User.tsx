@@ -1,5 +1,5 @@
 export interface User {
-  userID: number;
+  userID: number; //unique id for identification
   userName: string;
   password: string;
 }

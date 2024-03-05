@@ -39,10 +39,11 @@ const CreateEvent = (): ReactNode => {
     const description = descriptionRef.current!.value;
     let hostUserInfo: User;
     if (session && session.user) {
+      console.log(session.user)
       hostUserInfo = {
         userName: session.user.userName,
         userID: session.user.userID,
-        password: session.user.password,
+        password: '',
       };
     } else {
       hostUserInfo = {

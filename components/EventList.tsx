@@ -2,73 +2,75 @@ import { NextMeetEvent } from "@/template/Event";
 import { ReactNode } from "react";
 import EventBlock from "./EventBlock";
 
-const dummyEventList: NextMeetEvent[] = [
-  {
-    eventName: "회의 1",
-    description: "example event",
-    eventID: 12345,
-    timeInfo:{
-      isWeekly: true,
-      startTime: "12:30",
-      endTime: "15:00",
-      dateList:[],
-    },
-    participateStatus: [],
-    fixedMeeting: [],
-    hostUserInfo: {
-      userName: "name",
-      userID: 1234,
-      password: "1234",
-    },
-  },
-  {
-    eventName: "모임 1",
-    description: "example event",
-    eventID: 12345,
-    timeInfo:{
-      isWeekly: false,
-      startTime: "12:30",
-      endTime: "18:00",
-      dateList:[],
-    },
-    participateStatus: [],
-    fixedMeeting: [{ date: new Date(), timeRange: ["12:30"] }],
-    hostUserInfo: {
-      userName: "name",
-      userID: 1234,
-      password: "1234",
-    },
-  },
-  {
-    eventName: "모임 2",
-    description: "example event",
-    eventID: 12345,
-    timeInfo:{
-      isWeekly: true,
-      startTime: "12:30",
-      endTime: "15:00",
-      dateList:[],
-    },
-    participateStatus: [],
-    fixedMeeting: [],
-    hostUserInfo: {
-      userName: "name",
-      userID: 1234,
-      password: "1234",
-    },
-  },
-];
+// const dummyEventList: NextMeetEvent[] = [
+//   {
+//     eventName: "회의 1",
+//     description: "example event",
+//     eventID: 12345,
+//     timeInfo:{
+//       isWeekly: true,
+//       startTime: "12:30",
+//       endTime: "15:00",
+//       dateList:[],
+//     },
+//     participateStatus: [],
+//     fixedMeeting: [],
+//     hostUserInfo: {
+//       userName: "name",
+//       userID: 1234,
+//       password: "1234",
+//     },
+//   },
+//   {
+//     eventName: "모임 1",
+//     description: "example event",
+//     eventID: 12345,
+//     timeInfo:{
+//       isWeekly: false,
+//       startTime: "12:30",
+//       endTime: "18:00",
+//       dateList:[],
+//     },
+//     participateStatus: [],
+//     fixedMeeting: [{ date: new Date(), timeRange: ["12:30"] }],
+//     hostUserInfo: {
+//       userName: "name",
+//       userID: 1234,
+//       password: "1234",
+//     },
+//   },
+//   {
+//     eventName: "모임 2",
+//     description: "example event",
+//     eventID: 12345,
+//     timeInfo:{
+//       isWeekly: true,
+//       startTime: "12:30",
+//       endTime: "15:00",
+//       dateList:[],
+//     },
+//     participateStatus: [],
+//     fixedMeeting: [],
+//     hostUserInfo: {
+//       userName: "name",
+//       userID: 1234,
+//       password: "1234",
+//     },
+//   },
+// ];
 
-
-const EventList = (): ReactNode => {
-  
-    const onGoingEvents = dummyEventList
+type EventListProps = {
+  eventList : NextMeetEvent[];
+}
+const EventList = ({eventList}:EventListProps): ReactNode => {
+    console.log('eventList:',eventList);
+    const onGoingEvents = eventList
       .filter((item) => item.fixedMeeting.length === 0)
       .map((item, idx) => (
         <EventBlock event={item} key={idx} />
       ));
 
-    const terminatedEvents = dummyEventList
+    const terminatedEvents = eventList
     .filter((item) => item.fixedMeeting.length !== 0)
     .map((item, idx) => (
       <EventBlock event={item} key={idx} />
