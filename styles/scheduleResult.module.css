@@ -10,6 +10,18 @@
     overflow-y:scroll;
 }
 
+.result_scrolling3{
+    max-height: 250px;
+    border-spacing: 10px 0px;
+    overflow-y:scroll;
+}
+
+.result_scrolling4{
+    max-height: 70px;
+    border-spacing: 10px 0px;
+    overflow-y:scroll;
+}
+
 .result_height{
     min-height: 100px;
     border-spacing: 10px 0px;

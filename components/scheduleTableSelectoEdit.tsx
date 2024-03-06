@@ -15,6 +15,7 @@ import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { useSession } from "next-auth/react";
 import { User, NextMeetUser } from "@/template/User";
 import { useParams, useSearchParams } from "next/navigation";
+import { addRemoveUserEventID } from "@/lib/functions/CRUD";
 
 
 interface MyComponentProps {
@@ -50,6 +51,7 @@ interface MyComponentProps {
     eventID:number;
     preMySelected : Date[];
     setPreMySelected : Function;
+    setTotalMem : Function;
 }
 
 const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
@@ -58,7 +60,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         setShowMember, setTotalScheduleList, name, totalMem, 
         fixedSchedule, select,
         nonMemLogin, loginNonMem, isHost, week_startDate, eventID,
-        preMySelected, setPreMySelected
+        preMySelected, setPreMySelected, setTotalMem
       }:MyComponentProps) {
   
 //    const [schedule, setSchedule] = useState({schedule :[]})
@@ -115,6 +117,23 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     // }, [])
     
    const handleChange = async (newSchedule:Date[]) => {
+
+    setSchedule({schedule:newSchedule})
+
+    if(isLogin){
+      if(newSchedule.length > 0){
+        const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "addUser");
+        const data = await res.json();
+        console.log("addUser handle", data);
+        if(data.data[1]?.length <=0){setTotalMem((prev:number)=>(prev+1))};
+      }
+      else{
+        const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
+        const data = await res.json();
+        console.log("removeUser handle", data);
+        if(data.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
+      }
+    }
 
     let participateStatus:Participate[]|undefined = eventParti;
 
@@ -207,7 +226,6 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     console.log("final participateStatus",participateStatus)
 
-    setSchedule({schedule:newSchedule})
 
     try {
       const res = await fetch("http://localhost:3000/api/form", {
@@ -222,6 +240,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       console.log(res);
       const data = await res.json();
       console.log("data", data);
+
     } catch (error) {
       console.log("error",error);
     } 

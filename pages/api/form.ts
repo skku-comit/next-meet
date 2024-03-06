@@ -63,20 +63,34 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // If member, add the ID of new event to member's event list
       const reqBody = req.body;
       console.log("put reqBody", reqBody);
-      const user = await NextMeetUser.findOne({ userID: reqBody.userID });
-      // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
-      if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){
-        (user.eventIDList as number[]).push(parseInt(reqBody.eventID));
-        await user.save();
+      const user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
+        // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
+      if(reqBody.state == "addEvent"){
+        if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){
+          (user.eventIDList as number[]).push(parseInt(reqBody.eventID));
+          await user.save();
+        }
       }
+      
       const event = await Event.findOne({ eventID: reqBody.eventID });
-      const existedUser = event.userList.filter((eventuser:any)=>(eventuser.userID == reqBody.userID))
-      if(!(existedUser.length > 0)){
-        event.userList.push(user);
-        await event.save();
+      console.log(event)
+      const existedUser = event.userList?.filter((eventuser:any)=>(eventuser.userID == reqBody.user.userID))
+
+      console.log("existedUser addUser", existedUser)
+      if(reqBody.state=="addUser"){
+        if(!(existedUser.length > 0)){
+          event.userList.push(user ? user : reqBody.user);
+          await event.save();
+        }
       }
-      res.status(201).json({ userEventIDList: user.eventIDList, userID: user.userID });
-      return NextResponse.json({ userID: user.userID });
+      else if(reqBody.state=="removeUser"){
+        if(existedUser.length > 0){
+          await Event.findOneAndUpdate({eventID:reqBody.eventID}, {$set:{userList: event.userList.filter((eventuser:any)=>(eventuser.userID != reqBody.user.userID))}}, { overwrite: true })
+        }
+      }
+      
+      res.status(201).json({ data: [user ? user.userID : "",  existedUser]});
+      return NextResponse.json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server issue occurred" });

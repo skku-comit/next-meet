@@ -25,7 +25,6 @@ import { language } from "@/lib/recoil/Language";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from 'next/navigation'
-import { addUserEventID } from "@/lib/functions/CRUD";
 
 export const getServerSideProps = async (context:any) => {
     // Fetch data from external API   
@@ -345,6 +344,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                             eventTimeInfo={event?.timeInfo} eventParti = {event?.participateStatus} 
                             nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
                             preMySelected={preMySelected} setPreMySelected={setPreMySelected}
+                            setTotalMem={setTotalMem}
                             /> : ""}
                 <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
                 setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} eventID={event.eventID}

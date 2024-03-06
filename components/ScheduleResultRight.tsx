@@ -74,12 +74,12 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
 
 
   return (
-    <div className="w-5/12 flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
+    <div className="w-5/12 flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start" style={{minWidth:"260px"}}>
         <div className="p-5 bg-[#f8f9fa] rounded place-self-start w-full">
             <div className="">
                 <div className="pl-2 break-all font-bold">{lang=="ko"? "참여 가능한 사람":"Members"}</div>
                 <hr className="border-t-2 my-1 mb-2"/>
-                <ul className ={`${scheduleResultCSS.result_height} border-separate px-2 min-h-4`}>
+                <ul className ={`${scheduleResultCSS.result_height} border-separate px-2 min-h-4 `}>
                     {showMember ? showMemberList?.map((member)=>{
                         return(
                             <li>{member}</li>
@@ -94,7 +94,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                     <p>{lang == "ko" ?"최대인원이 참여 가능한 시간대":"Time with the Maximum Number of People"}</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
-                <ul className ="px-2 min-h-4">
+                <ul className ={`${scheduleResultCSS.result_scrolling3} px-2 min-h-4 flex flex-col gap-2`}>
                     {sortedMemList.length > 0 ? sortedMemList.map((sche, index)=>{
                         // const schedule = new Date(sche);
                         console.log("sortedMemList Map")
@@ -147,7 +147,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                                 {showMaxMember ? <FaAngleUp/> : <FaAngleDown/>}
                               </div>
                               <div>
-                                    {showMaxMember ? <p>
+                                    {showMaxMember ? <p className="text-gray-600">
                                         <hr className="border-black my-1 mb-2"/>
                                         {lang=="ko" ? "멤버":"Members"} : {scheduleList.member[new Date(sche).toString().replace("대한민국", "한국")]?.toString().replaceAll(",", ", ")}
                                     </p> :""}

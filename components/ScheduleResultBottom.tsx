@@ -69,10 +69,10 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     let term = 0;
     let mem_term = 0;
 
-    let sortedList:Date[] = [];
+    const [sortedList, setSortedList]:[Date[],Function] = useState([]);
 
     useEffect(()=>{
-        sortedList = fixedSchedule.schedule?.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime());
+        setSortedList(fixedSchedule.schedule?.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime()));
     },[fixedSchedule])
 
     useEffect(()=>{console.log("confirm",confirm)},[confirm])
@@ -188,7 +188,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                         <p>{lang == "ko" ?"최대인원이 참여 가능한 시간대":"Time with the Maximum Number of People"}</p>
                     </div>
                     <hr className="border-t-2 my-1 mb-2"/>
-                    <ul className ="px-2 min-h-4">
+                    <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 min-h-4 flex flex-col gap-2`}>
                         {sortedMemList ? sortedMemList.map((sche, index)=>{
                             // const schedule = new Date(sche);
                             let diffMin = 0;
@@ -228,7 +228,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                     //show the member name in row
                                     showMaxMember ? setShowMaxMember(false) : setShowMaxMember(true)
                                 }}>
-                                <div className="flex flex-row gap-1">
+                                <div className={`flex flex-row gap-1 justify-between px-2 ${showMaxMember ? "pt-0.5":""}`}>
                                     <div>
                                         <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
                                         <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
@@ -240,7 +240,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                     {showMaxMember ? <FaAngleUp/> : <FaAngleDown/>}
                                 </div>
                                 <div>
-                                        {showMaxMember ? <div className="w-inherit p-2">
+                                        {showMaxMember ? <div className={`w-inherit p-2 pt-0 text-gray-600 ${showMaxMember ? "pb-0.5":""}`}>
                                             <hr className="border-black my-1 mb-2"/>
                                             {lang=="ko" ? "멤버":"Members"} : {scheduleList.member[sche.toString().replace("대한민국", "한국")]?.toString().replaceAll(",", ", ")}
                                         </div> :""}
@@ -258,8 +258,9 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     <p>{lang == "ko" ?"확정된 일정":"Fixed Schedule"}</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
-                <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
-                    {sortedList.length > 0 ? sortedList.map((sche:Date, index)=>{
+                <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 min-h-6 grid grid-column gap-1`}>
+                    {(confirm != 1 && confirm !=3) && sortedList.length > 0 ? sortedList.map((sche:Date, index)=>{
+                            console.log("sortedList", sortedList)
                             let diffMin = 0;
                             let diffMSec = 0;
                             const schedule:Date = new Date(sche.getTime());
@@ -301,7 +302,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                     <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
                                     <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                     <div className="inline-block mx-1"> ~ </div>
-                                    <p className="inline-block">{(week ? "" : end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
                                     <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                     
                                     {/* <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p> */}

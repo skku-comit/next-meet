@@ -1,4 +1,6 @@
-import { addUserEventID, postUser } from "@/lib/functions/CRUD";
+
+
+import { addRemoveUserEventID, postUser } from "@/lib/functions/CRUD";
 import getID from "@/lib/functions/getID";
 import isFormValid from "@/lib/functions/isFormValid";
 import setterBtnTab from "@/styles/setterbtntab.module.css";
@@ -89,7 +91,7 @@ const Setter = (props:any): ReactNode => {
 
       // console.log("signin", isMember, props.name, session);
 
-      const res2 = await addUserEventID(eventID, session.user.userID);
+      const res2 = await addRemoveUserEventID(parseInt(eventID as string), session.user, "addEvent");
 
       const data = await res2.json();
 
@@ -100,10 +102,10 @@ const Setter = (props:any): ReactNode => {
       }
 
       const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? data.userID == eventUser.userID : false) : false;
-      if(!(existedUser.length > 0)){
-        console.log("increased total mem")
-        props.setTotalMem((prev:number)=>(prev+1));
-      }
+      // if(!(existedUser.length > 0)){
+      //   console.log("increased total mem")
+      //   props.setTotalMem((prev:number)=>(prev+1));
+      // }
       const user = existedUser.length > 0 ? existedUser[0] : null;
       console.log("props.eventParti", props.eventParti)
       const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
@@ -154,7 +156,7 @@ const Setter = (props:any): ReactNode => {
         user = newNonMem;
         props.setLoginNonMem(newNonMem);
         console.log("newNonMem",newNonMem, user);
-        props.setTotalMem((prev:number)=>(prev+1));
+        // props.setTotalMem((prev:number)=>(prev+1));
         
         await postUser(eventID, newNonMem);
         // const res = await fetch("../api/form", {

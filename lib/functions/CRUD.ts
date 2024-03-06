@@ -1,7 +1,7 @@
 import { NextMeetEvent } from "@/template/Event";
 import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
-import { User } from "@/template/User";
+import { NextMeetUser, User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -179,14 +179,14 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
     console.log(data);
 }
 
-export const addUserEventID = async (eventID:string  | string[] | undefined, userID : string)=>{
+export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser, state : string)=>{
   const res2 = await fetch(`${NEXTAUTH_URL}/api/form`,{
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body : JSON.stringify({      
-      eventID, userID
+      eventID, user, state
     })
   });
 
