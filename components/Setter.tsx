@@ -10,11 +10,15 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
 import { IoMdLogIn } from "react-icons/io";
+import { language } from '../lib/recoil/Language';
+import { useRecoilState } from "recoil";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
 const Setter = (props:any): ReactNode => {
   const { data: session } = useSession();
   console.log( "session", session );
+
+  const [lang, setLang] = useRecoilState(language);
 
   const [isMember,setIsMember] = useState<boolean>(session && session.user ? true : false);
   useEffect(()=>{if(props.isLogin){setIsMember(session && session.user ? true : false)}},[props.isLogin])
@@ -70,11 +74,16 @@ const Setter = (props:any): ReactNode => {
       
       let session: any = await getSession();
 
-      // console.log("res", res);
-      // console.log( "Ssession", session );
-      // console.log("Ssession user", session?.user);
+      console.log("res", res);
+      console.log( "Ssession", session );
+      console.log("Ssession user", session?.user);
 
-      props.setIsLogin(true);
+      if(res?.error){
+        setIsMember(false);
+        nameIdInputRef.current.value = "";
+        pwInputRef.current.value = "";
+        throw new Error("there isn't any matching user.")
+      }
       props.setName(session?.user.userName);
       setIsMember(true);
 
@@ -201,7 +210,7 @@ const Setter = (props:any): ReactNode => {
               signOut({ redirect: false });
               props.setIsLogin(false); 
             }}}>
-        비회원
+        {lang == 'ko' ? "비회원":"NON-MEMBER"}
         </button>
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
           onClick={(e)=>{e.preventDefault();setIsMember(true); props.setScheduleTable(true); props.setConfirm(false);
@@ -216,7 +225,7 @@ const Setter = (props:any): ReactNode => {
               signOut({ redirect: false });
               props.setIsLogin(false); 
             }}}>
-        회원
+        {lang == 'ko' ? "회원":"MEMBER"}
         </button>
       </div>
       <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 overflow-hidden gap-0`}>
@@ -258,7 +267,7 @@ const Setter = (props:any): ReactNode => {
             // !props.isLogin ? isMember ? onMemLoginHandler():onNonMemLoginHandler():props.setIsHost(false);
             // props.isLogin ? props.setNonMemLogin(false) : "";
           }}
-        >{props.isLogin ? "로그아웃" : props.width <= 500 || props.width > 786 ? "로그인" : <IoMdLogIn className={`h-full w-8 h-25`} />}</button>
+        >{props.isLogin ? (lang=="ko" ? "로그아웃":"LOGOUT") : props.width <= 500 || props.width > 786 ? (lang == 'ko' ? "로그인":"LOGIN") : <IoMdLogIn className={`h-full w-8 h-25`} />}</button>
       </div>
 
     </div>

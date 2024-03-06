@@ -7,7 +7,8 @@ import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { useSearchParams } from "next/navigation";
-
+import { language } from '../lib/recoil/Language';
+import { useRecoilState } from "recoil";
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -31,17 +32,19 @@ interface MyComponentProps {
     eventTimeInfo:TimeInfo;
     week_startDate:Date;
     schedule:{schedule:Date[]};
+    eventID:number;
 }
 
 const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
     select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, eventTimeInfo, week_startDate, showDateTime,
-    showMemberList, schedule}:MyComponentProps) {
+    showMemberList, schedule, eventID}:MyComponentProps) {
     
-    const params = useSearchParams();
-    const eventID = params.get('id');
+    const [lang, setLang] = useRecoilState(language);
     
-    let checked_mem_num: number[] = [];
-    let max_checked_mem_sche:string[]=[];
+    let checked_mem_num: number[] = Object.values(scheduleList.checked_num);;
+    let max_checked_mem_sche:string[]= Object.keys(scheduleList.checked_num).filter((key: string) => {
+        return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
+        });    
     const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
 
     const [totalMemNum, setTotalMemNum] = useState(totalMem);
@@ -69,73 +72,77 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     let sortedList:Date[] = [];
 
     useEffect(()=>{
-        sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime());
+        sortedList = fixedSchedule.schedule?.sort((a:Date,b:Date)=>new Date(a).getTime()- new Date(b).getTime());
     },[fixedSchedule])
 
+    useEffect(()=>{console.log("confirm",confirm)},[confirm])
 
     const handleConfirm = async (newSchedule:Date[]) => {
+
+        console.log("handleConfirm", newSchedule)
     
         const state = "CONFIRM";
 
-        const getDateDiff = (date1:Date, date2:Date) => {
+        // const getDateDiff = (date1:Date, date2:Date) => {
         
-          if(date1.getMonth() == date2.getMonth()){
-            return date1.getDate() - date2.getDate();
-          }
-          else{
-            const dayOfMonth = new Date(date2.getFullYear(), date2.getMonth(), 0);
-            return dayOfMonth.getDate() - date2.getDate() + date1.getDate()
-          }
+        //   if(date1.getMonth() == date2.getMonth()){
+        //     return date1.getDate() - date2.getDate();
+        //   }
+        //   else{
+        //     const dayOfMonth = new Date(date2.getFullYear(), date2.getMonth(), 0);
+        //     return dayOfMonth.getDate() - date2.getDate() + date1.getDate()
+        //   }
           
-        }
+        // }
     
-        const dateList = eventTimeInfo?.dateList.sort((a:Date,b:Date)=>(a.getTime()- b.getTime()))
-        const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
-        const sortedSelectedWeekDay = eventTimeInfo?.dayList.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+        // const dateList = eventTimeInfo?.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime()))
+        // const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
+        // const sortedSelectedWeekDay = eventTimeInfo?.dayList.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
+        
+        let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
         const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     
+        newSchedule.map((sche:Date)=>{
+        //   let fixedSche:WeeklyFixedDate | FixedDate;
     
-        let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
+        //   const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
+        //   const real_sche = week ? (sortedSelectedWeekDay as DaysOfWeek[])[index] : (dateList as Date[])[index];
+          const time = new Date(sche).getHours() + ":" + new Date(sche).getMinutes();
     
-        newSchedule.map((sche)=>{
-          let fixedSche:WeeklyFixedDate | FixedDate;
-    
-          const index = getDateDiff(sche, week ? week_startDate : (dateList as Date[])[0]);
-          const real_sche = week ? (sortedSelectedWeekDay as DaysOfWeek[])[index] : (dateList as Date[])[index];
-          const time = sche.getHours + ":" + sche.getMinutes;
-    
-          const existedDate = week ? (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day == real_sche))
-                              : (fixedMeeting as FixedDate[]).filter((FM)=>(FM.date.getFullYear() == (real_sche as Date).getFullYear()
-                                                                            && FM.date.getMonth() == (real_sche as Date).getMonth()
-                                                                            && FM.date.getDate() == (real_sche as Date).getDate()))
+        //   const existedDate = week ? (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day == real_sche))
+        //                       : (fixedMeeting as FixedDate[]).filter((FM)=>(FM.date.getFullYear() == (real_sche as Date).getFullYear()
+        //                                                                     && FM.date.getMonth() == (real_sche as Date).getMonth()
+        //                                                                     && FM.date.getDate() == (real_sche as Date).getDate()))
           
-          if(existedDate){
+        //   if(existedDate){
+        //     if(week){
+        //       fixedMeeting = (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day != real_sche))
+        //       existedDate[0].timeRange.push(time);
+        //       (fixedMeeting as WeeklyFixedDate[]).push(existedDate[0] as WeeklyFixedDate);
+        //     }
+        //     else{
+        //       fixedMeeting = (fixedMeeting as FixedDate[]).filter((FM)=>(!(FM.date.getFullYear() == (real_sche as Date).getFullYear()
+        //                                                                         && FM.date.getMonth() == (real_sche as Date).getMonth()
+        //                                                                         && FM.date.getDate() == (real_sche as Date).getDate())))
+        //       existedDate[0].timeRange.push(time);
+        //       (fixedMeeting as FixedDate[]).push(existedDate[0] as FixedDate);
+        //     }
+        //   }
+        //   else{
             if(week){
-              fixedMeeting = (fixedMeeting as WeeklyFixedDate[]).filter((weekFD)=>(weekFD.day != real_sche))
-              existedDate[0].timeRange.push(time);
-              (fixedMeeting as WeeklyFixedDate[]).push(existedDate[0] as WeeklyFixedDate);
+              (fixedMeeting as WeeklyFixedDate[]).push({day : WEEKDAY[new Date(sche).getDay()] as DaysOfWeek, timeRange:[time]})
             }
             else{
-              fixedMeeting = (fixedMeeting as FixedDate[]).filter((FM)=>(!(FM.date.getFullYear() == (real_sche as Date).getFullYear()
-                                                                                && FM.date.getMonth() == (real_sche as Date).getMonth()
-                                                                                && FM.date.getDate() == (real_sche as Date).getDate())))
-              existedDate[0].timeRange.push(time);
-              (fixedMeeting as FixedDate[]).push(existedDate[0] as FixedDate);
+              (fixedMeeting as FixedDate[]).push({date : new Date(sche), timeRange:[time]})
             }
-          }
-          else{
-            if(week){
-              (fixedMeeting as WeeklyFixedDate[]).push({day : (sortedSelectedWeekDay as DaysOfWeek[])[index], timeRange:[time]})
-            }
-            else{
-              (fixedMeeting as FixedDate[]).push({date : (dateList as Date[])[index], timeRange:[time]})
-            }
-          }
+        //   }
           
         })
+
+        console.log("FixedMeeting", fixedMeeting)
     
         try {
-          const res = await fetch("api/form", {
+          const res = await fetch("http://localhost:3000/api/form", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -151,7 +158,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
           console.log(error);
         } 
         // console.log(fixedSchedule.schedule);
-       }
+    }
     
     useEffect(()=>{
         console.log("show showMemberList", showMemberList);
@@ -162,7 +169,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         <div className="z-25 overflow-hidden overflow-x-auto px-5 pt-3 pb-2 bg-[#f8f9fa] rounded ">
           <div className={`flex flex-row`}>
             {width > 768 ? <div className="w-2/4 pr-3 pt-2">
-                <div className="pl-2 break-all font-bold">Members</div>
+                <div className="pl-2 break-all font-bold">{lang=="ko"? "참여 가능한 사람":"Members"}</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}>
                     {showMember ? scheduleList.member[showDateTime]?.map((member,idx)=>{
@@ -178,7 +185,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                 <div className={`w-full mr-1 grid grid-column gap-2 ${width > 768 ? "pl-3":''}`}>
                 <div className="pt-2 mr-1">
                     <div className="flex flex-row pl-2 font-bold justify-between items-center">
-                        <p>가장 많은 멤버가 참여 가능한 시간대</p>
+                        <p>{lang == "ko" ?"최대인원이 참여 가능한 시간대":"Time with the Maximum Number of People"}</p>
                     </div>
                     <hr className="border-t-2 my-1 mb-2"/>
                     <ul className ="px-2 min-h-4">
@@ -233,10 +240,10 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                     {showMaxMember ? <FaAngleUp/> : <FaAngleDown/>}
                                 </div>
                                 <div>
-                                        {showMaxMember ? <p>
+                                        {showMaxMember ? <div className="w-inherit p-2">
                                             <hr className="border-black my-1 mb-2"/>
-                                            멤버 : {scheduleList.member[sche.toLocaleString()].toString()}
-                                        </p> :""}
+                                            {lang=="ko" ? "멤버":"Members"} : {scheduleList.member[sche.toString().replace("대한민국", "한국")]?.toString().replaceAll(",", ", ")}
+                                        </div> :""}
                                 </div>
                                 </li>
                             )
@@ -248,7 +255,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
             <div className={`w-full pb-2 pt-2 mr-1 grid grid-column gap-2 ${width > 768 ? "pl-3" : "border-l-3"}`}>            
             <div className="pt-2 mr-1">
                 <div className="pl-2 font-bold justify-between items-center">
-                    <p>확정된 일정</p>
+                    <p>{lang == "ko" ?"확정된 일정":"Fixed Schedule"}</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
@@ -315,31 +322,35 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                     onClick={()=>{setShowResult(false)}}/>
             </div>
           </div>
-            {isHost ? select ? "" : <div className={`flex flex-row gap-2 mt-2`}>
+            {isHost ? select ? "" : ( confirm == 0 || confirm == 1) ? <div className={`flex flex-row gap-2 mt-2`}>
             <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                 onClick={()=>{
                     // console.log(fixedSchedule.schedule);
                     // console.log(confirm)
 
-                    if(confirm == 0 || confirm == 2){
+                    if(confirm == 0){
                         setConfirm(1);
-                        handleConfirm(fixedSchedule.schedule);
                     }
                     else if(confirm == 1){ //select 중
-                        setConfirm(0); 
-                        console.log(fixedSchedule.schedule);
+                        setConfirm(2); 
+                        handleConfirm(fixedSchedule.schedule);
+                        console.log("fixedSchedule.schedule",fixedSchedule.schedule);
 
                         if(fixedSchedule.schedule.length > 0){
                             setSelect(1); 
                             console.log(fixedSchedule.schedule.length);
                         }
+                        else{
+                            setConfirm(0);
+                        }
+                        setShowResult(false);
                     
                     }
                 }}>
                     {confirm == 1 ? "일정 확정완료" : "일정 확정하기"}
                     {/* {confirm == 1 ? "일정 확정완료" : select==1 ? "일정 수정하기" : "일정 확정하기"} */}
                 </div>
-                </div> : ""}
+                </div> :"": ""}
                 {/* {select == 1 ?
                 <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
                     onClick={()=>{

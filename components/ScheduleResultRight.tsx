@@ -2,6 +2,8 @@ import scheduleResultCSS from "@/styles/scheduleResult.module.css";
 import React, {useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { language } from '../lib/recoil/Language';
+import { useRecoilState } from "recoil";
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -24,6 +26,9 @@ interface MyComponentProps {
 
 const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
     select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, showMemberList }:MyComponentProps) {
+    
+    const [lang, setLang] = useRecoilState(language);
+
     let checked_mem_num: number[] = Object.values(scheduleList.checked_num);
     let max_checked_mem_sche:string[]=Object.keys(scheduleList.checked_num).filter((key: string) => {
         return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
@@ -72,7 +77,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     <div className="w-5/12 flex flex-col gap-3 overflow-hidden overflow-x-auto place-self-start">
         <div className="p-5 bg-[#f8f9fa] rounded place-self-start w-full">
             <div className="">
-                <div className="pl-2 break-all font-bold">Members</div>
+                <div className="pl-2 break-all font-bold">{lang=="ko"? "참여 가능한 사람":"Members"}</div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_height} border-separate px-2 min-h-4`}>
                     {showMember ? showMemberList?.map((member)=>{
@@ -86,7 +91,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
         <div className="p-5 bg-[#f8f9fa] rounded place-self-start w-full">            
             <div className="pt-2 mr-1">
                 <div className="pl-2 font-bold justify-between items-center">
-                    <p>가장 많은 멤버가 참여 가능한 시간대</p>
+                    <p>{lang == "ko" ?"최대인원이 참여 가능한 시간대":"Time with the Maximum Number of People"}</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ="px-2 min-h-4">
@@ -129,7 +134,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                             <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{
                                 //show the member name in row
                                 showMaxMember ? setShowMaxMember(false) : setShowMaxMember(true)
-                            }}>
+                            }} key={index}>
                               <div className="flex flex-row gap-1">
                                 <div>
                                     <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
@@ -144,7 +149,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                               <div>
                                     {showMaxMember ? <p>
                                         <hr className="border-black my-1 mb-2"/>
-                                        멤버 : {scheduleList.member[new Date(sche).toLocaleString()].toString()}
+                                        {lang=="ko" ? "멤버":"Members"} : {scheduleList.member[new Date(sche).toString().replace("대한민국", "한국")]?.toString().replaceAll(",", ", ")}
                                     </p> :""}
                               </div>
                             </li>
@@ -156,7 +161,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
         <div className="w-full p-5 bg-[#f8f9fa] rounded place-self-start">            
             <div className="pt-2 mr-1">
                 <div className="pl-2 font-bold justify-between items-center">
-                    <p>확정된 일정</p>
+                    <p>{lang == "ko" ?"확정된 일정":"Fixed Schedule"}</p>
                 </div>
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
@@ -236,7 +241,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                     
                     }
                 }}>
-                    {confirm == 1 ? "일정 확정완료" : "일정 확정하기"}
+                    {confirm == 1 ? (lang=="ko" ? "일정 확정완료":"Confirmed Complete") : (lang == "ko" ? "일정 확정하기":"Schedule confirmed")}
                     {/* {confirm == 1 ? "일정 확정완료" : select==1 ? "일정 수정하기" : "일정 확정하기"} */}
                 </div>:""}
                 {/* {select == 1 ?

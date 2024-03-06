@@ -378,7 +378,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
 
     // console.log(startTimeHour, endTimeHour)
 
-    useEffect(()=>{console.log("scheduleList TotalMem",scheduleList, schedule.schedule, totalMemNum)}, [schedule.schedule])
+    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, totalMemNum, state)}, [schedule.schedule, state])
 
   return (
         <div className="w-full overflow-hidden overflow-x-auto p-5 bg-[#f8f9fa] rounded" hidden={state=="EDIT" && confirm==1?true:false}>

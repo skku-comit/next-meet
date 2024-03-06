@@ -304,21 +304,21 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
 
     return <div className="w-screen h-full min-h-screen ">
         <div className="(header space) w-screen h-20 bg-[white]"></div>
-        {!select || confirm==1 ? "":<div className="pt-10 pb-10"></div>}
+        {confirm !=3 && (!select || confirm == 1) ? "":<div className={`pt-10 ${confirm == 3 ? "pb-5":"pb-10"}`}></div>}
         <div className={`w-screen ${select ? "" : "pt-6"} ${width < 768 ? "px-10":"px-20"}`}>
           <div className={`rounded w-full bg-[#eee] min-h-10 p-3 text-center ${showDescription? "": "pb-2"}`}>
             <div className={`font-bold min-h-5 ${showDescription?"pb-1":""} cursor-pointer`}
                 onClick={()=>{setShowDescription((prev)=>(!prev))}}>
                 {event?.eventName}
             </div>
-            {showDescription?<div className="border-t-2 pt-2.5  border-gray min-h-20 text-center">
+            {showDescription?<div className="border-t-2 pt-2.5  border-gray min-h-10 text-center">
                 {event?.description}
             </div>:""}
         </div>
           
         </div>
-        {select && isHost ? <ConfirmBtn select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule}/> : ""}
-        {!select || confirm==1 ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
+        {(select || confirm == 3) && isHost ? <ConfirmBtn week={week} select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}/> : ""}
+        {!select || (confirm==1 || confirm == 3) ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
                                     setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
                                     setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
                                     eventUsers={event?.userList} eventHost={event?.hostUserInfo} setSchedule={setSchedule}
@@ -327,7 +327,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                                     setLoginNonMem={setLoginNonMem} />:""}
         <div className={`w-screen pt-5 ${width < 768 ? "px-10":"px-20"} pb-5`}>
             <div className={`flex ${width < 768 ? "flex-col" : "flex-row"} flex-nowrap items-start text-center gap-4 justify-center`}> 
-                {confirm == 1 ? 
+                {confirm == 1 || confirm == 3? 
                     <ScheduleTableConfirm week={week} isLogin={isLogin} width={width} 
                         fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}
                         select={select} totalMem={totalMem} schedule={schedule} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime}
@@ -336,7 +336,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
                         preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                         /> : ""}
-                {isLogin? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
+                {isLogin && !(confirm == 1 || confirm == 3)? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
                             width={width} setSchedule={setSchedule} confirm={confirm}  
                             // fixedDate={null} fixedDay={null} fixedTime={null}
                             name={name} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} select={select} 
@@ -369,7 +369,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
             showResult ? 
             <div className={`z-30 w-full fixed bottom-0 border-gray border-t-2`}>
                 <ScheduleResultBottom 
-                setShowResult={setShowResult} showResult={showResult} width={width} schedule={schedule}
+                setShowResult={setShowResult} showResult={showResult} width={width} schedule={schedule} eventID={event.eventID}
                 showMember={showMember} showMemberList={showMemberList} scheduleList={totalScheduleList} totalMem={totalMem} showDateTime={showDateTime}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
