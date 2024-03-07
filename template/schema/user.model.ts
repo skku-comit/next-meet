@@ -24,6 +24,7 @@ const NextMeetUserSchema = new Schema({
   },
   eventIDList: {
     type: Array<Number>,
+    default: [],
   },
 });
 

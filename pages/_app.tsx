@@ -3,12 +3,15 @@ import type { AppProps } from "next/app";
 import RootLayout from "./layout";
 import { RecoilRoot } from "recoil";
 import AuthProvider from "@/lib/auth/SessionProvider";
-export default function App({ Component, pageProps }: AppProps) {
+import { SessionProvider } from "next-auth/react";
+export default function App({ Component, pageProps: {session, ...pageProps} }: AppProps) {
   return (
+    <SessionProvider session={session}>
     <RecoilRoot>
-      <AuthProvider>
+      
       <Component {...pageProps} />
-      </AuthProvider>
+      
     </RecoilRoot>
+    </SessionProvider>
   );
 }

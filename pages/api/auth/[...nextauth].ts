@@ -1,20 +1,40 @@
 import NextAuth from "next-auth/next";
+import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { NextResponse } from "next/server";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
 const handler = NextAuth({
   callbacks: {
-    async signIn({ user, account }: { user: any; account: any }) {
-      if (user.message != 0) {
-        throw new Error(user.message + "");
+    async signIn({ user, account }) {
+      console.log("This is signin function");
+      console.log(user);
+      console.log(account);
+      const res = await fetch(`${NEXTAUTH_URL}/api/signinG`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },      
+        body: JSON.stringify({ email: user.email, userName: user.name }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          if (data.isNew) {
+            console.log(`User ${user.name} signed up successfully`);
+          } else {
+            console.log(`User ${user.name} has just signed in`);
+          }
+          return true;  
+        } else {
+          throw new Error("Failed to form json");
+        }
+      } else {
+        console.log(res.status);
+        return false;
       }
-      else if (user?.error === "error in nextauth.ts line 51") {
-        throw new Error("error in nextauth.ts line 51")
-      }
-      return true;
     },
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs
@@ -25,13 +45,36 @@ const handler = NextAuth({
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
      },
-    async jwt({ token, user }) {
+    async jwt({ token, account, profile, user }) {
+      // console.log("This is jwt");
+      // console.log(token);
+      // console.log(account);
+      // console.log(profile);
       user && (token.user = user);
       return token;
     },
-    async session ({session, token }) {
-      session.user = token.user;
-      return session;
+    async session ({session, token, user }) {
+      console.log("This is session");
+      // console.log(`${Date.now()}`);
+      const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/userInfo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: (token.user as User).email })
+      });
+      if (getUserInfo.ok) {
+        const userInfo = await getUserInfo.json();
+        if (userInfo) {
+          (session as Session).user = userInfo;
+          console.log(session.user);
+          return session;
+        } else {
+          throw new Error("Failed to form json");
+        }
+      } else {
+        throw new Error("Failed to get valid response");
+      }
     },
   },
   providers: [
@@ -48,8 +91,11 @@ const handler = NextAuth({
       },
 
       async authorize(credentials, req) {
-        if (!credentials) return { error: "error in nextauth.ts line 51" };
         try {
+          if (!credentials) throw new Error("No credentials");
+          console.log("This is authorization function")
+          console.log(credentials);
+          console.log(req);
           const res = await fetch(`${NEXTAUTH_URL}/api/login`, {
             method: "POST",
             headers: {
@@ -62,13 +108,10 @@ const handler = NextAuth({
           });
           const user = await res.json();
           if (user) {
-            return {
-              ...user,
-              name: user.userName,
-            };
+            return user;
           }
           else {
-            return { error: "error in nextauth.ts line 71"};
+            throw new Error("Failed to form json");
           }
           // return { 
           //   ...user, 
@@ -76,6 +119,7 @@ const handler = NextAuth({
           // };
         } catch (error) {
           console.log(error);
+          return false;
         }
       },
     }),

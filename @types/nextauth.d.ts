@@ -1,9 +1,12 @@
-import NextAuth from 'next-auth';
+import NextAuth, { DefaultSession, User } from 'next-auth';
+import { NextMeetUserG } from "@/template/User";
 
 declare module 'next-auth' {
     interface Session {
         user: {
-            userID: number | null
-        } & DefaultSession['user'];
+            
+        } & User;
     }
+
+    interface User extends NextMeetUserG { };
 }
