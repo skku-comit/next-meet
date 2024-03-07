@@ -210,12 +210,17 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       if(part2){
         if(!(part2!.user.filter((user)=>(user.userID == (session && session.user ? session.user.userID : loginNonMem?.userID))).length > 0)){
           participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche).getTime()));
-          (session && session.user) || loginNonMem ? part2!.user.push(session && session.user ? session.user : loginNonMem) : "";
+          if((session && session.user)) {
+            part2!.user.push(session.user)
+          }
+          else if(loginNonMem){
+            part2!.user.push(loginNonMem)
+          }
           participateStatus?.push(part2)
         }
       }
       else{
-        const new_participate:Participate = {time : sche, user : session && session.user ? [session.user] : [loginNonMem]}
+        const new_participate:Participate = {time : sche, user : session && session.user ? [session.user] : loginNonMem ? [loginNonMem] : []}
         console.log("part2", new_participate, new_participate.user, session?.user, new_participate.user.length > 0)
         if(new_participate.user.length > 0) {
           // console.log("part2 push")

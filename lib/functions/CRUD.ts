@@ -179,7 +179,7 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
     console.log(data);
 }
 
-export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser, state : string)=>{
+export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser | undefined, state : string)=>{
   const res2 = await fetch(`${NEXTAUTH_URL}/api/form`,{
     method: "PUT",
     headers: {

@@ -7,6 +7,7 @@ import NextMeetUser from "@/template/schema/user.model";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from "@/template/Participate";
 import { NextResponse } from "next/server";
+import NextMeetUserG from "@/template/schema/userG.model";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -33,7 +34,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       } 
       else {
         // If member, add the ID of new event to member's event list
-        const user = await NextMeetUser.findOne({ userID: userID });
+        let user = await NextMeetUser.findOne({ userID: userID });
+        if(!user) {user = await NextMeetUserG.findOne({ userID: userID })};
         (user.eventIDList as number[]).push(newEventID);
         await user.save();
       }
@@ -47,7 +49,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         participateStatus: [],
         fixedMeeting: [],
         hostUserInfo: host,
-        userList:[host],
+        userList:[],
       });
 
       res.status(201).json({ eventID: newEventID});
@@ -63,7 +65,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // If member, add the ID of new event to member's event list
       const reqBody = req.body;
       console.log("put reqBody", reqBody);
-      const user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
+      let user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
+      if(!user) {user = await NextMeetUserG.findOne({ userID: reqBody.user.userID })};
         // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
       if(reqBody.state == "addEvent"){
         if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){

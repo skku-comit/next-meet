@@ -17,9 +17,9 @@
 }
 
 .result_scrolling4{
-    max-height: 70px;
-    border-spacing: 10px 0px;
     overflow-y:scroll;
+    border-spacing: 10px 0px;
+    
 }
 
 .result_height{

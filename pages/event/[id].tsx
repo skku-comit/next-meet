@@ -6,10 +6,11 @@ import ScheduleResultBottom from "@/components/ScheduleResultBottom";
 import ScheduleResultRight from "@/components/ScheduleResultRight";
 import ScheduleTableConfirm from "@/components/scheduleTableConfirm";
 import ConfirmBtn from "@/components/ConfirmBtn";
+import scheResultBotCSS from "@/styles/scheduleResultBottom.module.css";
 
 import { FaList, FaAngleDown, FaAngleUp } from "react-icons/fa";
 
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer, MouseEventHandler } from "react";
 import { throttle } from "lodash";
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -126,8 +127,12 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
     const [nonMemLogin, setNonMemLogin] = useState(false);
     const [loginNonMem, setLoginNonMem]:[User|undefined,Function] = useState();
     const [isLogin, setIsLogin] = useState(nonMemLogin || session && session.user ? true : false)
-    const [isHost, setIsHost] = useState(session && session.user ? session.user.userID == event.hostUserInfo.userID : false);
+    const [isHost, setIsHost] = useState(session && session.user ? session.user.userID == event.hostUserInfo.userID : loginNonMem?.userID == event.hostUserInfo.userID);
     
+    useEffect(()=>{
+        setIsHost(session && session.user ? session.user.userID == event.hostUserInfo.userID : loginNonMem?.userID == event.hostUserInfo.userID);
+    }, [isLogin, session?.user])
+
     console.log("login", isLogin)
 
     let eventParticipate:Participate[]|null = null;
@@ -167,7 +172,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
     const [schedule, setSchedule]:[{schedule :Date[]}, Function] = useState(eventParticiTime);    
     const [preMySelected, setPreMySelected] = useState(schedule.schedule);
     const [fixedSchedule, setFixedSchedule]:[{schedule :Date[]}, Function] = useState(fixedMeeting);
-    const [commitFixedSchedule, setCommitFixedSchedule]:[{schedule :Date[]}, Function] = useState({schedule :[]})
+    const [preFixedSchedule, setPreFixedSchedule]:[{schedule :Date[]}, Function] = useState(fixedMeeting);
     
     useEffect(() => {
         if(session && session.user){
@@ -258,7 +263,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
 
     const [totalMem, setTotalMem] = useState(event?.userList ? event.userList.length : 0);
 
-    const [confirm, setConfirm] = useState(event?.fixedMeeting.length > 0 ? 2 : 0);
+    const [confirm, setConfirm]:[number, Function] = useState(event?.fixedMeeting.length > 0 ? 2 : 0);
     const [select, setSelect] = useState(event?.fixedMeeting.length > 0 ? 1 : 0);
 
     const [width, setWidth]:[number, Function] = useState(0);
@@ -287,19 +292,36 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
         };
     }, []);
 
-    useEffect(()=>{
-        // console.log("fixedSchedule",fixedSchedule)
-    }, [fixedSchedule])
+    // useEffect(()=>{
+    //     // console.log("fixedSchedule",fixedSchedule)
+    // }, [fixedSchedule])
 
 
-    useEffect(()=>{
-        console.log("select",select, fixedSchedule)
-    }, [select])
+    const [height, setHeight] = useState(192);
+
+    const dragHandler: MouseEventHandler<HTMLDivElement> = (e) => {
+        const target = e.currentTarget.parentElement;
+        if (!target) return;
+      
+        const resize: EventListener = (e) => {
+          const top = target.getBoundingClientRect().top + target.getBoundingClientRect().height;
+          const bottom = (e as MouseEvent).clientY;
+          const height = Math.max(150, top - bottom);
+          console.log("resize", top, bottom, height, height-123);
+          target.style.height = `${height > 430 ? 430 : height}px`;
+          setHeight(height > 430 ? 430 : height);
+        };
+      
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize), { once: true });
+      };
 
     const [showDescription, setShowDescription] = useState(false);
 
-
-    console.log("totalMem NonMemLogin",totalMem, nonMemLogin, totalScheduleList, indexOfLongestUserParti, longestUser ? (longestUser)[0] : null)
+    // useEffect(()=>{
+    //     console.log("isHost",isHost, session?.user.userID == event.hostUserInfo.userID, fixedSchedule)
+    // }, [isHost])
+    // console.log("totalMem NonMemLogin", totalMem, nonMemLogin, totalScheduleList, indexOfLongestUserParti, longestUser ? (longestUser)[0] : null)
 
     return <div className="w-screen h-full min-h-screen ">
         <div className="(header space) w-screen h-20 bg-[white]"></div>
@@ -317,14 +339,15 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
         </div>
           
         </div>
-        {(select || confirm == 2 || confirm == 3) && isHost ? <ConfirmBtn week={week} select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}/> : ""}
+        {(select || confirm == 2 || confirm == 3) && isHost ? <ConfirmBtn week={week} select={select} setSelect={setSelect} confirm={confirm} 
+                                                                setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} setPreFixedSchedule={setPreFixedSchedule} eventID={event.eventID}/> : ""}
         {true || !select || (confirm==1 || confirm == 3) ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
                                     setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
                                     setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
                                     eventUsers={event?.userList} eventHost={event?.hostUserInfo} setSchedule={setSchedule}
                                     setIsHost={setIsHost} setNonMemLogin={setNonMemLogin} 
                                     eventParti = {event?.participateStatus} preMySelected={preMySelected} setPreMySelected={setPreMySelected}
-                                    setLoginNonMem={setLoginNonMem} />:""}
+                                    setLoginNonMem={setLoginNonMem} preFixedSchedule={preFixedSchedule}/>:""}
         <div className={`w-screen pt-5 ${width < 768 ? "px-10":"px-20"} pb-5`}>
             <div className={`flex ${width < 768 ? "flex-col" : "flex-row"} flex-nowrap items-start text-center gap-4 justify-center`}> 
                 {confirm == 1 || confirm == 3? 
@@ -336,7 +359,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
                         preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                         /> : ""}
-                {isLogin && (confirm == 0)? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
+                {isLogin && (confirm == 0) ? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
                             width={width} setSchedule={setSchedule} confirm={confirm}  
                             // fixedDate={null} fixedDay={null} fixedTime={null}
                             name={name} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} select={select} 
@@ -357,31 +380,32 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                 preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                 // fixedDate={null} fixedDay={null} fixedTime={null}
                 />
-                {!isLogin && width > 768 && confirm != 1?
+                {width > 768 && (confirm == 2)?
                 <ScheduleResultRight setShowResult={setShowResult} showResult={showResult} 
                 showMember={showMember} showMemberList={showMemberList} scheduleList={totalScheduleList} totalMem={totalMem}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
+                week_startDate={week_startDate} eventTimeInfo={event.timeInfo} eventID={event.eventID} setPreFixedSchedule={setPreFixedSchedule}
                 />
                 :"" }
             </div>
         </div>
-        {width <= 768 || (isLogin || confirm == 1) ?
+        {width > 768 && (confirm == 2) ? "":
             showResult ? 
-            <div className={`z-30 w-full fixed bottom-0 border-gray border-t-2`}>
+            <div className={`z-30 w-full fixed bottom-0 h-48`}>
+                <div className={`bg-[lightgray] h-0.5 cursor-row-resize hover:bg-[darkgray] ${scheResultBotCSS.result_bottom_border}`} onMouseDown={(e)=>dragHandler(e)}></div>
                 <ScheduleResultBottom 
                 setShowResult={setShowResult} showResult={showResult} width={width} schedule={schedule} eventID={event.eventID}
                 showMember={showMember} showMemberList={showMemberList} scheduleList={totalScheduleList} totalMem={totalMem} showDateTime={showDateTime}
                 confirm={confirm} setConfirm={setConfirm} select={select} setSelect={setSelect}
                 fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} week={week} isLogin={isLogin} isHost={isHost}
-                eventTimeInfo={event.timeInfo} week_startDate={week_startDate}
+                eventTimeInfo={event.timeInfo} week_startDate={week_startDate} setPreFixedSchedule={setPreFixedSchedule} height={height}
                 />
             </div> :
-            <div className="fixed bottom-5 right-5 rounded-full bg-[#eee] w-fit p-4 cursor-pointer">
-            <FaList className="w-5 h-5"
-                onClick={()=>setShowResult(true)}/>
+            <div className="z-30 fixed bottom-5 right-5 rounded-full bg-[#eee] h-fit p-4 cursor-pointer" style={{height:"52px"}} onClick={()=>setShowResult(true)}>
+            <FaList className="w-5 h-5"/>
         </div>
-        : ""}
+        }
     </div>
 }
 

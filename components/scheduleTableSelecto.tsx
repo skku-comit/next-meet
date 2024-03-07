@@ -119,7 +119,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
 
   const dummyTimePeriod = {startTime : "00:00", endTime : "24:00"};
 
-  const [dateList, setDateList]:[Date[], Function] = useState(eventTimeInfo ? eventTimeInfo.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : dummyDateList);
+  const [dateList, setDateList]:[Date[], Function] = useState(eventTimeInfo ? eventTimeInfo.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : []);
 //   console.log("dateList", dateList);
   const [timePeriod, setTimePeriod] = useState(eventTimeInfo ? {startTime: eventTimeInfo.startTime, endTime : eventTimeInfo.endTime} : dummyTimePeriod);
   const startTimeHour:number = parseInt(timePeriod.startTime.split(':')[0])+parseFloat(timePeriod.startTime.split(':')[1]=='30'?'0.5':'0');
@@ -513,7 +513,8 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                         onMouseOver={()=>{setShowMember(true); setShowMemberList(memberList); setShowDateTime(datetimeStr)}}
                         onMouseOut={()=>{setShowMember(false); setShowMemberList([]);}}>
                             
-                            {width <=768 ? <div className ={`${scheduleTableCSS.date_cell_popup}`}>
+                            {width > 768 && (confirm == 2) ? "" :
+                            <div className ={`${scheduleTableCSS.date_cell_popup}`}>
                                {scheduleList.member[datetimeStr] ? <ul>
                             {/* ${scheduleResultCSS.result_scrolling} border-separate px-2 min-h-4`}> */}
                                 {scheduleList.member[datetimeStr].map((member)=>{
@@ -522,7 +523,8 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                                     )
                                 })}
                                 </ul>:""}
-                            </div>:""}
+                            </div>
+                            }
                         </div>
                 }}
                 // renderTimeLabel={(time)=>{handleTimeLabel(time)}}

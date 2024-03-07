@@ -4,6 +4,9 @@ import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { useSearchParams } from "next/navigation";
 import React, {useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
+import { language } from '../lib/recoil/Language';
+import { useRecoilState } from "recoil";
+import { handleConfirm } from "@/lib/functions/handleConfirm";
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -15,52 +18,57 @@ interface MyComponentProps {
     fixedSchedule:{schedule:Date[]};
     setFixedSchedule:Function;
     eventID:number;
+    setPreFixedSchedule:Function;
 }
 
-const ConfirmBtn = ({week, select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, eventID}:MyComponentProps) => {
+const ConfirmBtn = ({week, select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, eventID, setPreFixedSchedule}:MyComponentProps) => {
 
-      const handleConfirm = async (newSchedule:Date[]) => {
+    const [lang, setLang] = useRecoilState(language);
+  
+    // const handleConfirm = async (newSchedule:Date[]) => {
 
-        console.log("handleConfirm", newSchedule)
+    //     console.log("handleConfirm", newSchedule)
 
-        const state = "CONFIRM";
+    //     const state = "CONFIRM";
 
-        let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
-        const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    //     let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
+    //     const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-        newSchedule.map((sche:Date)=>{
-            const time = new Date(sche).getHours() + ":" + new Date(sche).getMinutes();
+    //     newSchedule.map((sche:Date)=>{
+    //         const time = new Date(sche).getHours() + ":" + new Date(sche).getMinutes();
 
-            if(week){
-              (fixedMeeting as WeeklyFixedDate[]).push({day : WEEKDAY[new Date(sche).getDay()] as DaysOfWeek, timeRange:[time]})
-            }
-            else{
-              (fixedMeeting as FixedDate[]).push({date : new Date(sche), timeRange:[time]})
-            }
-        //   }
+    //         if(week){
+    //           (fixedMeeting as WeeklyFixedDate[]).push({day : WEEKDAY[new Date(sche).getDay()] as DaysOfWeek, timeRange:[time]})
+    //         }
+    //         else{
+    //           (fixedMeeting as FixedDate[]).push({date : new Date(sche), timeRange:[time]})
+    //         }
+    //     //   }
           
-        })
+    //     })
 
-        console.log("FixedMeeting", fixedMeeting)
+    //     console.log("FixedMeeting", fixedMeeting)
 
-        try {
-          const res = await fetch("http://localhost:3000/api/form", {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({      
-              eventID, fixedMeeting, state
-            }),
-          });
-          console.log(res);
-          const data = await res.json();
-          console.log(data);
-        } catch (error) {
-          console.log(error);
-        } 
-        // console.log(fixedSchedule.schedule);
-    }
+    //     try {
+    //       const res = await fetch("http://localhost:3000/api/form", {
+    //         method: "PATCH",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //         body: JSON.stringify({      
+    //           eventID, fixedMeeting, state
+    //         }),
+    //       });
+    //       console.log(res);
+    //       const data = await res.json();
+    //       console.log(data);
+    //     } catch (error) {
+    //       console.log(error);
+    //     } 
+
+    //     setPreFixedSchedule({schedule:[newSchedule]});
+    //     // console.log(fixedSchedule.schedule);
+    // }
 
 
     return (
@@ -71,12 +79,12 @@ const ConfirmBtn = ({week, select, setSelect, confirm, setConfirm, fixedSchedule
               // console.log(confirm)
 
               if(confirm == 0 || confirm == 2){
-                  setConfirm(3);
-                  setSelect(0);
+                setConfirm(3);
+                setSelect(0);
               }
               else if(confirm == 3){ //edit 중
-                  setConfirm(2); 
-                handleConfirm(fixedSchedule.schedule);
+                setConfirm(2); 
+                handleConfirm(fixedSchedule.schedule, week, eventID, setPreFixedSchedule);
                 console.log(fixedSchedule.schedule);
 
                 if(fixedSchedule.schedule.length > 0){
@@ -89,17 +97,17 @@ const ConfirmBtn = ({week, select, setSelect, confirm, setConfirm, fixedSchedule
             
             }
         }}>
-            {confirm==3 ? "일정 수정완료" : "일정 수정하기"}
+            {confirm==3 ? lang == "ko" ? "수정완료" : "Schedule Modification Completed": lang == "ko" ? "확정된 일정 수정하기" : "Edit a Confirmed Schedule"}
         </div>
         {select == 1 ?
         <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[darkgray]"} cursor-pointer text-center`}
             onClick={async ()=>{
-                handleConfirm([]);                
+                handleConfirm([], week, eventID, setPreFixedSchedule);                
                 setConfirm(0);
                 setSelect(0);
                 setFixedSchedule({schedule:[]});
             }}>
-            일정 확정 취소
+            {lang =="ko" ? "일정 확정 취소" : "Cancel confirmed schedule"}
         </div>:""}
     </div>
   );

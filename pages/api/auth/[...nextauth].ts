@@ -7,7 +7,8 @@ const NEXTAUTH_URL = "http://localhost:3000";
 
 const handler = NextAuth({
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: any; account: any }) {
+      
       console.log("This is signin function");
       console.log(user);
       console.log(account);
@@ -56,6 +57,11 @@ const handler = NextAuth({
     async session ({session, token, user }) {
       console.log("This is session");
       // console.log(`${Date.now()}`);
+      if(token && token.user){
+        session.user = token.user;
+        return session;
+      }
+
       const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/userInfo`, {
         method: "POST",
         headers: {
@@ -108,7 +114,11 @@ const handler = NextAuth({
           });
           const user = await res.json();
           if (user) {
-            return user;
+            // return user;
+            return {
+              ...user,
+              name: user.userName,
+            };
           }
           else {
             throw new Error("Failed to form json");

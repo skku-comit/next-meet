@@ -200,7 +200,7 @@ const Setter = (props:any): ReactNode => {
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
       <div className="w-full flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(false); props.setScheduleTable(true); props.setConfirm(false); 
+          onClick={(e)=>{e.preventDefault();setIsMember(false); props.setScheduleTable(true); props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0); 
             if(props.isLogin){
               props.setScheduleTable(true);
               setTimeout(()=>{props.setIsLogin(false)
@@ -215,7 +215,7 @@ const Setter = (props:any): ReactNode => {
         {lang == 'ko' ? "비회원":"NON-MEMBER"}
         </button>
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(true); props.setScheduleTable(true); props.setConfirm(false);
+          onClick={(e)=>{e.preventDefault();setIsMember(true); props.setScheduleTable(true); props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
             if(props.isLogin){
               props.setScheduleTable(true);
               setTimeout(()=>{props.setIsLogin(false)
@@ -262,7 +262,7 @@ const Setter = (props:any): ReactNode => {
               props.setScheduleTable(false);
               isMember ? onMemLoginHandler():onNonMemLoginHandler();
             }
-            props.confirm == 1 ? props.setConfirm(2) : "";
+            props.confirm == 1 ? props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0) : "";
             // props.isLogin ? props.setScheduleTable(true) : props.setScheduleTable(false);
             // props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true);  
             // props.isLogin ? props.setName(""):"";

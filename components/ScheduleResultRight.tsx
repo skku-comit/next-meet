@@ -4,6 +4,8 @@ import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { language } from '../lib/recoil/Language';
 import { useRecoilState } from "recoil";
+import MaxMemberSche from "@/components/MaxMemberSche"
+import { TimeInfo } from "@/template/TimeInfo";
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -22,12 +24,21 @@ interface MyComponentProps {
     week:boolean;
     isLogin:boolean;
     isHost:boolean;
+    week_startDate:Date;
+    eventTimeInfo:TimeInfo | undefined;
+    eventID:number;
+    setPreFixedSchedule:Function;
 }
 
 const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResult, showResult,showMember, scheduleList, totalMem,
-    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, showMemberList }:MyComponentProps) {
-    
+    select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, showMemberList, week_startDate, eventTimeInfo 
+    , eventID, setPreFixedSchedule}:MyComponentProps) {
+
     const [lang, setLang] = useRecoilState(language);
+
+    const dateListD:Date[] = eventTimeInfo ? eventTimeInfo.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : [];
+    const dateList:string[] = dateListD.map((date)=>(new Date(date).toISOString()));
+    const selectedWeekDay = eventTimeInfo ? eventTimeInfo.dayList: []; 
 
     let checked_mem_num: number[] = Object.values(scheduleList.checked_num);
     let max_checked_mem_sche:string[]=Object.keys(scheduleList.checked_num).filter((key: string) => {
@@ -53,7 +64,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
 
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
-    const [showMaxMember, setShowMaxMember] = useState(false);
+    // const [showMaxMember, setShowMaxMember] = useState(false);
     // const [showMemberList, setShowMemberList] = useState(false);
 
     let term:number = 0;
@@ -131,28 +142,11 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                         end_sche.setMinutes(end_sche.getMinutes()+30);
                         mem_term = 0;
                         return(
-                            <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{
-                                //show the member name in row
-                                showMaxMember ? setShowMaxMember(false) : setShowMaxMember(true)
-                            }} key={index}>
-                              <div className="flex flex-row gap-1">
-                                <div>
-                                    <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
-                                    <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
-                                    <div className="inline-block mx-1"> ~ </div>
-                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
-                                    <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
-                                    <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p>
-                                </div>
-                                {showMaxMember ? <FaAngleUp/> : <FaAngleDown/>}
-                              </div>
-                              <div>
-                                    {showMaxMember ? <p className="text-gray-600">
-                                        <hr className="border-black my-1 mb-2"/>
-                                        {lang=="ko" ? "멤버":"Members"} : {scheduleList.member[new Date(sche).toString().replace("대한민국", "한국")]?.toString().replaceAll(",", ", ")}
-                                    </p> :""}
-                              </div>
-                            </li>
+                            <MaxMemberSche index={index} week={week} start_sche={start_sche} end_sche={end_sche} 
+                                scheduleList={scheduleList} sche={sche} isHost={isHost} checked_mem_num={checked_mem_num} 
+                                totalMemNum={totalMemNum} week_startDate={week_startDate} dateList={dateList} selectedWeekDay={selectedWeekDay}
+                                setFixedSchedule={setFixedSchedule} setSelect={setSelect} setConfirm={setConfirm}
+                                eventID={eventID} setPreFixedSchedule={setPreFixedSchedule}/>
                         )
                     }):""}
                 </ul>
