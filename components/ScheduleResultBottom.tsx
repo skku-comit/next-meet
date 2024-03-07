@@ -48,7 +48,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
 
     const [totalMemNum, setTotalMemNum] = useState(totalMem);
-    useEffect(()=>{setTotalMemNum(totalMem);},[totalMem]);
+    useEffect(()=>{setTotalMemNum(totalMem); console.log("bottom totalMem", totalMem)},[totalMem]);
 
     // console.log(scheduleList.checked_num);
     useEffect(()=>{

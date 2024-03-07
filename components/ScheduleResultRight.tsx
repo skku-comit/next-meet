@@ -60,12 +60,12 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     let mem_term:number = 0;
 
     // const [sortedList, setSortedList]:[Date[],Function] = useState([]);
-    let sortedList:Date[] = [];
+    const [sortedList, setSortedList]:[Date[],Function] = useState([]);
 
 
     // useMemo(()=>{
         useEffect(()=>{
-            sortedList = fixedSchedule.schedule.sort((a:Date,b:Date)=>a.getTime()-b.getTime());
+            setSortedList(fixedSchedule.schedule.sort((a:Date,b:Date)=>new Date(a).getTime()-new Date(b).getTime()));
         },[fixedSchedule])
     // }, [fixedSchedule]);
     
@@ -207,7 +207,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                                     <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
                                     <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                     <div className="inline-block mx-1"> ~ </div>
-                                    <p className="inline-block">{(week ? "" : end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
                                     <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                     
                                     {/* <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p> */}

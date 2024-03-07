@@ -7,7 +7,7 @@ import ScheduleResultRight from "@/components/ScheduleResultRight";
 import ScheduleTableConfirm from "@/components/scheduleTableConfirm";
 import ConfirmBtn from "@/components/ConfirmBtn";
 
-import { FaList } from "react-icons/fa";
+import { FaList, FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 import { useState, useEffect, useReducer } from "react";
 import { throttle } from "lodash";
@@ -126,7 +126,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
     const [nonMemLogin, setNonMemLogin] = useState(false);
     const [loginNonMem, setLoginNonMem]:[User|undefined,Function] = useState();
     const [isLogin, setIsLogin] = useState(nonMemLogin || session && session.user ? true : false)
-    const [isHost, setIsHost] = useState(session ? session.user.userID == event.hostUserInfo.userID : false);
+    const [isHost, setIsHost] = useState(session && session.user ? session.user.userID == event.hostUserInfo.userID : false);
     
     console.log("login", isLogin)
 
@@ -258,8 +258,8 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
 
     const [totalMem, setTotalMem] = useState(event?.userList ? event.userList.length : 0);
 
-    const [confirm, setConfirm] = useState(0);
-    const [select, setSelect] = useState(0);
+    const [confirm, setConfirm] = useState(event?.fixedMeeting.length > 0 ? 2 : 0);
+    const [select, setSelect] = useState(event?.fixedMeeting.length > 0 ? 1 : 0);
 
     const [width, setWidth]:[number, Function] = useState(0);
 
@@ -293,8 +293,8 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
 
 
     useEffect(()=>{
-        console.log(loginNonMem)
-    }, [loginNonMem])
+        console.log("select",select, fixedSchedule)
+    }, [select])
 
     const [showDescription, setShowDescription] = useState(false);
 
@@ -303,12 +303,13 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
 
     return <div className="w-screen h-full min-h-screen ">
         <div className="(header space) w-screen h-20 bg-[white]"></div>
-        {confirm !=3 && (!select || confirm == 1) ? "":<div className={`pt-10 ${confirm == 3 ? "pb-5":"pb-10"}`}></div>}
+        {confirm !=3 && (!select || confirm == 1) ? "":<div className={isHost ? `pt-10 ${confirm == 3 ? "pb-5":"pb-10"}` : `pt-5`}></div>}
         <div className={`w-screen ${select ? "" : "pt-6"} ${width < 768 ? "px-10":"px-20"}`}>
           <div className={`rounded w-full bg-[#eee] min-h-10 p-3 text-center ${showDescription? "": "pb-2"}`}>
-            <div className={`font-bold min-h-5 ${showDescription?"pb-1":""} cursor-pointer`}
+            <div className={`relative font-bold min-h-5 ${showDescription?"pb-1":""} cursor-pointer`}
                 onClick={()=>{setShowDescription((prev)=>(!prev))}}>
                 {event?.eventName}
+                {showDescription ? <FaAngleUp className={`absolute right-0 top-0.5`} /> : <FaAngleDown className={`absolute right-0 top-0.5`}/>}
             </div>
             {showDescription?<div className="border-t-2 pt-2.5  border-gray min-h-10 text-center">
                 {event?.description}
@@ -316,8 +317,8 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
         </div>
           
         </div>
-        {(select || confirm == 3) && isHost ? <ConfirmBtn week={week} select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}/> : ""}
-        {!select || (confirm==1 || confirm == 3) ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
+        {(select || confirm == 2 || confirm == 3) && isHost ? <ConfirmBtn week={week} select={select} setSelect={setSelect} confirm={confirm} setConfirm={setConfirm} fixedSchedule={fixedSchedule} setFixedSchedule={setFixedSchedule} eventID={event.eventID}/> : ""}
+        {true || !select || (confirm==1 || confirm == 3) ? <Setter width={width} isLogin={isLogin} setIsLogin={setIsLogin} name={name}
                                     setName={setName} setTotalMem={setTotalMem} totalMem={totalMem} confirm={confirm} 
                                     setConfirm={setConfirm} select={select} scheduleTable={scheduleTable} setScheduleTable={setScheduleTable}
                                     eventUsers={event?.userList} eventHost={event?.hostUserInfo} setSchedule={setSchedule}
@@ -335,7 +336,7 @@ const EventPage = ({ event }: InferGetServerSidePropsType<typeof getServerSidePr
                         nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
                         preMySelected={preMySelected} setPreMySelected={setPreMySelected}
                         /> : ""}
-                {isLogin && !(confirm == 1 || confirm == 3)? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
+                {isLogin && (confirm == 0)? <ScheduleTableSelectoEdit week={week} isLogin={isLogin} schedule={schedule} 
                             width={width} setSchedule={setSchedule} confirm={confirm}  
                             // fixedDate={null} fixedDay={null} fixedTime={null}
                             name={name} setShowMember={setShowMember} setShowMemberList={setShowMemberList} setShowDateTime={setShowDateTime} select={select} 

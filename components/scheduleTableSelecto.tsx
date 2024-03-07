@@ -477,8 +477,9 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                     if(select == 1){
                         fixedScheduleList.map((sche:Date)=>{
                             // console.log(sche == datetimeStr)
-                            const sche_str = sche.toString().replace("대한민국", "한국");
-                            if (sche_str == datetimeStr){
+                            // const sche_str = sche.toString().replace("대한민국", "한국");
+                            // console.log("select 2", isHost)
+                            if (new Date(sche).getTime() == new Date(datetime).getTime()){
                                     cellColor = "#63c5da";
                                 }
                         })

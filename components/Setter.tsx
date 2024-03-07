@@ -95,31 +95,31 @@ const Setter = (props:any): ReactNode => {
 
       const data = await res2.json();
 
-      console.log("put data", data);
+      console.log("put data", data.data);
 
-      if (data.userID == props.eventHost.userID){
+      if (data.data[0] == props.eventHost.userID){
         props.setIsHost(true);
       }
 
-      const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? data.userID == eventUser.userID : false) : false;
+      // const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? data.userID == eventUser.userID : false) : false;
       // if(!(existedUser.length > 0)){
       //   console.log("increased total mem")
       //   props.setTotalMem((prev:number)=>(prev+1));
       // }
-      const user = existedUser.length > 0 ? existedUser[0] : null;
-      console.log("props.eventParti", props.eventParti)
-      const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
-            for(let i = 0; i<participate.user.length; i++){
-                console.log("eventParticiTime put v", participate.user, user?.userID)
-                if(participate.user[i].userID == user?.userID){
-                    return true;
-                }
-            }
-            return false}) : null;
-      const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
-      console.log("eventParticiTime put",eventParticiTime,eventParticipate)
-      props.setSchedule(eventParticiTime);
-      props.setPreMySelected(eventParticiTime.schedule);
+      // const user = existedUser.length > 0 ? existedUser[0] : null;
+      // console.log("props.eventParti", props.eventParti)
+      // const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
+      //       for(let i = 0; i<participate.user.length; i++){
+      //           console.log("eventParticiTime put v", participate.user, user?.userID)
+      //           if(participate.user[i].userID == user?.userID){
+      //               return true;
+      //           }
+      //       }
+      //       return false}) : null;
+      // const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
+      // console.log("eventParticiTime put",eventParticiTime,eventParticipate)
+      // props.setSchedule(eventParticiTime);
+      // props.setPreMySelected(eventParticiTime.schedule);
     } catch (error) {
       console.error("error:", error);
     }
@@ -142,7 +142,7 @@ const Setter = (props:any): ReactNode => {
       if (props.eventHost.userID == 0 && loginName == props.eventHost.userName && password == props.eventHost.password){
         props.setIsHost(true);
       }
-      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && (password ? password == eventUser.password : true) : false):null;
+      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password == eventUser.password : false):null;
       console.log("existedUser", existedUser, props.eventUsers)
       if(existedUser.length > 0){
         props.setLoginNonMem(existedUser[0]);
@@ -158,7 +158,7 @@ const Setter = (props:any): ReactNode => {
         console.log("newNonMem",newNonMem, user);
         // props.setTotalMem((prev:number)=>(prev+1));
         
-        await postUser(eventID, newNonMem);
+        // await postUser(eventID, newNonMem);
         // const res = await fetch("../api/form", {
         //   method: "POST_USER",
         //   headers: {
