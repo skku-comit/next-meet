@@ -22,12 +22,12 @@ const LogoutButton = (): ReactNode => {
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
   console.log("MyPage")
-  console.log( session );
+  console.log( 'session:',session );
   const [eventList,setEventList] = useState<NextMeetEvent[]>([]);
   
   useEffect(()=>{
     if(session && session.user){
-      getEventList();
+      // getEventList();
     }
   },[session]);
 
@@ -52,7 +52,7 @@ const MyPage = (): ReactNode => {
         <Login />
       ) : (
         <>
-          <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{session.user.userName} 님의</p>
+          <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{session.user.userName ?? session.user.name ?? session.user.email} 님의</p>
           <EventList eventList={eventList}/>
           <LogoutButton />
         </>

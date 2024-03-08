@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
 import { IoMdLogIn } from "react-icons/io";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
@@ -23,6 +23,7 @@ const Setter = (props:any): ReactNode => {
   const [lang, setLang] = useRecoilState(language);
 
   const [isMember,setIsMember] = useState<boolean>(session && session.user ? true : false);
+  const [loginMode,setLoginMode] = useState<'nonMember'|'Email'|'social'>('nonMember');
   useEffect(()=>{if(props.isLogin){setIsMember(session && session.user ? true : false)}},[props.isLogin])
   // const [isLogin, setIsLogin] = useState<boolean>(false);
   // const [idName, setIdName] = useState<String>("");
@@ -199,8 +200,13 @@ const Setter = (props:any): ReactNode => {
   return (
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
       <div className="w-full flex flex-row items-center text-center">
-        <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${!isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(false); props.setScheduleTable(true); props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0); 
+        <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${loginMode === 'nonMember' ? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
+          onClick={(e)=>{
+            e.preventDefault();
+            setIsMember(false); 
+            setLoginMode('nonMember');
+            props.setScheduleTable(true); 
+            props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0); 
             if(props.isLogin){
               props.setScheduleTable(true);
               setTimeout(()=>{props.setIsLogin(false)
@@ -212,10 +218,15 @@ const Setter = (props:any): ReactNode => {
               signOut({ redirect: false });
               props.setIsLogin(false); 
             }}}>
-        {lang == 'ko' ? "비회원":"NON-MEMBER"}
+        {lang == 'ko' ? "비회원 로그인":"NON-MEMBER LOGIN"}
         </button>
-        <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${isMember? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
-          onClick={(e)=>{e.preventDefault();setIsMember(true); props.setScheduleTable(true); props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
+        <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${loginMode === 'Email' ? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
+          onClick={(e)=>{
+            e.preventDefault();
+            setIsMember(true); 
+            setLoginMode('Email');
+            props.setScheduleTable(true); 
+            props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
             if(props.isLogin){
               props.setScheduleTable(true);
               setTimeout(()=>{props.setIsLogin(false)
@@ -227,11 +238,34 @@ const Setter = (props:any): ReactNode => {
               signOut({ redirect: false });
               props.setIsLogin(false); 
             }}}>
-        {lang == 'ko' ? "회원":"MEMBER"}
+        {lang == 'ko' ? "이메일 로그인":"EMAIL LOGIN"}
+        </button>
+        <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${loginMode === 'social' ? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
+          onClick={(e)=>{
+            e.preventDefault();
+            setIsMember(true); 
+            setLoginMode('social');
+            props.setScheduleTable(true); 
+            props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
+            if(props.isLogin){
+              props.setScheduleTable(true);
+              setTimeout(()=>{props.setIsLogin(false)
+                props.setName("")
+                props.setIsHost(false);
+                props.setLoginNonMem(undefined);
+                props.setNonMemLogin(false);
+              }, 5000);
+              signOut({ redirect: false });
+              props.setIsLogin(false); 
+            }}}>
+        {lang == 'ko' ? "소셜 로그인": "SOCIAL LOGIN"}
         </button>
       </div>
       <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 overflow-hidden gap-0`}>
-        {props.isLogin ? props.name ? <div className="w-full"><div className="items-center pt-1.5">{props.name}</div></div> : ""
+
+        {props.isLogin ? props.name ? <div className="w-full">
+          <div className="items-center pt-1.5">{props.name}</div>
+          </div> : ""
         : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
             <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex flex-row items-center gap-3 justify-end overflow-hidden`}>
                 <label className="text-center pt-1 min-w-[26px] whitespace-nowrap text-right">{isMember ? "ID":"이름"}</label>
@@ -246,6 +280,7 @@ const Setter = (props:any): ReactNode => {
                   onChange={(e)=>{setPw(e.target.value)}}/>
             </div>
         </div>}
+
         <button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
           onClick={()=>{
             if(props.isLogin){

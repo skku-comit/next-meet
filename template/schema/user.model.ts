@@ -1,6 +1,10 @@
 import mongoose, { Schema, models } from "mongoose";
 
 const NextMeetUserSchema = new Schema({
+  provider: {
+    type: String,
+    required: true
+  },
   loginID: { //id created by user
     type: String,
     required: true,

@@ -6,7 +6,7 @@ import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 const NEXTAUTH_URL = "http://localhost:3000";
 
 
-export const registerNextMeetUser = async (
+export const registerEmail = async (
   userName: string,
   loginID: string,
   email: string,
