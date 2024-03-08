@@ -133,7 +133,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         console.log("removeUser handle", data);
         if(data.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
       }
-    }
+    }    
 
     let participateStatus:Participate[]|undefined = eventParti;
 

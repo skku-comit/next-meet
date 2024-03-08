@@ -57,10 +57,10 @@ const handler = NextAuth({
     async session ({session, token, user }) {
       console.log("This is session");
       // console.log(`${Date.now()}`);
-      if(token && token.user){
-        session.user = token.user;
-        return session;
-      }
+      // if(token && token.user){
+      //   session.user = token.user;
+      //   return session;
+      // }
 
       const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/userInfo`, {
         method: "POST",

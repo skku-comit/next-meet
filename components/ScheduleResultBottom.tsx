@@ -50,7 +50,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
     const selectedWeekDay = eventTimeInfo ? eventTimeInfo.dayList: []; 
 
     let checked_mem_num: number[] = Object.values(scheduleList.checked_num);;
-    let max_checked_mem_sche:string[]= Object.keys(scheduleList.checked_num).filter((key: string) => {
+    let max_checked_mem_sche:string[]= Math.max(...checked_mem_num) == 0 ? [] : Object.keys(scheduleList.checked_num).filter((key: string) => {
         return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
         });    
     const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
@@ -63,7 +63,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         if(scheduleList.checked_num){
             checked_mem_num= Object.values(scheduleList.checked_num);
             
-            max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
+            max_checked_mem_sche = Math.max(...checked_mem_num) == 0 ? [] : Object.keys(scheduleList.checked_num).filter((key: string) => {
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
             console.log("max_checked_mem_sche",max_checked_mem_sche)
