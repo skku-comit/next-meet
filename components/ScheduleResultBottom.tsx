@@ -80,8 +80,9 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         }
     }, [scheduleList, wait2]);
     
-    const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
-    const [showMaxMember, setShowMaxMember] = useState(false);
+    const WEEKDAY2 = ['일', '월', '화', '수', '목', '금', '토'];
+    const WEEKDAY3 = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const [showMaxMember, setShowMaxMember] = useState(false);
 
     let term = 0;
     let mem_term = 0;
@@ -181,10 +182,10 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                     return(
                                         <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{}}>
                                     
-                                            <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
+                                            <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')'}</p>
                                             <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                             <div className="inline-block mx-1"> ~ </div>
-                                            <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
+                                            <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')')}</p>
                                             <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                             
                                         </li>
