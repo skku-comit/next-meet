@@ -90,8 +90,6 @@ const Setter = (props:any): ReactNode => {
       props.setName(session?.user.userName);
       setIsMember(true);
 
-      // console.log("signin", isMember, props.name, session);
-
       const res2 = await addRemoveUserEventID(parseInt(eventID as string), session.user, "addEvent");
 
       const data = await res2.json();
@@ -101,26 +99,6 @@ const Setter = (props:any): ReactNode => {
       if (data.data[0] == props.eventHost.userID){
         props.setIsHost(true);
       }
-
-      // const existedUser = props.eventUsers ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as NextMeetUser ? data.userID == eventUser.userID : false) : false;
-      // if(!(existedUser.length > 0)){
-      //   console.log("increased total mem")
-      //   props.setTotalMem((prev:number)=>(prev+1));
-      // }
-      // const user = existedUser.length > 0 ? existedUser[0] : null;
-      // console.log("props.eventParti", props.eventParti)
-      // const eventParticipate = props.eventParti.length > 0 ? props.eventParti.filter((participate:Participate) =>{ 
-      //       for(let i = 0; i<participate.user.length; i++){
-      //           console.log("eventParticiTime put v", participate.user, user?.userID)
-      //           if(participate.user[i].userID == user?.userID){
-      //               return true;
-      //           }
-      //       }
-      //       return false}) : null;
-      // const eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
-      // console.log("eventParticiTime put",eventParticiTime,eventParticipate)
-      // props.setSchedule(eventParticiTime);
-      // props.setPreMySelected(eventParticiTime.schedule);
     } catch (error) {
       console.error("error:", error);
     }
@@ -157,21 +135,6 @@ const Setter = (props:any): ReactNode => {
         user = newNonMem;
         props.setLoginNonMem(newNonMem);
         console.log("newNonMem",newNonMem, user);
-        // props.setTotalMem((prev:number)=>(prev+1));
-        
-        // await postUser(eventID, newNonMem);
-        // const res = await fetch("../api/form", {
-        //   method: "POST_USER",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({      
-        //     eventID, newNonMem
-        //   }),
-        // });
-        // console.log("post_user",res);
-        // const data = await res.json();
-        // console.log(data);
       }
       props.setIsLogin(true);
       props.setNonMemLogin(true);

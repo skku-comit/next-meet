@@ -26,6 +26,7 @@ import { language } from "@/lib/recoil/Language";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from "next/navigation";
+import Header from "@/components/Header";
 
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
@@ -399,7 +400,7 @@ const EventPage = ({
 
   return (
     <div className="w-screen h-full min-h-screen ">
-      <div className="(header space) w-screen h-20 bg-[white]"></div>
+      <div className="(header space) w-screen h-20 bg-[white]"><Header/></div>
       {confirm != 3 && (!select || confirm == 1) ? (
         ""
       ) : (
