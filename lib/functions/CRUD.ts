@@ -1,3 +1,4 @@
+import { USER_SEARCH_RESPONSE } from "@/pages/api/register";
 import { NextMeetEvent } from "@/template/Event";
 import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
@@ -11,6 +12,33 @@ export const registerEmail = async (
   loginID: string,
   email: string,
   password: string
+):Promise<0|1|2|11|99> => {
+  try {
+    const res = await fetch("api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ provider: 'credentials', userName, loginID, email, password }),
+    });
+
+    const { message } = await res.json();
+    return message;
+    // if (res.status == 200) {
+    // } else {
+    //   const { message } = await res.json();
+    //   console.log("register failed.");
+    //   console.log('message:', message);
+    // }
+  } catch (error) {
+    console.log(error);
+    return USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR;
+  }
+};
+
+export const registerGoogle = async (
+  userName: string,
+  email: string,
 ) => {
   try {
     const res = await fetch("api/register", {
@@ -18,7 +46,7 @@ export const registerEmail = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userName, loginID, email, password }),
+      body: JSON.stringify({ provider: 'google', userName, loginID:'', email, password:'' }),
     });
 
     if (res.ok) {
@@ -31,6 +59,7 @@ export const registerEmail = async (
     console.log(error);
   }
 };
+
 
 export const createEvent = async (
   eventName: string,

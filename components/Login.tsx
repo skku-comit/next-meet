@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import LoginForm from "./LoginForm";
-import { existingUserCheck, registerNextMeetUser } from "@/lib/functions/CRUD";
+import { existingUserCheck, registerEmail } from "@/lib/functions/CRUD";
 import isFormValid from "@/lib/functions/isFormValid";
 import { signIn, signOut } from "next-auth/react";
 
@@ -34,6 +34,8 @@ const Login = (): ReactNode => {
     8: "아이디를 입력하세요.",
     9: "비밀번호를 입력하세요.",
     10: "아이디 혹은 비밀번호가 틀렸습니다.",
+    11: "존재하는 구글계정입니다.",
+    99: "서버 오류가 발생했습니다.",
   };
   //functions
   const resetForm = () => {
@@ -56,13 +58,14 @@ const Login = (): ReactNode => {
   };
 
   const onLoginHandler = async () => {
+    setError(ERROR_MESSAGE[0]);
     if (!(idInputRef.current && pwInputRef.current)) return;
     const loginID = idInputRef.current.value;
     const password = pwInputRef.current.value;
 
     let errorNo = isFormValid("login", loginID, "", "", password, "");
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo as 8 | 9]);
+      setError(ERROR_MESSAGE[errorNo]);
       return;
     }
     try {
@@ -79,18 +82,16 @@ const Login = (): ReactNode => {
     }
   };
 
-  const onRegisterHandler = async () => {
-    if (
-      !(
+  const onRegisterEmailHandler = async () => {
+
+    if (!(
         nameInputRef.current &&
         idInputRef.current &&
         pwInputRef.current &&
         emailInputRef.current &&
-        pwcInputRef.current
-      )
-    )
-      return;
+        pwcInputRef.current)) return;
 
+    setError(ERROR_MESSAGE[0]);
     const userName = nameInputRef.current.value;
     const loginID = idInputRef.current.value;
     const email = emailInputRef.current.value;
@@ -100,26 +101,30 @@ const Login = (): ReactNode => {
     //test input validity
     let errorNo = isFormValid(
       "register",
-      userName,
       loginID,
+      userName,
       email,
       password,
       passwordCheck
     );
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo as 3 | 4 | 5 | 6 | 7]);
+      setError(ERROR_MESSAGE[errorNo]);
       return;
     }
-    try {
-      const errorNo = await existingUserCheck(loginID!, email!);
-      if (errorNo !== 0) {
-        setError(ERROR_MESSAGE[errorNo as 1 | 2]);
-        return;
-      }
-    } catch (error) {
-      console.log(error);
+    // try {
+    //   const errorNo = await existingUserCheck(loginID!, email!);
+    //   if (errorNo !== 0) {
+    //     setError(ERROR_MESSAGE[errorNo as 1 | 2]);
+    //     return;
+    //   }
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    const registerStatus: 0|1|2|11|99 = await registerEmail(userName, loginID, email, password);
+    if(registerStatus !== 0){ //error
+      setError(ERROR_MESSAGE[registerStatus])
+      return;
     }
-    await registerNextMeetUser(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
   };
@@ -153,7 +158,7 @@ const Login = (): ReactNode => {
         {isLoggingIn ? (
           <button
             className={`${className_button}`}
-            onClick={isRegistering ? onRegisterHandler : onLoginHandler}
+            onClick={isRegistering ? onRegisterEmailHandler : onLoginHandler}
           >
             {isRegistering ? "Register" : "Login"}
           </button>

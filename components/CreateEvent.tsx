@@ -8,7 +8,7 @@ import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { createEvent } from "@/lib/functions/CRUD";
 import { useSession } from "next-auth/react";
 import { TimeInfo } from "@/template/TimeInfo";
-import { User } from "@/template/User";
+import { NextMeetUser, User } from "@/template/User";
 import { useRouter } from "next/navigation";
 
 const CreateEvent = (): ReactNode => {
@@ -41,8 +41,8 @@ const CreateEvent = (): ReactNode => {
     if (session && session.user) {
       console.log(session.user)
       hostUserInfo = {
-        userName: session.user.userName,
-        userID: session.user.userID,
+        userName: (session.user as NextMeetUser).userName,
+        userID: (session.user as NextMeetUser).userID,
         password: '',
       };
     } else {

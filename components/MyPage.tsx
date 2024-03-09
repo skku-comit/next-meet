@@ -33,8 +33,6 @@ const MyPage = (): ReactNode => {
 
   const getEventList = async () => {
     const eventList: NextMeetEvent[] = [];
-    
-    console.log(session);
     const eventIDPromises = session!.user.eventIDList.map(async (eventID: string) => {
       const event = await getEvent(eventID);
       if (event) eventList.push(event);

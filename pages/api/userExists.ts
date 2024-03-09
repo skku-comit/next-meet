@@ -1,22 +1,21 @@
 import connectDB from "@/lib/mongodb/connectDB";
 import NextMeetUser from "@/template/schema/user.model";
-import NextMeetUserG from "@/template/schema/userG.model";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export enum USER_SEARCH_RESPONSE { "NOT_FOUND" = 0, "EXISTING_LOGINID", "EXISTING_EMAIL", "INTERNAL_SERVER_ERROR" };
+export enum USER_SEARCH_RESPONSE { "NOT_FOUND" = 0, "EXISTING_LOGINID", "EXISTING_EMAIL", "INTERNAL_SERVER_ERROR" = 99 };
 
 const POST = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectDB();
     const { loginID, email } = await req.body;
     let existingUser = await NextMeetUser.findOne({ loginID }).select("_id");
-    if(!existingUser){existingUser = await NextMeetUserG.findOne({ loginID }).select("_id")};
+    if(!existingUser){existingUser = await NextMeetUser.findOne({ loginID }).select("_id")};
 
     if(existingUser){
       return res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_LOGINID });
     }
     existingUser = await NextMeetUser.findOne({ email }).select("_id");
-    if(!existingUser){existingUser = await NextMeetUserG.findOne({ email }).select("_id")};
+    if(!existingUser){existingUser = await NextMeetUser.findOne({ email }).select("_id")};
     if(existingUser){
         return res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_EMAIL });
     }

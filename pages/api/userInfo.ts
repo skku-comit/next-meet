@@ -1,15 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import connectDB from "@/lib/mongodb/connectDB";
-import NextMeetUserG from "@/template/schema/userG.model";
-
-
+import NextMeetUser from "@/template/schema/user.model";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
       await connectDB();
 
-      const user = await NextMeetUserG.findOne({ email: req.body.email });
+      const user = await NextMeetUser.findOne({ email: req.body.email });
 
       //console.log(user);
 
