@@ -2,12 +2,13 @@ import NextAuth from "next-auth/next";
 import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { getUserInfo } from "@/lib/functions/CRUD";
+import { getUserInfoByID } from "@/lib/functions/CRUD";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
 const handler = NextAuth({
   callbacks: {
+
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs
       // console.log(`url: ${url}, baseurl: ${url == baseUrl ? baseUrl : url}`);
@@ -22,12 +23,16 @@ const handler = NextAuth({
       console.log(token);
       console.log(account);
       console.log(profile);
+      console.log(user);
       user && (token.user = user);
       return token;
     },
     async session ({session, token, user }) {
       console.log("This is session");
       if(token && token.user){
+        console.log(token.user)
+        // const userInfo = await getUserInfoByID(+(token.user as User).id);
+        // console.log('userInfo: ',userInfo);
         session.user = token.user;
         return session;
       }
@@ -81,21 +86,14 @@ const handler = NextAuth({
               password: credentials.password,
             }),
           });
-          const user = await res.json();
-          if (user) {
-            // return user;
-            return {
-              ...user,
-              name: user.userName,
-            };
+          const {message, user} = await res.json();
+          if (message === 0) {
+            return user;
           }
           else {
-            throw new Error("Failed to form json");
+            throw new Error("login failed with errorcode " + message);
           }
-          // return { 
-          //   ...user, 
-          //   name: user.userName,
-          // };
+
         } catch (error) {
           console.log(error);
           return false;

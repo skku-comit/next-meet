@@ -14,7 +14,7 @@ export const registerEmail = async (
   password: string
 ):Promise<0|1|2|11|99> => {
   try {
-    const res = await fetch("api/register", {
+    const res = await fetch("api/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const registerGoogle = async (
   email: string,
 ) => {
   try {
-    const res = await fetch("api/register", {
+    const res = await fetch("api/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -129,7 +129,13 @@ export const editEvent = async (
 };
 
 export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
-  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+  const queryParams = new URLSearchParams({
+    userID: "null",
+    provider: provider,
+    loginID: loginID,
+    email: email,
+  });
+  const res = await fetch(`api/user?userID=${queryParams}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -140,8 +146,14 @@ export const existingUserCheck = async (provider: 'credentials'|'google', loginI
   return message;
 };
 
-export const getUserInfo = async (provider: 'credentials'|'google', loginID: string, email: string):Promise<NextMeetUser|null> => {
-  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null> => {
+  const queryParams = new URLSearchParams({
+    userID: userID.toString(),
+    provider: "null",
+    loginID: "null",
+    email: "null"
+  });
+  const res = await fetch(`https://localhost:3000/api/user?${queryParams}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

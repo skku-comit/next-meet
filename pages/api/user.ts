@@ -54,8 +54,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   else if(req.method === "GET"){
     //check if the user already exist, and return user info otherwise
     const { provider, loginID, email } = req.query;
+    console.log('req.query:', req.query);
     let existingUser;
     try{
+    //find by userID
+    // if(userID !== null){ 
+    //   existingUser = await NextMeetUser.findOne({ userID: userID }).select("_id");
+    //   if(existingUser){
+    //     return res.status(400).json({ user: existingUser, message:''});
+    //   }
+    //   else return res.status(200).json({ user: null, message:''});
+    // }
+    //find by loginID and Email
     if(provider === 'credentials'){
       existingUser = await NextMeetUser.findOne({ loginID: loginID }).select("_id");
       if(existingUser){
