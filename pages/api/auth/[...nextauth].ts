@@ -2,7 +2,8 @@ import NextAuth from "next-auth/next";
 import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { getUserInfoByID } from "@/lib/functions/CRUD";
+import { addRemoveUserEventID, getUserInfoByID } from "@/lib/functions/CRUD";
+import { useState } from "react";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -61,25 +62,7 @@ const handler = NextAuth({
         session.user = token.user;
         return session;
       }
-      const getUserInfo = await fetch(`api/userInfo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: (token.user as User).email })
-      });
-      if (getUserInfo.ok) {
-        const userInfo = await getUserInfo.json();
-        if (userInfo) {
-          (session as Session).user = userInfo;
-          console.log(session.user);
-          return session;
-        } else {
-          throw new Error("Failed to form json");
-        }
-      } else {
-        throw new Error("Failed to get valid response");
-      }
+      
     },
   },
   providers: [

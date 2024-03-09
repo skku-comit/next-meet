@@ -54,6 +54,17 @@ const Setter = (props:any): ReactNode => {
     100: "회원가입이 완료되었습니다."
   };
 
+  const setUp = async() =>{
+    if(session?.user?.provider == "google"){
+      const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session.user, "addEvent");
+      const data = await res2.json();
+      console.log("put data", data.data);
+    }
+  }
+    
+  useEffect(()=>{
+    setUp()
+  }, [session?.user, eventID])
 
   const onMemLoginHandler = async () => {
     if (!(nameIdInputRef.current && pwInputRef.current)) return;
@@ -93,7 +104,7 @@ const Setter = (props:any): ReactNode => {
       props.setName(session?.user.userName);
       setIsMember(true);
 
-      const res2 = await addRemoveUserEventID(parseInt(eventID as string), session.user, "addEvent");
+      const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session.user, "addEvent");
 
       const data = await res2.json();
 
@@ -249,6 +260,9 @@ const Setter = (props:any): ReactNode => {
               className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
               onClick={(e) => {
                 e.preventDefault();
+                setTimeout(()=>{
+                  props.setIsLogin(true);
+                }, 5000);              
                 signIn("google", { callbackUrl: `/event/${eventID}` }, { prompt: "select_account" });
               }}>
               구글로 로그인
@@ -269,7 +283,7 @@ const Setter = (props:any): ReactNode => {
               </div>
           </div>}
 
-          {loginMode =="social" ? "" :<button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
+          {loginMode =="social" && !(props.isLogin) ? "" :<button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
             onClick={()=>{
               if(props.isLogin){
                 props.setScheduleTable(true);
