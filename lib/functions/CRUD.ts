@@ -1,4 +1,4 @@
-import { USER_SEARCH_RESPONSE } from "@/pages/api/register";
+import { USER_SEARCH_RESPONSE } from "@/pages/api/user";
 import { NextMeetEvent } from "@/template/Event";
 import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
@@ -23,6 +23,7 @@ export const registerEmail = async (
     });
 
     const { message } = await res.json();
+
     return message;
     // if (res.status == 200) {
     // } else {
@@ -127,17 +128,28 @@ export const editEvent = async (
   }
 };
 
-export const existingUserCheck = async (loginID: string, email: string) => {
-  const res = await fetch("api/userExists", {
-    method: "POST",
+export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
+  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ loginID, email }),
   });
 
-  const data = await res.json();
-  return data.message;
+  const {user, message} = await res.json();
+  return message;
+};
+
+export const getUserInfo = async (provider: 'credentials'|'google', loginID: string, email: string):Promise<NextMeetUser|null> => {
+  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const {user, message} = await res.json();
+  return user;
 };
 
 export const getEvent = async (eventID: string|null) => {

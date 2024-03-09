@@ -32,6 +32,6 @@ const NextMeetUserSchema = new Schema({
   },
 });
 
-const NextMeetUser = models.NextMeetUser || mongoose.model("NextMeetUser", NextMeetUserSchema);
+const NextMeetUser = models?.NextMeetUser || mongoose.model("NextMeetUser", NextMeetUserSchema);
 
 export default NextMeetUser;

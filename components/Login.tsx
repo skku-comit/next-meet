@@ -36,6 +36,7 @@ const Login = (): ReactNode => {
     10: "아이디 혹은 비밀번호가 틀렸습니다.",
     11: "존재하는 구글계정입니다.",
     99: "서버 오류가 발생했습니다.",
+    100: "회원가입이 완료되었습니다."
   };
   //functions
   const resetForm = () => {
@@ -128,6 +129,7 @@ const Login = (): ReactNode => {
     await registerEmail(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
+    setError(ERROR_MESSAGE[100]);
   };
 
   return (
