@@ -24,59 +24,11 @@ interface MyComponentProps {
 const ConfirmBtn = ({week, select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, eventID, setPreFixedSchedule}:MyComponentProps) => {
 
     const [lang, setLang] = useRecoilState(language);
-  
-    // const handleConfirm = async (newSchedule:Date[]) => {
-
-    //     console.log("handleConfirm", newSchedule)
-
-    //     const state = "CONFIRM";
-
-    //     let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
-    //     const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    //     newSchedule.map((sche:Date)=>{
-    //         const time = new Date(sche).getHours() + ":" + new Date(sche).getMinutes();
-
-    //         if(week){
-    //           (fixedMeeting as WeeklyFixedDate[]).push({day : WEEKDAY[new Date(sche).getDay()] as DaysOfWeek, timeRange:[time]})
-    //         }
-    //         else{
-    //           (fixedMeeting as FixedDate[]).push({date : new Date(sche), timeRange:[time]})
-    //         }
-    //     //   }
-          
-    //     })
-
-    //     console.log("FixedMeeting", fixedMeeting)
-
-    //     try {
-    //       const res = await fetch("http://localhost:3000/api/form", {
-    //         method: "PATCH",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify({      
-    //           eventID, fixedMeeting, state
-    //         }),
-    //       });
-    //       console.log(res);
-    //       const data = await res.json();
-    //       console.log(data);
-    //     } catch (error) {
-    //       console.log(error);
-    //     } 
-
-    //     setPreFixedSchedule({schedule:[newSchedule]});
-    //     // console.log(fixedSchedule.schedule);
-    // }
-
 
     return (
       <div className={`flex flex-column gap-2 p-5 py-4 fixed top-20 left-0 right-0 w-full bg-[white] border-0 z-30`}>
       <div className={`w-full p-2 pt-3 rounded hover:font-bold ${confirm == 1 ? "bg-[#ced4da]": select==1? "bg-[#868e96]" : "bg-[gray]"} cursor-pointer text-center`}
           onClick={()=>{
-              // console.log(fixedSchedule.schedule);
-              // console.log(confirm)
 
               if(confirm == 0 || confirm == 2){
                 setConfirm(3);
