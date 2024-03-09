@@ -1,3 +1,4 @@
+import { USER_SEARCH_RESPONSE } from "@/pages/api/user";
 import { NextMeetEvent } from "@/template/Event";
 import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
@@ -11,6 +12,34 @@ export const registerEmail = async (
   loginID: string,
   email: string,
   password: string
+):Promise<0|1|2|11|99> => {
+  try {
+    const res = await fetch("api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ provider: 'credentials', userName, loginID, email, password }),
+    });
+
+    const { message } = await res.json();
+
+    return message;
+    // if (res.status == 200) {
+    // } else {
+    //   const { message } = await res.json();
+    //   console.log("register failed.");
+    //   console.log('message:', message);
+    // }
+  } catch (error) {
+    console.log(error);
+    return USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR;
+  }
+};
+
+export const registerGoogle = async (
+  userName: string,
+  email: string,
 ) => {
   try {
     const res = await fetch("api/register", {
@@ -18,7 +47,7 @@ export const registerEmail = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ userName, loginID, email, password }),
+      body: JSON.stringify({ provider: 'google', userName, loginID:'', email, password:'' }),
     });
 
     if (res.ok) {
@@ -31,6 +60,7 @@ export const registerEmail = async (
     console.log(error);
   }
 };
+
 
 export const createEvent = async (
   eventName: string,
@@ -98,17 +128,28 @@ export const editEvent = async (
   }
 };
 
-export const existingUserCheck = async (loginID: string, email: string) => {
-  const res = await fetch("api/userExists", {
-    method: "POST",
+export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
+  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ loginID, email }),
   });
 
-  const data = await res.json();
-  return data.message;
+  const {user, message} = await res.json();
+  return message;
+};
+
+export const getUserInfo = async (provider: 'credentials'|'google', loginID: string, email: string):Promise<NextMeetUser|null> => {
+  const res = await fetch(`api/user?provider=${provider}&loginID=${loginID}&email=${email}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const {user, message} = await res.json();
+  return user;
 };
 
 export const getEvent = async (eventID: string|null) => {

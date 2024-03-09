@@ -17,7 +17,7 @@ const isFormValid = (
   email: string,
   password: string,
   passwordCheck: string
-): number => {
+): 0|3|4|5|6|7|8|9 => {
   //for login
   if (loginID.trim().length == 0) return FORM_INPUT_ERR.EMPTY_ID;
   if(mode == 'non-mem-login') return FORM_INPUT_ERR.NO_ERROR;
@@ -26,7 +26,7 @@ const isFormValid = (
   
   //for register
   if (loginID.trim().length < 4) return FORM_INPUT_ERR.SHORT_ID;
-  if (userName.trim().length < 2) return FORM_INPUT_ERR.SHORT_NAME;
+  if (userName.trim().length < 1) return FORM_INPUT_ERR.SHORT_NAME;
   if (!email_regex.test(email)) return FORM_INPUT_ERR.BAD_EMAIL_FORM;
   if (password.trim().length < 4) return FORM_INPUT_ERR.SHORT_PW;
   if (password !== passwordCheck) return FORM_INPUT_ERR.INCORRECT_PW;

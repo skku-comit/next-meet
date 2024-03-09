@@ -2,41 +2,12 @@ import NextAuth from "next-auth/next";
 import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { getUserInfo } from "@/lib/functions/CRUD";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
 const handler = NextAuth({
   callbacks: {
-    async signIn({ user, account }: { user: any; account: any }) {
-      
-      console.log("This is signin function");
-      console.log(user);
-      console.log(account);
-      const res = await fetch(`${NEXTAUTH_URL}/api/signinG`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },      
-        body: JSON.stringify({ email: user.email, userName: user.name }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data) {
-          if (data.isNew) {
-            console.log(`User ${user.name} signed up successfully`);
-          } else {
-            console.log(`User ${user.name} has just signed in`);
-          }
-          return true;  
-        } else {
-          throw new Error("Failed to form json");
-        }
-      } else {
-        console.log(res.status);
-        return false;
-      }
-    },
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs
       // console.log(`url: ${url}, baseurl: ${url == baseUrl ? baseUrl : url}`);
@@ -47,22 +18,20 @@ const handler = NextAuth({
       return baseUrl
      },
     async jwt({ token, account, profile, user }) {
-      // console.log("This is jwt");
-      // console.log(token);
-      // console.log(account);
-      // console.log(profile);
+      console.log("This is jwt");
+      console.log(token);
+      console.log(account);
+      console.log(profile);
       user && (token.user = user);
       return token;
     },
     async session ({session, token, user }) {
       console.log("This is session");
-      // console.log(`${Date.now()}`);
-      // if(token && token.user){
-      //   session.user = token.user;
-      //   return session;
-      // }
-
-      const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/userInfo`, {
+      if(token && token.user){
+        session.user = token.user;
+        return session;
+      }
+      const getUserInfo = await fetch(`api/userInfo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,7 +7,6 @@ import NextMeetUser from "@/template/schema/user.model";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from "@/template/Participate";
 import { NextResponse } from "next/server";
-import NextMeetUserG from "@/template/schema/userG.model";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -34,8 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       } 
       else {
         // If member, add the ID of new event to member's event list
-        let user = await NextMeetUser.findOne({ userID: userID });
-        if(!user) {user = await NextMeetUserG.findOne({ userID: userID })};
+        const user = await NextMeetUser.findOne({ userID: userID });
         (user.eventIDList as number[]).push(newEventID);
         await user.save();
       }
@@ -49,7 +47,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         participateStatus: [],
         fixedMeeting: [],
         hostUserInfo: host,
-        userList:[],
+        userList:[host],
       });
 
       res.status(201).json({ eventID: newEventID});
@@ -65,8 +63,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // If member, add the ID of new event to member's event list
       const reqBody = req.body;
       console.log("put reqBody", reqBody);
-      let user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
-      if(!user) {user = await NextMeetUserG.findOne({ userID: reqBody.user.userID })};
+      const user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
         // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
       if(reqBody.state == "addEvent"){
         if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){
@@ -111,11 +108,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // const {eventID} = req.query;
       // const event = await Event.findOne({ eventID: reqBody.eventID });
       if(req.body.state == "CONFIRM"){
-        await Event.findOneAndUpdate({eventID:reqBody.eventID}, {$set:{fixedMeeting: reqBody.fixedMeeting}}, { overwrite: true })
+        await Event.findOneAndUpdate({eventID: reqBody.eventID}, {$set:{fixedMeeting: reqBody.fixedMeeting}}, { overwrite: true })
       }
       else if(req.body.state == "EDIT"){
         console.log("Patch Edit")
-        await Event.findOneAndUpdate({eventID:reqBody.eventID}, {$set:{participateStatus: reqBody.participateStatus}}, { overwrite: true })
+        await Event.findOneAndUpdate({eventID: reqBody.eventID}, {$set:{participateStatus: reqBody.participateStatus}}, { overwrite: true })
       }
       res.status(201).json({ eventID: reqBody.eventID });
     } catch (error) {
@@ -139,7 +136,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error(error);
       res.status(500).json({ message: "Internal server issue occurred" });
     }
-
 
     res.status(200).json({});
   }

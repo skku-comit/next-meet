@@ -1,7 +1,7 @@
 // import type { NextApiRequest, NextApiResponse } from "next";
 // import connectDB from "@/lib/mongodb/connectDB";
 // import getID from "@/lib/functions/getID";
-// import NextMeetUserG from "@/template/schema/userG.model";
+// import NextMeetUser from "@/template/schema/user.model";
 
 // export enum SIGNIN_ERROR_GOOGLE {
 //   NO_ERROR = 0,
@@ -14,7 +14,7 @@
 //     try {
 //       await connectDB();
 //       // Check if the member is in database
-//       const checkQuery = await NextMeetUserGOOGLE.find({ email: req.body.email });
+//       const checkQuery = await NextMeetUser.find({ email: req.body.email });
 
 //       console.log(checkQuery);
 //       // Member already exist
@@ -23,7 +23,7 @@
 //       }
 
 //       // Register new member
-//       const user = NextMeetUserG;
+//       const user = NextMeetUser;
 //       const { email, userName } = req.body;
 
 //       await user.create({
