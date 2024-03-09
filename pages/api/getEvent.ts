@@ -10,7 +10,7 @@ const POST = async (req: NextApiRequest, res: NextApiResponse) => {
     const reqBody = await req.body;
     console.log(reqBody);
     
-    const existingEvent: NextMeetEvent|null = await Event.findOne({ eventID : parseInt(reqBody.eventID) });
+    const existingEvent: NextMeetEvent|null = await Event.findOne({ eventID : parseFloat(reqBody.eventID) });
     console.log('existingEvent:',existingEvent);
     if(existingEvent){
       return res.status(400).json({ existingEvent });

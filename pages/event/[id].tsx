@@ -182,6 +182,8 @@ const EventPage = ({
   const [schedule, setSchedule]: [{ schedule: Date[] }, Function] =
     useState(eventParticiTime);
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
+  const [wait, setWait]= useState(preMySelected.length <=0 ? true:false);  
+  const [wait2, setWait2]= useState(false);  
   const [fixedSchedule, setFixedSchedule]: [{ schedule: Date[] }, Function] =
     useState(fixedMeeting);
   const [preFixedSchedule, setPreFixedSchedule]: [
@@ -330,6 +332,7 @@ const EventPage = ({
   const [totalMem, setTotalMem] = useState(
     event?.userList ? event.userList.length : 0
   );
+  const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
 
   const [confirm, setConfirm]: [number, Function] = useState(
     event?.fixedMeeting.length > 0 ? 2 : 0
@@ -394,7 +397,7 @@ const EventPage = ({
   const [showDescription, setShowDescription] = useState(false);
 
   useEffect(()=>{
-      console.log("isHost",isHost, session?.user.userID == event.hostUserInfo.userID, fixedSchedule)
+      console.log("isHost",isHost, session?.user?.userID == event.hostUserInfo.userID, fixedSchedule)
   }, [isHost])
   // console.log("totalMem NonMemLogin", totalMem, nonMemLogin, totalScheduleList, indexOfLongestUserParti, longestUser ? (longestUser)[0] : null)
 
@@ -503,6 +506,8 @@ const EventPage = ({
               eventID={event.eventID}
               select={select}
               totalMem={totalMem}
+              prevTotalMem={prevTotalMem}
+              setPrevTotalMem={setPrevTotalMem}
               schedule={schedule}
               setShowMember={setShowMember}
               setShowMemberList={setShowMemberList}
@@ -518,6 +523,8 @@ const EventPage = ({
               week_startDate={week_startDate}
               preMySelected={preMySelected}
               setPreMySelected={setPreMySelected}
+              wait={wait}
+              setWait2={setWait2}
             />
           ) : (
             ""
@@ -540,6 +547,8 @@ const EventPage = ({
               eventID={event.eventID}
               setTotalScheduleList={setTotalScheduleList}
               totalMem={totalMem}
+              prevTotalMem={prevTotalMem}
+              setPrevTotalMem={setPrevTotalMem}
               eventTimeInfo={event?.timeInfo}
               eventParti={event?.participateStatus}
               nonMemLogin={nonMemLogin}
@@ -549,6 +558,9 @@ const EventPage = ({
               preMySelected={preMySelected}
               setPreMySelected={setPreMySelected}
               setTotalMem={setTotalMem}
+              wait={wait}
+              setWait={setWait}
+              setWait2={setWait2}
             />
           ) : (
             ""
@@ -563,6 +575,8 @@ const EventPage = ({
             eventID={event.eventID}
             setTotalScheduleList={setTotalScheduleList}
             totalMem={totalMem}
+            prevTotalMem={prevTotalMem}
+            setPrevTotalMem={setPrevTotalMem}
             fixedSchedule={fixedSchedule}
             week={week}
             confirm={confirm}
@@ -578,6 +592,8 @@ const EventPage = ({
             week_startDate={week_startDate}
             preMySelected={preMySelected}
             setPreMySelected={setPreMySelected}
+            wait={wait}
+            setWait2={setWait2}
             // fixedDate={null} fixedDay={null} fixedTime={null}
           />
           {width > 768 && confirm == 2 ? (
@@ -601,6 +617,7 @@ const EventPage = ({
               eventTimeInfo={event.timeInfo}
               eventID={event.eventID}
               setPreFixedSchedule={setPreFixedSchedule}
+              wait2={wait2}
             />
           ) : (
             ""
@@ -639,6 +656,7 @@ const EventPage = ({
             week_startDate={week_startDate}
             setPreFixedSchedule={setPreFixedSchedule}
             height={height}
+            wait2={wait2}
           />
         </div>
       ) : (

@@ -52,6 +52,11 @@ interface MyComponentProps {
     preMySelected : Date[];
     setPreMySelected : Function;
     setTotalMem : Function;
+    wait:boolean;
+    setWait:Function;
+    setWait2:Function;
+    prevTotalMem:number;
+    setPrevTotalMem:Function;
 }
 
 const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
@@ -60,7 +65,8 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         setShowMember, setTotalScheduleList, name, totalMem, 
         fixedSchedule, select,
         nonMemLogin, loginNonMem, isHost, week_startDate, eventID,
-        preMySelected, setPreMySelected, setTotalMem
+        preMySelected, setPreMySelected, setTotalMem,
+        wait,setWait, setWait2, prevTotalMem, setPrevTotalMem
       }:MyComponentProps) {
   
    const { data: session } = useSession();
@@ -68,7 +74,12 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
    const handleChange = async (newSchedule:Date[]) => {
 
-    setSchedule({schedule:newSchedule})
+    setSchedule((prev: { schedule: Date[]; })=>{
+      if(prev.schedule.length <= 0){
+        setWait(true);  console.log("wait true")
+      }
+      return{schedule:newSchedule}
+    })
 
     if(isLogin){
       if(newSchedule.length > 0){
@@ -80,10 +91,12 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       else{
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
         const data = await res.json();
-        console.log("removeUser handle", data);
+        console.log("removeUser handle", data, data?.data[1]?.length > 0);
         if(data?.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
       }
     }    
+
+    setWait(false); console.log("wait false");
 
     let participateStatus:Participate[]|undefined = eventParti;
 
@@ -161,16 +174,35 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
 
   return (
-    <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
-        setShowMember={setShowMember} eventID={eventID} setShowMemberList={setShowMemberList}
-        setShowDateTime={setShowDateTime}
-        setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
-        fixedSchedule={fixedSchedule} week={week} confirm={confirm}
-        select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti} 
-        state={state} handleChange={handleChange}
-        nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
-        preMySelected={preMySelected} setPreMySelected={setPreMySelected}
-        // fixedDate={null} fixedDay={null} fixedTime={null}
+    <ScheduleTableSelecto 
+      isLogin={isLogin} 
+      schedule={schedule} 
+      name={name}
+      setShowMember={setShowMember}
+      eventID={eventID} 
+      setShowMemberList={setShowMemberList}
+      setShowDateTime={setShowDateTime}
+      setTotalScheduleList={setTotalScheduleList} 
+      totalMem={totalMem}
+      fixedSchedule={fixedSchedule} 
+      week={week} 
+      confirm={confirm}
+      select={select} 
+      width={width} 
+      eventTimeInfo={eventTimeInfo} 
+      eventParti = {eventParti} 
+      state={state} 
+      handleChange={handleChange}
+      nonMemLogin={nonMemLogin} 
+      loginNonMem={loginNonMem} 
+      isHost={isHost} 
+      week_startDate={week_startDate}
+      preMySelected={preMySelected} 
+      setPreMySelected={setPreMySelected}
+      wait={wait} 
+      setWait2={setWait2} 
+      prevTotalMem={prevTotalMem}
+      setPrevTotalMem={setPrevTotalMem}// fixedDate={null} fixedDay={null} fixedTime={null}
     />
   );
 });

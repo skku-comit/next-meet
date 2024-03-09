@@ -11,6 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     //check if the user already exist, and add new user otherwise
     const { provider, userName, loginID, email, password } = req.body;
+    console.log("user Post", req.body, [loginID]);
     try {
       // Check if the member is in database
       let checkQuery;
@@ -24,9 +25,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       else{
         checkQuery = await NextMeetUser.find({ provider:'google', email: req.body.email }); //google login
+        console.log("checkQuery", checkQuery);
         if (checkQuery.length !== 0) {
           // Member already exist
-          res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_GOOGLE_ACCOUNT });
+          res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_GOOGLE_ACCOUNT, user:checkQuery[0] });
           return;
         }
       }
@@ -35,17 +37,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const user = NextMeetUser;
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await user.create({
+      const userID = getID(1);
+      const new_user = {
         provider:provider,
         loginID,
         password: hashedPassword,
-        userID: getID(1),
+        userID: userID,
         userName,
         email,
-      });
+      }
+      console.log("new user", new_user);
+
+      await user.create(new_user);
 
       console.log(`${userName} registered as user`);
-      res.status(200).json({ message: USER_SEARCH_RESPONSE.NO_ERROR });
+      res.status(200).json({ message: USER_SEARCH_RESPONSE.NO_ERROR, 
+        user : new_user });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR });

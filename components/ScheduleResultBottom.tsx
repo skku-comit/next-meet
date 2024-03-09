@@ -36,11 +36,14 @@ interface MyComponentProps {
     eventID:number;
     setPreFixedSchedule:Function;
     height:number;
+    wait2:boolean;
+
 }
 
 const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, setShowResult, showResult,showMember, scheduleList, totalMem,
     select, setSelect, confirm, setConfirm, fixedSchedule, setFixedSchedule, week, isLogin, isHost, eventTimeInfo, week_startDate, showDateTime,
-    showMemberList, schedule, eventID, setPreFixedSchedule, height}:MyComponentProps) {
+    showMemberList, schedule, eventID, setPreFixedSchedule, height, wait2
+    }:MyComponentProps) {
     
     const [lang, setLang] = useRecoilState(language);
     
@@ -54,10 +57,16 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         });    
     const [sortedMemList, setSortedMemList]:[string[], Function] = useState(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
 
-    const [totalMemNum, setTotalMemNum] = useState(totalMem);
-    useEffect(()=>{setTotalMemNum(totalMem); console.log("bottom totalMem", totalMem)},[totalMem]);
+    const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
+    
+    useEffect(()=>{
+        setPrevTotalMem(totalMem);
+    },[totalMem]);
 
     useEffect(()=>{
+        if(wait2){
+            return;
+        }
         if(scheduleList.checked_num){
             checked_mem_num= Object.values(scheduleList.checked_num);
             
@@ -65,9 +74,11 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
             console.log("max_checked_mem_sche",max_checked_mem_sche)
+            
             setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
+            console.log("wait2 change sortmemlist")
         }
-    }, [scheduleList]);
+    }, [scheduleList, wait2]);
     
     const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
     const [showMaxMember, setShowMaxMember] = useState(false);
@@ -220,7 +231,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                             return(
                                 <MaxMemberSche index={index} week={week} start_sche={start_sche} end_sche={end_sche} 
                                 scheduleList={scheduleList} sche={sche} isHost={isHost} checked_mem_num={checked_mem_num} 
-                                totalMemNum={totalMemNum} week_startDate={week_startDate} dateList={dateList} selectedWeekDay={selectedWeekDay}
+                                prevTotalMem={prevTotalMem} totalMem={totalMem} week_startDate={week_startDate} dateList={dateList} selectedWeekDay={selectedWeekDay}
                                 setFixedSchedule={setFixedSchedule} setSelect={setSelect} setConfirm={setConfirm}
                                 eventID={eventID} setPreFixedSchedule={setPreFixedSchedule}/>
                             )

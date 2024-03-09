@@ -43,13 +43,17 @@ interface MyComponentProps {
     eventID:number;
     preMySelected: Date[];
     setPreMySelected : Function;
+    wait:boolean;
+    setWait2:Function;
+    prevTotalMem:number;
+    setPrevTotalMem:Function;
 }
 
 const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
     {isLogin, width, week, schedule, totalMem, select, confirm, name, setShowDateTime,
     fixedSchedule, setFixedSchedule, setShowMember, setShowMemberList, setTotalScheduleList, eventID,
     eventTimeInfo, eventParti, nonMemLogin, loginNonMem, isHost, week_startDate,
-    preMySelected, setPreMySelected}:MyComponentProps) {
+    preMySelected, setPreMySelected, wait, setWait2, prevTotalMem, setPrevTotalMem}:MyComponentProps) {
 
   const state = "CONFIRM";
 
@@ -60,17 +64,35 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
   }
 
   return(
-    <ScheduleTableSelecto isLogin={isLogin} schedule={schedule} name={name}
-        setShowMember={setShowMember} eventID={eventID} setShowMemberList={setShowMemberList}
-        setShowDateTime={setShowDateTime}
-        setTotalScheduleList={setTotalScheduleList} totalMem={totalMem}
-        fixedSchedule={fixedSchedule} week={week}
-        select={select} width={width} eventTimeInfo={eventTimeInfo} eventParti = {eventParti}
-        state={state} handleChange={handleChange} confirm={confirm}
-        nonMemLogin={nonMemLogin} loginNonMem={loginNonMem} isHost={isHost} week_startDate={week_startDate}
-        preMySelected={preMySelected} setPreMySelected={setPreMySelected}
-        // fixedDate={null} fixedDay={null} fixedTime={null}
-    />
+    <ScheduleTableSelecto 
+      isLogin={isLogin} 
+      schedule={schedule} 
+      name={name}
+      setShowMember={setShowMember}
+      eventID={eventID} 
+      setShowMemberList={setShowMemberList}
+      setShowDateTime={setShowDateTime}
+      setTotalScheduleList={setTotalScheduleList} 
+      totalMem={totalMem}
+      fixedSchedule={fixedSchedule} 
+      week={week} 
+      confirm={confirm}
+      select={select} 
+      width={width} 
+      eventTimeInfo={eventTimeInfo} 
+      eventParti = {eventParti} 
+      state={state} 
+      handleChange={handleChange}
+      nonMemLogin={nonMemLogin} 
+      loginNonMem={loginNonMem} 
+      isHost={isHost} 
+      week_startDate={week_startDate}
+      preMySelected={preMySelected} 
+      setPreMySelected={setPreMySelected}
+      wait={wait} 
+      setWait2={setWait2} 
+      prevTotalMem={prevTotalMem}
+      setPrevTotalMem={setPrevTotalMem}/>
   );
 });
 
