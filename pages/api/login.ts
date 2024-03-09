@@ -13,7 +13,6 @@ export enum LOGIN_FAIL_ERR {
 }
 
 //for finding registered NextMeetUser
-
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     try {
@@ -24,21 +23,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (user) {
         const passwordCheck = await bcrypt.compare(req.body.password, user.password);
+        // console.log('passwordCheck: ',passwordCheck);
         if (passwordCheck) {
           const { password, ...dataWithoutPassword } = user._doc;          
           return res.status(200).json({
             message: LOGIN_FAIL_ERR.NO_ERROR,
-            ...dataWithoutPassword,
+            user: {...dataWithoutPassword},
           });
         } else {
-          return res.status(400).json({ message: LOGIN_FAIL_ERR.INCORRECT_PW });
+          return res.status(400).json({ message: LOGIN_FAIL_ERR.INCORRECT_PW, user:null });
         }
       } else {
-        return res.status(400).json({ message: LOGIN_FAIL_ERR.NOT_EXISTING_USERID });
+        return res.status(400).json({ message: LOGIN_FAIL_ERR.NOT_EXISTING_USERID, user:null });
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server issue occurred" });
+      res.status(500).json({ message: "Internal server issue occurred", user:null });
     }
   } else if (req.method === "PUT") {
     try {
