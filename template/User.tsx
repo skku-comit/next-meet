@@ -1,7 +1,7 @@
 export interface User {
   userID: number; //unique id for identification
   userName: string;
-  password: string|null;  // Password would be null except for the case of "credenetials"
+  password?: string;  // Password would be null except for the case of "credenetials"
 }
 
 export interface NextMeetUser extends User {
