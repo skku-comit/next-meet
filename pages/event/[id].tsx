@@ -392,9 +392,9 @@ const EventPage = ({
 
   const [showDescription, setShowDescription] = useState(false);
 
-  // useEffect(()=>{
-  //     console.log("isHost",isHost, session?.user.userID == event.hostUserInfo.userID, fixedSchedule)
-  // }, [isHost])
+  useEffect(()=>{
+      console.log("isHost",isHost, session?.user.userID == event.hostUserInfo.userID, fixedSchedule)
+  }, [isHost])
   // console.log("totalMem NonMemLogin", totalMem, nonMemLogin, totalScheduleList, indexOfLongestUserParti, longestUser ? (longestUser)[0] : null)
 
   return (

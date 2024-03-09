@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import LoginForm from "./LoginForm";
-import { existingUserCheck, registerNextMeetUser } from "@/lib/functions/CRUD";
+import { existingUserCheck, registerEmail } from "@/lib/functions/CRUD";
 import isFormValid from "@/lib/functions/isFormValid";
 import { signIn, signOut } from "next-auth/react";
 
@@ -119,7 +119,7 @@ const Login = (): ReactNode => {
     } catch (error) {
       console.log(error);
     }
-    await registerNextMeetUser(userName, loginID, email, password);
+    await registerEmail(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
   };

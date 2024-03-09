@@ -196,7 +196,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                 <p>{lang == "ko" ?"확정된 일정":"Fixed Schedule"}</p>
                             </div>
                             <hr className="border-t-2 my-1 mb-2"/>
-                            <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 min-h-6 grid grid-column gap-1`} style={{maxHeight: isHost && (confirm == 2 || confirm == 3) ? height-60 : height-119}}>
+                            <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 min-h-6 grid grid-column gap-1`} style={{maxHeight: isHost ? ((confirm == 2 || confirm == 3) ? height-60 : height-119): height-60}}>
                                 {(confirm != 1 && confirm !=3) && sortedList.length > 0 ? sortedList.map((sche:Date, index)=>{
                                         console.log("sortedList", sortedList)
                                         let diffMin = 0;
@@ -262,7 +262,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                         <p>{lang == "ko" ?"최대인원이 참여 가능한 시간대":"Time with the Maximum Number of People"}</p>
                     </div>
                     <hr className="border-t-2 my-1 mb-2"/>
-                    <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 flex flex-col gap-2`} style={{maxHeight: isHost && (confirm == 2 || confirm == 3) ? height-60 : height-119}}>
+                    <ul className ={`${scheduleResultCSS.result_scrolling4} px-2 flex flex-col gap-2`} style={{maxHeight: isHost ? ((confirm == 2 || confirm == 3) ? height-60 : height-119) : height-60}}>
                         {sortedMemList ? sortedMemList.map((sche, index)=>{
                             // const schedule = new Date(sche);
                             let diffMin = 0;

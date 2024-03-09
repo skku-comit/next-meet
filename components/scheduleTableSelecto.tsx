@@ -201,23 +201,23 @@ if(eventParti) {
 // const givenEventScheList_checked_num_sum = givenEventScheList.checked_num ? sumValues(givenEventScheList.checked_num) : 0;
 const [scheduleList, setScheduleList] = useState(givenEventScheList);
 //   useEffect(()=>setTotalScheduleList(scheduleList), []);
-//   useEffect(()=>{
-//     let revisedScheduleList = scheduleList;
-//     // console.log("totalMem", totalMem);
-//     for(const key in scheduleList.checked_num){
-//         revisedScheduleList.checked_num[key] = totalMem == 0 ? 0 : scheduleList.checked_num[key] * totalMemNum / totalMem;
-//     }
-//     // console.log("revisedScheduleList",revisedScheduleList);
-//     setScheduleList(revisedScheduleList);
-//     // setTotalMemNum(totalMem);
-//   }, [totalMem]);
+  useEffect(()=>{
+    let revisedScheduleList = scheduleList;
+    // console.log("totalMem", totalMem);
+    for(const key in scheduleList.checked_num){
+        revisedScheduleList.checked_num[key] = totalMem == 0 ? 0 : scheduleList.checked_num[key] * totalMemNum / totalMem;
+    }
+    // console.log("revisedScheduleList",revisedScheduleList);
+    setScheduleList(revisedScheduleList);
+    // setTotalMemNum(totalMem);
+  }, [totalMem]);
   
 //   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
 
   useEffect(()=>{
-        // if(totalMem != totalMemNum){
-        //     return;
-        // }
+        if(totalMem != totalMemNum){
+            return;
+        }
         if(isLogin){
             console.log("update", preMySelected)
             preMySelected?.map((sche:Date)=>{
@@ -257,7 +257,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>({
                         checked_num:{
                             ...prevSche.checked_num,
-                            [sche_str]: totalMem == 0 ? 0 : (prevSche.checked_num[sche_str]*totalMemNum-1)/(totalMem)
+                            [sche_str]: totalMem == 0 ? 0 : (prevSche.checked_num[sche_str]*totalMem-1)/(totalMem)
                         },
                         member:{
                             ...prevSche.member,
@@ -302,7 +302,7 @@ const [scheduleList, setScheduleList] = useState(givenEventScheList);
                             return({
                             checked_num:{
                                 ...prevSche.checked_num,
-                                [sche_str]: totalMem == 0 ? 0 : (prevSche.checked_num[sche_str]*totalMemNum+1)/(totalMem)
+                                [sche_str]: totalMem == 0 ? 0 : (prevSche.checked_num[sche_str]*totalMem+1)/(totalMem)
                             },
                             member:{
                                 ...prevSche.member,
