@@ -64,7 +64,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const reqBody = req.body;
       console.log("put reqBody", reqBody);
       const user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
-        // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
+      console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
       if(reqBody.state == "addEvent"){
         if(!(user.eventIDList.includes(parseInt(reqBody.eventID)))){
           (user.eventIDList as number[]).push(parseInt(reqBody.eventID));

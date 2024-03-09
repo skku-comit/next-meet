@@ -75,13 +75,13 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "addUser");
         const data = await res.json();
         console.log("addUser handle", data);
-        if(data.data[1]?.length <=0){setTotalMem((prev:number)=>(prev+1))};
+        if(data?.data[1]?.length <=0){setTotalMem((prev:number)=>(prev+1))};
       }
       else{
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
         const data = await res.json();
         console.log("removeUser handle", data);
-        if(data.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
+        if(data?.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
       }
     }    
 

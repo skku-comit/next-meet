@@ -175,6 +175,8 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
             revisedScheduleList.checked_num[key] = totalMem == 0 ? 0 : scheduleList.checked_num[key] * totalMemNum / totalMem;
         }
         setScheduleList(revisedScheduleList);
+        setTotalMemNum(totalMem);
+
         }, [totalMem]);
   
 
@@ -250,7 +252,6 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
         else{
             setPreMySelected([]);
         }
-        setTotalMemNum(totalMem);
     }, [schedule.schedule, totalMem, isLogin])
 
 

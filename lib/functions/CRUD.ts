@@ -173,9 +173,9 @@ export const getEvent = async (eventID: string|null) => {
     body: JSON.stringify({ eventID }),
   });
 
-  const { existingEvent } = await res.json();
-  console.log(existingEvent);
-  return existingEvent;
+  const data = await res.json();
+  console.log(data?.existingEvent);
+  return data?.existingEvent;
 };
 
 

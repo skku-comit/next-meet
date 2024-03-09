@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
 import { IoMdLogIn } from "react-icons/io";
-import { language } from '../lib/recoil/language';
+import { language } from '../lib/recoil/Language';
 import { useRecoilState } from "recoil";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
@@ -24,9 +24,10 @@ const Setter = (props:any): ReactNode => {
 
   const [isMember,setIsMember] = useState<boolean>(session && session.user ? true : false);
   const [loginMode,setLoginMode] = useState<'nonMember'|'Email'|'social'>('nonMember');
-  useEffect(()=>{if(props.isLogin){setIsMember(session && session.user ? true : false)}},[props.isLogin])
-  // const [isLogin, setIsLogin] = useState<boolean>(false);
-  // const [idName, setIdName] = useState<String>("");
+  useEffect(()=>{if(props.isLogin){
+    setIsMember(session && session.user ? true : false)
+    setLoginMode(session && session.user ? session.user.provider == "credentials" ? "Email" : "social" : "nonMember");
+  }},[props.isLogin])
   const [pw, setPw] = useState<String>("");
   const nameIdInputRef = useRef<HTMLInputElement>(null);
   const pwInputRef = useRef<HTMLInputElement>(null);
@@ -36,21 +37,23 @@ const Setter = (props:any): ReactNode => {
   const eventID = router.query['id'];
   console.log("eventID",eventID);
 
-  // props.setName(idName);
-  // const addTotalNum:Function = ()=>{
-  //   // console.log("islogin", props.isLogin);
-  //   !props.isLogin ? props.setTotalMem(props.totalMem+1):"";
-  // }
-
   const ERROR_MESSAGE = {
     0: "",
     1: "동일한 아이디가 존재합니다.",
     2: "동일한 이메일이 존재합니다.",
-    3: "비밀번호가 일치하지 않습니다.",
-    4: "아이디를 입력하세요.",
-    5: "비밀번호를 입력하세요.",
-    6: "아이디 혹은 비밀번호가 틀렸습니다.",
+    3: "이름이 너무 짧습니다",
+    4: "아이디가 너무 짧습니다.",
+    5: "비밀번호가 너무 짧습니다.",
+    6: "이메일 형식이 옳지 않습니다.",
+    7: "비밀번호가 일치하지 않습니다.",
+    8: "아이디를 입력하세요.",
+    9: "비밀번호를 입력하세요.",
+    10: "아이디 혹은 비밀번호가 틀렸습니다.",
+    11: "존재하는 구글계정입니다.",
+    99: "서버 오류가 발생했습니다.",
+    100: "회원가입이 완료되었습니다."
   };
+
 
   const onMemLoginHandler = async () => {
     if (!(nameIdInputRef.current && pwInputRef.current)) return;
@@ -58,9 +61,9 @@ const Setter = (props:any): ReactNode => {
     const password = pwInputRef.current.value;
 
     let errorNo = isFormValid("login", loginID, "", "", password, "");
-    console.log("memLogin errorNo")
+    console.log("memLogin errorNo", errorNo)
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo as 4 | 5]);
+      setError(ERROR_MESSAGE[errorNo as 8 | 9]);
       return;
     }
     try {
@@ -72,7 +75,7 @@ const Setter = (props:any): ReactNode => {
       });
 
       if (res && +res.error! != 0) {
-        setError(ERROR_MESSAGE[6]);
+        setError(ERROR_MESSAGE[10]);
       }
       
       let session: any = await getSession();
@@ -114,7 +117,7 @@ const Setter = (props:any): ReactNode => {
     let errorNo = isFormValid("non-mem-login", loginName, "", "", password, "");
     console.log("nonMem", errorNo)
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo as 4]);
+      setError(ERROR_MESSAGE[errorNo as 8]);
       return;
     }
     try {
@@ -158,7 +161,7 @@ const Setter = (props:any): ReactNode => {
       return null;
     }
   }
-  console.log("isMember",isMember)
+  console.log("error",error)
 
   return (
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
@@ -168,6 +171,7 @@ const Setter = (props:any): ReactNode => {
             e.preventDefault();
             setIsMember(false); 
             setLoginMode('nonMember');
+            setError("");
             props.setScheduleTable(true); 
             props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0); 
             if(props.isLogin){
@@ -176,7 +180,7 @@ const Setter = (props:any): ReactNode => {
                 props.setName("")
                 props.setIsHost(false);
                 props.setLoginNonMem(undefined);
-                props.setNonMemLogin(false)
+                props.setNonMemLogin(false);
               }, 5000);
               signOut({ redirect: false });
               props.setIsLogin(false); 
@@ -188,6 +192,7 @@ const Setter = (props:any): ReactNode => {
             e.preventDefault();
             setIsMember(true); 
             setLoginMode('Email');
+            setError("");
             props.setScheduleTable(true); 
             props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
             if(props.isLogin){
@@ -208,6 +213,7 @@ const Setter = (props:any): ReactNode => {
             e.preventDefault();
             setIsMember(true); 
             setLoginMode('social');
+            setError("");
             props.setScheduleTable(true); 
             props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0);
             if(props.isLogin){
@@ -224,71 +230,72 @@ const Setter = (props:any): ReactNode => {
         {lang == 'ko' ? "소셜 로그인": "SOCIAL LOGIN"}
         </button>
       </div>
-      <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 overflow-hidden gap-0`}>
+      <div className={`flex flex-col flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center overflow-hidden gap-0 ${error && error.length > 0 ? "pt-1" : "pt-4"}`}>
+        {error && error.length > 0 ? <div className="h-4 m-4 text-md text-red-400">{error}</div>:""}
+        <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 pt-0 overflow-hidden gap-0`}>
+          {props.isLogin ? 
+            //로그인했을 경우
+            props.name ? 
+              //로그인한 회원의 이름 정보가 있을 경우
+              <div className="w-full">
+                <div className="items-center pt-1.5">{props.name}</div>
+              </div> 
+              //로그인한 회원의 이름 정보가 없을 경우
+              : ""
+            //로그인 하지 않았을 경우
+          : loginMode =="social" ? 
+            // 소셜로그인인 경우
+            <button
+              className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
+              onClick={(e) => {
+                e.preventDefault();
+                signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
+              }}>
+              구글로 로그인
+            </button>
+            // 비회원 로그인 또는 이메일 로그인인 경우
+            : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
+              <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex flex-row items-center gap-3 justify-end overflow-hidden`}>
+                  <label className="text-center pt-1 min-w-[26px] whitespace-nowrap text-right">{isMember ? "ID":"이름"}</label>
+                  <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='text' 
+                    ref={nameIdInputRef}
+                    onChange={(e)=>{props.setName(e.target.value)}}/>
+              </div>
+              <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex items-center gap-3 justify-end overflow-hidden`}>
+                  <label className="text-center pt-1 min-w-fit whitespace-nowrap text-right">{props.width < 786 ? "PW":"비밀번호"}</label>
+                  <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='password' 
+                    ref={pwInputRef}
+                    onChange={(e)=>{setPw(e.target.value)}}/>
+              </div>
+          </div>}
 
-        {props.isLogin ? 
-          //로그인했을 경우
-          props.name ? 
-            //로그인한 회원의 이름 정보가 있을 경우
-            <div className="w-full">
-              <div className="items-center pt-1.5">{props.name}</div>
-            </div> 
-            //로그인한 회원의 이름 정보가 없을 경우
-            : ""
-          //로그인 하지 않았을 경우
-        : loginMode =="social" ? 
-          // 소셜로그인인 경우
-          <button
-            className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
-            onClick={(e) => {
-              e.preventDefault();
-              signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
-            }}>
-            구글로 로그인
-          </button>
-          // 비회원 로그인 또는 이메일 로그인인 경우
-          : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
-            <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex flex-row items-center gap-3 justify-end overflow-hidden`}>
-                <label className="text-center pt-1 min-w-[26px] whitespace-nowrap text-right">{isMember ? "ID":"이름"}</label>
-                <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='text' 
-                  ref={nameIdInputRef}
-                  onChange={(e)=>{props.setName(e.target.value)}}/>
-            </div>
-            <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex items-center gap-3 justify-end overflow-hidden`}>
-                <label className="text-center pt-1 min-w-fit whitespace-nowrap text-right">{props.width < 786 ? "PW":"비밀번호"}</label>
-                <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='password' 
-                  ref={pwInputRef}
-                  onChange={(e)=>{setPw(e.target.value)}}/>
-            </div>
-        </div>}
-
-        {loginMode =="social" ? "" :<button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
-          onClick={()=>{
-            if(props.isLogin){
-              props.setScheduleTable(true);
-              setTimeout(()=>{props.setIsLogin(false)
-                props.setName("")
-                props.setIsHost(false);
-                props.setLoginNonMem(undefined);
-                props.setNonMemLogin(false)
-              }, 5000);
-              signOut();
-            }
-            else{
-              props.setScheduleTable(false);
-              isMember ? onMemLoginHandler():onNonMemLoginHandler();
-            }
-            props.confirm == 1 ? props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0) : "";
-            // props.isLogin ? props.setScheduleTable(true) : props.setScheduleTable(false);
-            // props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true);  
-            // props.isLogin ? props.setName(""):"";
-            // !props.isLogin ? isMember ? onMemLoginHandler():onNonMemLoginHandler():props.setIsHost(false);
-            // props.isLogin ? props.setNonMemLogin(false) : "";
-          }}
-        >{props.isLogin ? (lang=="ko" ? "로그아웃":"LOGOUT") : props.width <= 500 || props.width > 786 ? (lang == 'ko' ? "로그인":"LOGIN") : <IoMdLogIn className={`h-full w-8 h-25`} />}
-        </button>}
+          {loginMode =="social" ? "" :<button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
+            onClick={()=>{
+              if(props.isLogin){
+                props.setScheduleTable(true);
+                setTimeout(()=>{props.setIsLogin(false)
+                  props.setName("")
+                  props.setIsHost(false);
+                  props.setLoginNonMem(undefined);
+                  props.setNonMemLogin(false)
+                }, 5000);
+                signOut();
+              }
+              else{
+                props.setScheduleTable(false);
+                isMember ? onMemLoginHandler():onNonMemLoginHandler();
+              }
+              props.confirm == 1 ? props.setConfirm(props.preFixedSchedule.schedule.length > 0 ? 2 : 0) : "";
+              // props.isLogin ? props.setScheduleTable(true) : props.setScheduleTable(false);
+              // props.isLogin ? props.setIsLogin(false) : props.setIsLogin(true);  
+              // props.isLogin ? props.setName(""):"";
+              // !props.isLogin ? isMember ? onMemLoginHandler():onNonMemLoginHandler():props.setIsHost(false);
+              // props.isLogin ? props.setNonMemLogin(false) : "";
+            }}
+          >{props.isLogin ? (lang=="ko" ? "로그아웃":"LOGOUT") : props.width <= 500 || props.width > 786 ? (lang == 'ko' ? "로그인":"LOGIN") : <IoMdLogIn className={`h-full w-8 h-25`} />}
+          </button>}
+        </div>
       </div>
-
     </div>
   );
 };

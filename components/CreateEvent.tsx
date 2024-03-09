@@ -10,8 +10,14 @@ import { useSession } from "next-auth/react";
 import { TimeInfo } from "@/template/TimeInfo";
 import { NextMeetUser, User } from "@/template/User";
 import { useRouter } from "next/navigation";
+import { useRecoilState } from "recoil";
+import { language } from '../lib/recoil/Language';
+
 
 const CreateEvent = (): ReactNode => {
+
+  const [lang, setLang] = useRecoilState(language);
+
   //useRouter
   const router = useRouter();
   //useSession
@@ -120,7 +126,7 @@ const CreateEvent = (): ReactNode => {
   };
 
   const proceedCheck = () => {
-    console.log(dateSelection.dateList);
+    console.log("dateSelection.dateList",dateSelection.dateList);
     if (!eventNameRef.current || !descriptionRef.current) return;
 
     //check session
@@ -163,7 +169,7 @@ const CreateEvent = (): ReactNode => {
             setIsCreatingEvent(true);
           }}
         >
-          <IoMdAddCircleOutline className="mr-2 w-8 h-8" />새 이벤트 만들기
+          <IoMdAddCircleOutline className="mr-2 w-8 h-8" />{lang=="ko" ? "새 이벤트 만들기" : "Create New Event"}
         </button>
       )}
 
