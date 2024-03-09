@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { ReactNode, useState, useEffect, useRef } from "react";
 import { IoMdLogIn } from "react-icons/io";
-import { language } from '../lib/recoil/language';
+import { language } from '../lib/recoil/Language';
 import { useRecoilState } from "recoil";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
@@ -143,8 +143,8 @@ const Setter = (props:any): ReactNode => {
       if (props.eventHost.userID == 0 && loginName == props.eventHost.userName && password == props.eventHost.password){
         props.setIsHost(true);
       }
-      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password == eventUser.password : false):null;
-      console.log("existedUser", existedUser, props.eventUsers)
+      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password == eventUser.password : false):[];
+      console.log("existedUser", existedUser.length, props.eventUsers)
       if(existedUser.length > 0){
         props.setLoginNonMem(existedUser[0]);
         user = existedUser[0];
@@ -263,10 +263,28 @@ const Setter = (props:any): ReactNode => {
       </div>
       <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 overflow-hidden gap-0`}>
 
-        {props.isLogin ? props.name ? <div className="w-full">
-          <div className="items-center pt-1.5">{props.name}</div>
-          </div> : ""
-        : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
+        {props.isLogin ? 
+          //로그인했을 경우
+          props.name ? 
+            //로그인한 회원의 이름 정보가 있을 경우
+            <div className="w-full">
+              <div className="items-center pt-1.5">{props.name}</div>
+            </div> 
+            //로그인한 회원의 이름 정보가 없을 경우
+            : ""
+          //로그인 하지 않았을 경우
+        : loginMode =="social" ? 
+          // 소셜로그인인 경우
+          <button
+            className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
+            onClick={(e) => {
+              e.preventDefault();
+              signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
+            }}>
+            구글로 로그인
+          </button>
+          // 비회원 로그인 또는 이메일 로그인인 경우
+          : <div className={`flex ${props.width <= 500 ? "flex-col pb-0 justify-between" : "flex-row"} items-center justify-around gap-3 m-2 w-full overflow-hidden`}>
             <div className={`w-full ${props.width <= 500 ? "text-sm" : ""} flex flex-row items-center gap-3 justify-end overflow-hidden`}>
                 <label className="text-center pt-1 min-w-[26px] whitespace-nowrap text-right">{isMember ? "ID":"이름"}</label>
                 <input className={`${props.width <= 500 ? "" : ""} grow border-[1px] h-8 p-2 outline-none rounded min-w-0`} type='text' 
@@ -281,7 +299,7 @@ const Setter = (props:any): ReactNode => {
             </div>
         </div>}
 
-        <button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
+        {loginMode =="social" ? "" :<button className={`items-center ${setterBtnTab.login_btn} grow-0 bg-white rounded text-center p-1 pt-1.5 m-2 mb-0 text-sm grow-0 ${props.width <= 500 ? "w-full mt-1":"mt-0 min-w-fit"} `}
           onClick={()=>{
             if(props.isLogin){
               props.setScheduleTable(true);
@@ -304,7 +322,8 @@ const Setter = (props:any): ReactNode => {
             // !props.isLogin ? isMember ? onMemLoginHandler():onNonMemLoginHandler():props.setIsHost(false);
             // props.isLogin ? props.setNonMemLogin(false) : "";
           }}
-        >{props.isLogin ? (lang=="ko" ? "로그아웃":"LOGOUT") : props.width <= 500 || props.width > 786 ? (lang == 'ko' ? "로그인":"LOGIN") : <IoMdLogIn className={`h-full w-8 h-25`} />}</button>
+        >{props.isLogin ? (lang=="ko" ? "로그아웃":"LOGOUT") : props.width <= 500 || props.width > 786 ? (lang == 'ko' ? "로그인":"LOGIN") : <IoMdLogIn className={`h-full w-8 h-25`} />}
+        </button>}
       </div>
 
     </div>

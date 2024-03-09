@@ -125,6 +125,7 @@ const Login = (): ReactNode => {
       setError(ERROR_MESSAGE[registerStatus])
       return;
     }
+    await registerEmail(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
   };
