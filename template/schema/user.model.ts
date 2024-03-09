@@ -12,7 +12,7 @@ const NextMeetUserSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: false,
   },
   userID: { //id for identification, created by server
     type: Number,
