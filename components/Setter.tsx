@@ -279,7 +279,7 @@ const Setter = (props:any): ReactNode => {
             className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
             onClick={(e) => {
               e.preventDefault();
-              signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
+              signIn("google", { callbackUrl: `/event/${eventID}` }, { prompt: "select_account" });
             }}>
             구글로 로그인
           </button>

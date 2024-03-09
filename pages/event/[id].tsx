@@ -1,16 +1,13 @@
 import Setter from "@/components/Setter";
 import ScheduleTableSelecto from "@/components/scheduleTableSelecto";
 import ScheduleTableSelectoEdit from "@/components/scheduleTableSelectoEdit";
-import eventIdCSS from "@/styles/eventId.module.css";
 import ScheduleResultBottom from "@/components/ScheduleResultBottom";
 import ScheduleResultRight from "@/components/ScheduleResultRight";
 import ScheduleTableConfirm from "@/components/scheduleTableConfirm";
 import ConfirmBtn from "@/components/ConfirmBtn";
 import scheResultBotCSS from "@/styles/scheduleResultBottom.module.css";
-
 import { FaList, FaAngleDown, FaAngleUp } from "react-icons/fa";
-
-import { useState, useEffect, useReducer, MouseEventHandler } from "react";
+import { useState, useEffect,  MouseEventHandler } from "react";
 import { throttle } from "lodash";
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
@@ -18,14 +15,12 @@ import { NextMeetEvent } from "@/template/Event";
 import { useRecoilState } from "recoil";
 import { Participate } from "@/template/Participate";
 import { useSession } from "next-auth/react";
-import { NextMeetUser, User } from "@/template/User";
+import {  User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-import { useSearchParams } from "next/dist/client/components/navigation";
-import { useRouter } from "next/router";
-import { language } from "@/lib/recoil/Language";
-import { TimeInfo } from "@/template/TimeInfo";
+import { language } from "@/lib/recoil/language";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
-import { redirect } from "next/navigation";
+import { currentEvent } from "@/lib/recoil/currentEvent";
+import { useSetRecoilState } from "recoil";
 
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
@@ -96,6 +91,10 @@ export const getServerSideProps = async (context: any) => {
 const EventPage = ({
   event,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  
+  const setCurrentEvent = useSetRecoilState(currentEvent);
+  setCurrentEvent(event.eventID);
+  
   // const params = useSearchParams();
   // const eventID = params.get('id');
   // const res = await fetch("api/getEvent", {
@@ -117,6 +116,7 @@ const EventPage = ({
   // }, [])
 
   console.log("event", event);
+  
   const { data: session } = useSession();
   console.log("session", session);
 

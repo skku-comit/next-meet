@@ -183,7 +183,8 @@ const Login = (): ReactNode => {
           className={`${className_button} py-2`}
           onClick={(e) => {
             e.preventDefault();
-            signIn("google", { callbackUrl: "/" }, { prompt: "select_account" });
+            // console.log('currentEvent: ',currentEventState);
+            signIn("google", { callbackUrl: '/' }, { prompt: "select_account" });
           }}>
           구글로 로그인
         </button>

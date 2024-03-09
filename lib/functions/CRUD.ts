@@ -130,16 +130,15 @@ export const editEvent = async (
 
 export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
   const queryParams = new URLSearchParams({
-    userID: "null",
     provider: provider,
     loginID: loginID,
     email: email,
   });
-  const res = await fetch(`api/user?userID=${queryParams}`, {
+  const res = await fetch(`api/user?${queryParams}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
   });
 
   const {user, message} = await res.json();
@@ -149,15 +148,12 @@ export const existingUserCheck = async (provider: 'credentials'|'google', loginI
 export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null> => {
   const queryParams = new URLSearchParams({
     userID: userID.toString(),
-    provider: "null",
-    loginID: "null",
-    email: "null"
   });
-  const res = await fetch(`https://localhost:3000/api/user?${queryParams}`, {
+  const res = await fetch(`api/user?${queryParams}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
   });
 
   const {user, message} = await res.json();

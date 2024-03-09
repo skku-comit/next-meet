@@ -31,12 +31,12 @@ const handler = NextAuth({
       console.log("This is session");
       if(token && token.user){
         console.log(token.user)
-        // const userInfo = await getUserInfoByID(+(token.user as User).id);
-        // console.log('userInfo: ',userInfo);
+        const userInfo = await getUserInfoByID(+(token.user as User).id);
+        console.log('userInfo: ',userInfo);
         session.user = token.user;
         return session;
       }
-      const getUserInfo = await fetch(`api/userInfo`, {
+      const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

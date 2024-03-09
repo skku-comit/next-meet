@@ -53,7 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   else if(req.method === "GET"){
     //check if the user already exist, and return user info otherwise
-    const { provider, loginID, email } = req.query;
+    const { userID, provider, loginID, email } = req.query;
     console.log('req.query:', req.query);
     let existingUser;
     try{
