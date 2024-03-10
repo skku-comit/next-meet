@@ -40,7 +40,7 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
     const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
 
     const realScheToSelecto = (sche:Date) => {
-        let selectoDate:Date;
+        let selectoDate:Date = new Date(sche);;
         if(week){
             const scheDay = WEEKDAY[new Date(sche).getDay()];
             console.log("selectoDate day", scheDay, sortedSelectedWeekDay);
@@ -55,26 +55,37 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
             date.setHours(0);
             date.setMinutes(0);
             date.setMilliseconds(0);
-            console.log("selectoDate date", date, dateList);
-            const index = dateList.indexOf(new Date(date).toISOString());
-            console.log("selectoDate index", index);
+            // console.log("selectoDate date", date, new Date(date).toISOString(), dateList);
+            let index = 0;
+            for(let i=0; i< dateList.length ; i++){
+                const indexDate = dateList[i].toString().split("T")[0];
+                if(new Date(indexDate).getFullYear()==date.getFullYear() && new Date(indexDate).getMonth() == date.getMonth() && new Date(indexDate).getDate()==date.getDate()){
+                    index = i;
+                }
+                // console.log("selectoDate date 2", new Date(indexDate).getFullYear()==date.getFullYear() && new Date(indexDate).getMonth() == date.getMonth() && new Date(indexDate).getDate()==date.getDate());
+            }
+            // console.log("selectoDate index", date, index);
             selectoDate = new Date(sche);
-            selectoDate.setDate(selectoDate.getDate()-index);
+            selectoDate.setMonth(new Date(dateList[0].toString().split("T")[0]).getMonth())
+            selectoDate.setDate(new Date(dateList[0].toString().split("T")[0]).getDate()+index);
         }
 
         console.log("selectoDate", selectoDate);
         return selectoDate;
     }
 
-    let fixedDateList:Date[]= [];
+    const fixedDateList:Date[]= [];
     for(let i = 0; i < ((end_sche.getTime()-start_sche.getTime())/(30 * 60 * 1000)) ; i++){
         let schedule = new Date(start_sche)
         schedule.setMinutes(schedule.getMinutes()+30*i);
         const selectoDate = realScheToSelecto(schedule);
+        console.log("fixedDateList b",schedule, selectoDate, start_sche)
         fixedDateList.push(selectoDate);
     }
 
     let exist = true;
+
+    console.log("fixedDateList", start_sche, end_sche, fixedDateList);
 
     fixedDateList.map((date)=>{
         const existed = fixedSchedule.schedule.filter((sche)=>(new Date(sche).getTime() == new Date(date).getTime()))
