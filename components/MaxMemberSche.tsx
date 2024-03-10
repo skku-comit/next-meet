@@ -24,15 +24,15 @@ interface MyComponentProps {
     setConfirm:Function;
     eventID:number;
     setPreFixedSchedule:Function;
+    fixedSchedule:{schedule:Date[]};
 }
 
 const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,sche, checked_mem_num, totalMem, prevTotalMem, week_startDate, 
-        dateList, selectedWeekDay, setFixedSchedule, setSelect, setConfirm, eventID, setPreFixedSchedule}:MyComponentProps) =>{
+        dateList, selectedWeekDay, setFixedSchedule, setSelect, setConfirm, eventID, setPreFixedSchedule, fixedSchedule}:MyComponentProps) =>{
     
     const [lang, setLang] = useRecoilState(language);
     const [showMaxMember, setShowMaxMember] = useState(false);
-    const [scheConfirm, setScheConfirm] = useState(false);
-
+    
     const WEEKDAY:DaysOfWeek[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const WEEKDAY2 = ['일', '월', '화', '수', '목', '금', '토'];
     const WEEKDAY3 = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -66,6 +66,24 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
         return selectoDate;
     }
 
+    let fixedDateList:Date[]= [];
+    for(let i = 0; i < ((end_sche.getTime()-start_sche.getTime())/(30 * 60 * 1000)) ; i++){
+        let schedule = new Date(start_sche)
+        schedule.setMinutes(schedule.getMinutes()+30*i);
+        const selectoDate = realScheToSelecto(schedule);
+        fixedDateList.push(selectoDate);
+    }
+
+    let exist = true;
+
+    fixedDateList.map((date)=>{
+        const existed = fixedSchedule.schedule.filter((sche)=>(new Date(sche).getTime() == new Date(date).getTime()))
+        if(existed.length <= 0){
+            exist = false;
+        }
+    })
+
+    const [scheConfirm, setScheConfirm] = useState(exist);
 
     return(
         <li className={`flex flex-col ${showMaxMember ? "gap-2":"gap-0.5"} bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer`}  key={index}>
@@ -94,13 +112,6 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
                     !scheConfirm ?
                      <button className={`w-full pt-1 bg-[darkgray] rounded hover:bg-[gray]`} 
                         onClick={()=>{setScheConfirm((prev)=>(!prev));
-                            let fixedDateList:Date[]= [];
-                            for(let i = 0; i < ((end_sche.getTime()-start_sche.getTime())/(30 * 60 * 1000)) ; i++){
-                                let schedule = new Date(start_sche)
-                                schedule.setMinutes(schedule.getMinutes()+30*i);
-                                const selectoDate = realScheToSelecto(schedule);
-                                fixedDateList.push(selectoDate);
-                            }
                             setFixedSchedule((prev:{schedule:Date[]})=>{
                                 let newSche = prev.schedule;
                                 fixedDateList.map((date)=>{
@@ -113,18 +124,13 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
                                 handleConfirm(newSche, week, eventID, setPreFixedSchedule);                
                                 return({schedule : newSche})
                             })
+                            setSelect(1);
+                            setConfirm(2);
                         }}>
                         {lang == "ko" ? "확정" : "Confirm"}
                      </button>
                     :<button className={`w-full pt-1 bg-[darkgray] rounded hover:bg-[gray]`} 
                         onClick={()=>{setScheConfirm((prev)=>(!prev));
-                            let fixedDateList:Date[]= [];
-                            for(let i = 0; i < ((end_sche.getTime()-start_sche.getTime())/(30 * 60 * 1000)) ; i++){
-                                let schedule = new Date(start_sche)
-                                schedule.setMinutes(schedule.getMinutes()+30*i);
-                                const selectoDate = realScheToSelecto(schedule);
-                                fixedDateList.push(selectoDate);
-                            }
                             setFixedSchedule((prev:{schedule:Date[]})=>{
                                 let newSche = prev.schedule;
                                 fixedDateList.map((date)=>{

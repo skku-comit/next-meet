@@ -119,6 +119,33 @@ const EventPage = ({
   const [week, setWeek]: [boolean, Function] = useState(
     event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly
   );
+
+  const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDaySorter: { [index: string]: number } = {
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+    Sun: 7,
+  };
+  console.log(event?.timeInfo.isWeekly);
+  const sortedSelectedWeekDay = event
+    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
+        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
+      )
+    : [];
+  let week_startDate: Date = new Date(0);
+  if (sortedSelectedWeekDay) {
+    for (let i = 0; i < 7; i++) {
+      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
+        break;
+      }
+      week_startDate.setDate(week_startDate.getDate() + 1);
+    }
+  }
+
   let fixedMeeting: { schedule: Date[] } = { schedule: [] };
 
   if (week) {
@@ -204,32 +231,6 @@ const EventPage = ({
     // setSchedule(eventParticiTime);
     // console.log("loginNonMem", loginNonMem)
   }, [session ? session.user : nonMemLogin]);
-
-  const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const weekDaySorter: { [index: string]: number } = {
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
-    Sun: 7,
-  };
-  console.log(event?.timeInfo.isWeekly);
-  const sortedSelectedWeekDay = event
-    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
-        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
-      )
-    : [];
-  let week_startDate: Date = new Date(0);
-  if (sortedSelectedWeekDay) {
-    for (let i = 0; i < 7; i++) {
-      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
-        break;
-      }
-      week_startDate.setDate(week_startDate.getDate() + 1);
-    }
-  }
 
   const [totalScheduleList, setTotalScheduleList]: [
     {
