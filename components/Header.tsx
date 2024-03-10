@@ -12,7 +12,7 @@ const Header = ():ReactNode =>{
     return <div className="w-screen h-20 px-4 fixed flex flex-col bg-white z-50">
         <div className="flex flex-row justify-between pr-2">
             {/* <Link href={'/'}> */}
-                <h1 className="m-4 text-2xl pt-2" onClick={() => router.push("/")}>NextMeet</h1>
+                <h1 className="m-4 text-2xl pt-2 cursor-pointer" onClick={() => router.push("/")}>NextMeet</h1>
             {/* </Link> */}
             <div className="pt-1">
                 <LangButton lang={lang} setLang={setLang}/>

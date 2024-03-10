@@ -2,12 +2,13 @@ import { ReactNode, useEffect, useState } from "react";
 import EventList from "@/components/EventList";
 import Login from "@/components/Login";
 import { signOut, useSession } from "next-auth/react";
-import { NextMeetEvent } from "@/template/Event";
-import { getEvent } from "@/lib/functions/CRUD";
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
 
 const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
 const LogoutButton = (): ReactNode => {
+  const lang = useRecoilValue(language);
   return (
     <button
       // className={"mt-auto pt-20 hover:underline underline-offset-[6px]"}
@@ -16,7 +17,7 @@ const LogoutButton = (): ReactNode => {
         e.preventDefault();
         signOut({ redirect: false });
       }}>
-      로그아웃
+      {lang === 'ko' ? '로그아웃' : 'Logout'}
     </button>
   );
 };
@@ -25,33 +26,6 @@ const MyPage = (): ReactNode => {
   const { data: session } = useSession();
   console.log("MyPage")
   console.log( 'session:',session );
-  const [eventList,setEventList] = useState<NextMeetEvent[]>([]);
-  
-  useEffect(()=>{
-    if(session && session.user){
-      getEventList();
-    }
-  },[session,session?.user]);
-
-  const getEventList = async () => {
-    const eventList: NextMeetEvent[] = [];
-<<<<<<< HEAD
-    const set = new Set(session!.user.eventIDList);
-    const uniqueEventList = [...set];
-    const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
-=======
-    if(session && session.user){
-    const eventIDPromises = session!.user!.eventIDList.map(async (eventID: string) => {
->>>>>>> a17a44e0ec1c024609d39db87afee1dfbb4ce195
-      const event = await getEvent(eventID);
-      if (event) eventList.push(event);
-      // Wait for all promises to resolve
-      await Promise.all(eventIDPromises);
-    });
-    }
-    // console.log(eventList)
-    setEventList(eventList);
-  }
 
   return (
     <div className="flex-grow lg:p-20 pb-10 h-fit flex flex-col items-center justify-center">
@@ -60,7 +34,7 @@ const MyPage = (): ReactNode => {
       ) : (
         <>
           <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{session.user.userName ?? session.user.name ?? session.user.email} 님의</p>
-          <EventList eventList={eventList}/>
+          <EventList/>
           <LogoutButton />
         </>
       )}

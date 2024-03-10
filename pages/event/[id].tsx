@@ -18,7 +18,10 @@ import { User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { language } from "@/lib/recoil/language";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
-import Header from "@/components/Header";
+import { FaLink } from "react-icons/fa";
+import { className_button } from "@/styles/button";
+import { copyURL } from "@/lib/functions/copyURL";
+import CopiedAlert from "@/components/CopiedAlert";
 
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
@@ -52,101 +55,49 @@ export const getServerSideProps = async (context: any) => {
       },
     };
   }
-
-  //   const data= getEventData(context);
-  // if(data)
-  //     return { props: {event:data} }
-  // else
-  //     return { props: {event:null} }
-  // Pass data to the page via props
-};
-// })satisfies GetServerSideProps<{ props: { event: NextMeetEvent } } | { props: { event: [] }}>
-
-// const checkExistenceOfEvent = async ()=>{
-//     try{
-//         const params = useSearchParams();
-//         const eventID = params.get('id');
-//         const existenceOfEvent = await existingEventCheck(eventID);
-//         console.log("existenceOfEvent",existenceOfEvent);
-//         if(existenceOfEvent != 1){
-//                 router.push(`/404`);
-//         }
-//     }
-//     catch(error){
-//         console.log("existenceOfEvent", error);
-//         return {props:{event : null}};
-//     }
-
-//     return;
-// }
+}
 
 const EventPage = ({
   event,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
   console.log("event", event);
-  
+  //language
+  const [lang, setLang] = useRecoilState(language);
+
+  //useSession
   const { data: session } = useSession();
   console.log("session", session);
 
-  const [lang, setLang] = useRecoilState(language);
+  //values
+  let eventParticipate: Participate[] | null = null;
+  let eventParticiTime: { schedule: Date[] } = { schedule: [] };
+  let fixedMeeting: { schedule: Date[] } = { schedule: [] };
+  const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDaySorter: { [index: string]: number } = {
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+    Sun: 7,
+  };
 
+  //useState
+  const [showCopyMessage,setShowCopyMessage] = useState<boolean>(false);
+  const [showDescription, setShowDescription] = useState(false);
   const [nonMemLogin, setNonMemLogin] = useState(false);
-  const [loginNonMem, setLoginNonMem]: [User | undefined, Function] =
-    useState();
-  const [isLogin, setIsLogin] = useState(
-    nonMemLogin || (session && session.user) ? true : false
-  );
+  const [loginNonMem, setLoginNonMem]: [User | undefined, Function] = useState();
+  const [isLogin, setIsLogin] = useState( nonMemLogin || (session && session.user) ? true : false);
   const [isHost, setIsHost] = useState(
     session && session.user
       ? session.user.userID == event.hostUserInfo.userID
       : loginNonMem?.userID == event.hostUserInfo.userID
   );
-
-  useEffect(() => {
-    setIsHost(
-      session && session.user
-        ? session.user.userID == event.hostUserInfo.userID
-        : loginNonMem?.userID == event.hostUserInfo.userID
-    );
-  }, [isLogin, session?.user]);
-
-  console.log("login", isLogin);
-
-  let eventParticipate: Participate[] | null = null;
-  let eventParticiTime: { schedule: Date[] } = { schedule: [] };
-
   const [week, setWeek]: [boolean, Function] = useState(
     event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly
   );
-  let fixedMeeting: { schedule: Date[] } = { schedule: [] };
-
-  if (week) {
-    event?.fixedMeeting.map((sche) => {
-      const date = new Date(week_startDate);
-      for (let i = 0; i < 7; i++) {
-        if (date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]) {
-          break;
-        }
-        date.setDate(week_startDate.getDate() + 1);
-      }
-      sche.timeRange.map((time: string) => {
-        date.setHours(parseInt(time.split(":")[0]));
-        date.setMinutes(parseInt(time.split(":")[1]));
-        fixedMeeting.schedule.push(date);
-      });
-    });
-  } else {
-    event?.fixedMeeting.map((sche) => {
-      const date = new Date((sche as FixedDate).date);
-      sche.timeRange.map((time: string) => {
-        date.setHours(parseInt(time.split(":")[0]));
-        date.setMinutes(parseInt(time.split(":")[1]));
-        fixedMeeting.schedule.push(date);
-      });
-    });
-  }
-
   const [schedule, setSchedule]: [{ schedule: Date[] }, Function] =
     useState(eventParticiTime);
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
@@ -158,6 +109,46 @@ const EventPage = ({
     { schedule: Date[] },
     Function
   ] = useState(fixedMeeting);
+  const [totalScheduleList, setTotalScheduleList]: [
+    {
+      checked_num: { [key: string]: number };
+      member: { [key: string]: string[] };
+    },
+    Function
+  ] = useState({ checked_num: {}, member: {} });
+  const [name, setName] = useState(
+    session && isLogin
+      ? session.user.userName
+      : loginNonMem
+      ? loginNonMem.userName
+      : ""
+  );
+  const [showMember, setShowMember]: [boolean, Function] = useState(false);
+  const [showMemberList, setShowMemberList] = useState([]);
+  const [showDateTime, setShowDateTime] = useState("");
+  const [showResult, setShowResult] = useState(false);
+  const [totalMem, setTotalMem] = useState(
+    event?.userList ? event.userList.length : 0
+  );
+  const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
+
+  const [confirm, setConfirm]: [number, Function] = useState(
+    event?.fixedMeeting.length > 0 ? 2 : 0
+  );
+  const [select, setSelect] = useState(event?.fixedMeeting.length > 0 ? 1 : 0);
+
+  const [width, setWidth]: [number, Function] = useState(0);
+
+  const [scheduleTable, setScheduleTable] = useState(true);
+
+  //useEffect
+  useEffect(() => {
+    setIsHost(
+      session && session.user
+        ? session.user.userID == event.hostUserInfo.userID
+        : loginNonMem?.userID == event.hostUserInfo.userID
+    );
+  }, [isLogin, session?.user]);
 
   useEffect(() => {
     if (session && session.user) {
@@ -205,17 +196,63 @@ const EventPage = ({
     // console.log("loginNonMem", loginNonMem)
   }, [session ? session.user : nonMemLogin]);
 
-  const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const weekDaySorter: { [index: string]: number } = {
-    Mon: 1,
-    Tue: 2,
-    Wed: 3,
-    Thu: 4,
-    Fri: 5,
-    Sat: 6,
-    Sun: 7,
+  useEffect(() => {
+    setName(
+      session && isLogin
+        ? session.user.userName
+        : loginNonMem
+        ? loginNonMem.userName
+        : ""
+    );
+  }, [isLogin]);
+  
+  useEffect(()=>{
+    console.log("isHost",isHost, session?.user?.userID == event.hostUserInfo.userID, fixedSchedule)
+}, [isHost]);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    setWidth(window.innerWidth);
+  }
+}, []);
+
+useEffect(() => {
+  window.addEventListener("resize", handleResize);
+  return () => {
+    // cleanup
+    window.removeEventListener("resize", handleResize);
   };
-  console.log(event?.timeInfo.isWeekly);
+}, []);
+
+  if (week) {
+    event?.fixedMeeting.map((sche) => {
+      const date = new Date(week_startDate);
+      for (let i = 0; i < 7; i++) {
+        if (date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]) {
+          break;
+        }
+        date.setDate(week_startDate.getDate() + 1);
+      }
+      sche.timeRange.map((time: string) => {
+        date.setHours(parseInt(time.split(":")[0]));
+        date.setMinutes(parseInt(time.split(":")[1]));
+        fixedMeeting.schedule.push(date);
+      });
+    });
+  } else {
+    event?.fixedMeeting.map((sche) => {
+      const date = new Date((sche as FixedDate).date);
+      sche.timeRange.map((time: string) => {
+        date.setHours(parseInt(time.split(":")[0]));
+        date.setMinutes(parseInt(time.split(":")[1]));
+        fixedMeeting.schedule.push(date);
+      });
+    });
+  }
+
+  
+
+  
   const sortedSelectedWeekDay = event
     ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
         (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
@@ -231,36 +268,6 @@ const EventPage = ({
     }
   }
 
-  const [totalScheduleList, setTotalScheduleList]: [
-    {
-      checked_num: { [key: string]: number };
-      member: { [key: string]: string[] };
-    },
-    Function
-  ] = useState({ checked_num: {}, member: {} });
-  const [name, setName] = useState(
-    session && isLogin
-      ? session.user.userName
-      : loginNonMem
-      ? loginNonMem.userName
-      : ""
-  );
-  useEffect(() => {
-    setName(
-      session && isLogin
-        ? session.user.userName
-        : loginNonMem
-        ? loginNonMem.userName
-        : ""
-    );
-  }, [isLogin]);
-  const [showMember, setShowMember]: [boolean, Function] = useState(false);
-  const [showMemberList, setShowMemberList] = useState([]);
-  // const [showMemberList, setShowMemberList] = useReducer((state:string[], action:{list:string[]})=>(action.list), []);
-  const [showDateTime, setShowDateTime] = useState("");
-
-  const [showResult, setShowResult] = useState(false);
-
   const indexOfLongestUserParti =
     event && event.participateStatus.length > 0
       ? event.participateStatus.reduce(
@@ -270,6 +277,7 @@ const EventPage = ({
               : currentValue
         )
       : null;
+
   const longestUser = indexOfLongestUserParti?.user;
   // console.log("event_userList",event.userList?.length);
   // const userList:(User|NextMeetUser)[]=[];
@@ -297,41 +305,17 @@ const EventPage = ({
   // }, [])
   // console.log("userList",userList);
 
-  const [totalMem, setTotalMem] = useState(
-    event?.userList ? event.userList.length : 0
-  );
-  const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
-
-  const [confirm, setConfirm]: [number, Function] = useState(
-    event?.fixedMeeting.length > 0 ? 2 : 0
-  );
-  const [select, setSelect] = useState(event?.fixedMeeting.length > 0 ? 1 : 0);
-
-  const [width, setWidth]: [number, Function] = useState(0);
-
-  const [scheduleTable, setScheduleTable] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setWidth(window.innerWidth);
-    }
-  }, []);
-
-  // const handleResize = () => {
-  //     setWidth(window.innerWidth);
-  // };
+  const onURLCopy = () =>{
+    copyURL(event.eventID);
+  }
 
   const handleResize = throttle(() => {
     setWidth(window.innerWidth);
   }, 200);
 
-  useEffect(() => {
-    window.addEventListener("resize", handleResize);
-    return () => {
-      // cleanup
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  
+
+  
 
   // useEffect(()=>{
   //     // console.log("fixedSchedule",fixedSchedule)
@@ -362,57 +346,40 @@ const EventPage = ({
     );
   };
 
-  const [showDescription, setShowDescription] = useState(false);
-
-  useEffect(()=>{
-      console.log("isHost",isHost, session?.user?.userID == event.hostUserInfo.userID, fixedSchedule)
-  }, [isHost])
-  // console.log("totalMem NonMemLogin", totalMem, nonMemLogin, totalScheduleList, indexOfLongestUserParti, longestUser ? (longestUser)[0] : null)
-
   return (
-    <div className="w-screen h-full min-h-screen ">
-      <div className="(header space) w-screen h-20 bg-[white]"><Header/></div>
-      {confirm != 3 && (!select || confirm == 1) ? (
-        ""
-      ) : (
-        <div
-          className={
-            isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`
-          }
-        ></div>
+    <div className="w-screen h-full min-h-screen pt-20 flex flex-col">
+      <div className="relative self-end mx-20 mt-8">
+      <button className={`${className_button} flex items-center justify-center w-72 `}
+        onClick={() => {
+          onURLCopy();
+          setShowCopyMessage(true);
+          setTimeout(()=>{
+            setShowCopyMessage(false);
+          },1000);
+        }}>
+        <FaLink className="w-6 h-6 mr-4"/>
+        { lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</button>
+        {showCopyMessage && <CopiedAlert/>}
+      </div>
+      {confirm != 3 && (!select || confirm == 1) ? "" : (
+        <div className={ isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`}></div>
       )}
-      <div
-        className={`w-screen ${select ? "" : "pt-6"} ${
-          width < 768 ? "px-10" : "px-20"
-        }`}
-      >
-        <div
-          className={`rounded w-full bg-[#eee] min-h-10 p-3 text-center ${
-            showDescription ? "" : "pb-2"
-          }`}
-        >
-          <div
-            className={`relative font-bold min-h-5 ${
-              showDescription ? "pb-1" : ""
-            } cursor-pointer`}
+      <div className={`w-screen ${select ? "" : "pt-6"} ${ width < 768 ? "px-10" : "px-20"}`}>
+        <div className={`rounded w-full bg-[#eee] min-h-10 p-3 text-center ${showDescription ? "" : "pb-2"}`}>
+          <div className={`relative font-bold min-h-5 ${showDescription ? "pb-1" : "" } cursor-pointer`}
             onClick={() => {
               setShowDescription((prev) => !prev);
-            }}
-          >
+            }}>
             {event?.eventName}
-            {showDescription ? (
+            {showDescription ? 
               <FaAngleUp className={`absolute right-0 top-0.5`} />
-            ) : (
-              <FaAngleDown className={`absolute right-0 top-0.5`} />
-            )}
+             : <FaAngleDown className={`absolute right-0 top-0.5`} />
+            }
           </div>
-          {showDescription ? (
+          {showDescription && 
             <div className="border-t-2 pt-2.5  border-gray min-h-10 text-center">
               {event?.description}
-            </div>
-          ) : (
-            ""
-          )}
+            </div>}
         </div>
       </div>
       {(select || confirm == 2 || confirm == 3) && isHost ? (
