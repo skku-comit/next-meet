@@ -68,12 +68,8 @@ const TimeInput = ({onStartTimeChange,onEndTimeChange}:TimeInputProps): ReactNod
       </div>
       <div className="flex items-center gap-2">
         <input type="checkbox" onChange={(e)=>{
-          if(e.target.checked){
-            setIsAllDay(true);
-          }
-          else{
-            setIsAllDay(false);
-          }
+          if(e.target.checked) setIsAllDay(true);
+          else setIsAllDay(false);
         }}></input>
         <label>{lang === 'ko' ? '하루종일' : 'All Day'}</label>
       </div>

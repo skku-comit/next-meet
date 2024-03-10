@@ -48,9 +48,8 @@ const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates}:CalendarInpu
         {selectedDates.isWeekly ? <DaysPicker
           selectedDays={selectedDates.dateList}
           onClickDay={onClickDate}/> : <Calendar
+          locale={lang === 'ko' ? 'ko' : 'en'}
           className='m-8'
-          // onChange={onChange}
-          // value={value}
           onClickDay={value=>{
             onClickDate(value as Date);
           }}
@@ -64,8 +63,8 @@ const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates}:CalendarInpu
           }}/>
         <label>{lang==='ko' ? '또는 요일 선택' : 'or choose from week'}</label>
         </div>
-        {!selectedDates.isWeekly ? <DateList dateList={selectedDates.dateList as Date[]}/>
-        : <DayList dayList={selectedDates.dateList as DaysOfWeek[]}/>}
+        {/* {!selectedDates.isWeekly ? <DateList dateList={selectedDates.dateList as Date[]}/>
+        : <DayList dayList={selectedDates.dateList as DaysOfWeek[]}/>} */}
         </div>
     );
 }

@@ -2,12 +2,13 @@ import { ReactNode, useEffect, useState } from "react";
 import EventList from "@/components/EventList";
 import Login from "@/components/Login";
 import { signOut, useSession } from "next-auth/react";
-import { NextMeetEvent } from "@/template/Event";
-import { getEvent } from "@/lib/functions/CRUD";
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
 
 const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
 const LogoutButton = (): ReactNode => {
+  const lang = useRecoilValue(language);
   return (
     <button
       // className={"mt-auto pt-20 hover:underline underline-offset-[6px]"}
@@ -16,7 +17,7 @@ const LogoutButton = (): ReactNode => {
         e.preventDefault();
         signOut({ redirect: false });
       }}>
-      로그아웃
+      {lang === 'ko' ? '로그아웃' : 'Logout'}
     </button>
   );
 };
@@ -24,31 +25,9 @@ const LogoutButton = (): ReactNode => {
 
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
+  const lang = useRecoilValue(language);
   console.log("MyPage")
   console.log( 'session:',session );
-  const [eventList,setEventList] = useState<NextMeetEvent[]>([]);
-  
-  useEffect(()=>{
-    if(session && session.user){
-      getEventList();
-    }
-  },[session,session?.user]);
-
-  const getEventList = async () => {
-    const eventList: NextMeetEvent[] = [];
-    if(session && session.user){
-      const set = new Set(session!.user.eventIDList);
-      const uniqueEventList = [...set];
-      const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
-      const event = await getEvent(eventID);
-      if (event) eventList.push(event);
-      // Wait for all promises to resolve
-      await Promise.all(eventIDPromises);
-    });
-    }
-    // console.log(eventList)
-    setEventList(eventList);
-  }
 
   return (
     <div className="flex-grow lg:p-20 pb-10 h-fit flex flex-col items-center justify-center">
@@ -56,7 +35,7 @@ const MyPage = (): ReactNode => {
         <Login />
       ) : (
         <>
-          <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{session.user.userName ?? session.user.name ?? session.user.email} 님의</p>
+          <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{lang === 'en' && 'User'} {session.user.userName ?? session.user.name ?? session.user.email} { lang === 'ko' && '님의'}</p>
           <EventList/>
           <LogoutButton />
         </>

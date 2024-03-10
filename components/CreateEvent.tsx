@@ -133,7 +133,7 @@ const CreateEvent = (): ReactNode => {
     //check session
     if (session && session.user) {
     } else if (
-      hostNameRef.current!.value.trim().length > 2 &&
+      hostNameRef.current!.value.trim().length > 1 &&
       hostPWRef.current!.value.trim().length > 4
     ) {
     } else {
@@ -162,12 +162,9 @@ const CreateEvent = (): ReactNode => {
   };
 
   useEffect(()=>{
-    console.log('proceedCheck');
+    // console.log('proceedCheck');
     proceedCheck();
-  },[eventNameRef.current?.value,
-    hostNameRef.current?.value,
-    hostPWRef.current?.value,
-    dateSelection.dateList,
+  },[dateSelection.dateList,
     session,session?.user]);
 
     useEffect(()=>{
@@ -182,8 +179,7 @@ const CreateEvent = (): ReactNode => {
           onClick={(e) => {
             e.preventDefault();
             setIsCreatingEvent(true);
-          }}
-        >
+          }} >
           <IoMdAddCircleOutline className="mr-2 w-8 h-8"/>{lang=="ko" ? "새 이벤트 만들기" : "Create New Event"}
         </button>
       )}
@@ -204,8 +200,7 @@ const CreateEvent = (): ReactNode => {
             <label className="text-xl font-bold py-4">{lang==='ko' ? '이벤트 설명' : 'Event description'}</label>
             <textarea
               className="w-full h-20 p-2 resize-none border-2 border-solid border-black rounded-md"
-              ref={descriptionRef}
-            />
+              ref={descriptionRef}/>
           </form>
           <CalendarInput
             onToggleDateMode={onToggleDateMode}
@@ -230,6 +225,7 @@ const CreateEvent = (): ReactNode => {
                     className="border-[1px] py-1 indent-2 indent outline-none rounded-md"
                     type="text"
                     ref={hostNameRef}
+                    onChange={proceedCheck}
                   ></input>
                 </div>
                 <div className="flex items-center gap-2">
@@ -242,7 +238,8 @@ const CreateEvent = (): ReactNode => {
                     className="border-[1px] py-1 indent-2 outline-none rounded-md"
                     type="password"
                     ref={hostPWRef}
-                    placeholder="6자리 이상 입력해주세요"
+                    onChange={proceedCheck}
+                    placeholder={lang === 'ko' ? "6자리 이상 입력해주세요": 'longer than 6 digits'}
                   ></input>
                 </div>
               </form>
