@@ -48,11 +48,8 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
 
     const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
     useEffect(()=>{
-        if(wait2){
-            return;
-        }
-        setPrevTotalMem(totalMem); console.log("right totalMem", totalMem)
-    },[totalMem, wait2]);
+        setPrevTotalMem(totalMem);
+    },[totalMem]);
 
     useEffect(()=>{
         if(wait2){
@@ -61,11 +58,13 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
         if(scheduleList.checked_num){
             checked_mem_num= Object.values(scheduleList.checked_num);
             
-            max_checked_mem_sche = Object.keys(scheduleList.checked_num).filter((key: string) => {
+            max_checked_mem_sche = Math.max(...checked_mem_num) == 0 ? [] : Object.keys(scheduleList.checked_num).filter((key: string) => {
             return scheduleList.checked_num[key] === Math.max(...checked_mem_num);
             });    
             console.log("max_checked_mem_sche",max_checked_mem_sche)
+            
             setSortedMemList(max_checked_mem_sche.sort((a:string,b:string)=>new Date(a).getTime()-new Date(b).getTime()));
+            console.log("wait2 change sortmemlist")
         }
     }, [scheduleList, wait2]);
 
@@ -107,14 +106,14 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`${scheduleResultCSS.result_scrolling3} px-2 min-h-4 flex flex-col gap-2`}>
                     {sortedMemList.length > 0 ? sortedMemList.map((sche, index)=>{
-                        console.log("sortedMemList Map")
+                        console.log("sortedMemList Map", sortedMemList)
                         let diffMin = 0;
                         let diffMSec = 0;
                         const schedule:Date = new Date(sche);
                         const post_time:Date = new Date(sortedMemList[index < sortedMemList.length-1 ? index+1:index]);
                         const prev_time:Date = new Date(sortedMemList[index > 0 ? index-1 : index]);
                         if((mem_term == 0) && sortedMemList.length > 1){
-                            diffMin = (post_time.getHours()*60 + post_time.getMinutes()) - (schedule.getHours()*60 + schedule.getMinutes());
+                            diffMin = (post_time?.getHours()*60 + post_time?.getMinutes()) - (schedule.getHours()*60 + schedule.getMinutes());
                         }
                         else{
                             diffMin = (schedule.getHours()*60 + schedule.getMinutes()) - (prev_time.getHours()*60 + prev_time.getMinutes());
@@ -152,12 +151,14 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                 <hr className="border-t-2 my-1 mb-2"/>
                 <ul className ={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
                     {sortedList.map((sche:Date, index)=>{
+                        console.log("sortedList", sortedList);
                             let diffMin = 0;
                             let diffMSec = 0;
                             const schedule:Date = new Date(sche.getTime());
-                            const post_time:Date = fixedSchedule.schedule[index < fixedSchedule.schedule.length-1 ? index+1:index];
-                            const prev_time:Date = fixedSchedule.schedule[index > 0 ? index-1 : index];
-                            if((term == 0) && fixedSchedule.schedule.length > 1){
+                            const post_time:Date = sortedList[index < sortedList.length-1 ? index+1:index];
+                            const prev_time:Date = sortedList[index > 0 ? index-1 : index];
+                            console.log("sortedList", index, post_time);
+                            if((term == 0) && sortedList.length > 1){
                                 diffMin = (post_time.getHours()*60 + post_time.getMinutes()) - (schedule.getHours()*60 + schedule.getMinutes());
                             }
                             else{

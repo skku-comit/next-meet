@@ -320,8 +320,8 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                         </div>}}
                 timeFormat="h:mma"
                 unselectedColor="#eee"
-                hoveredColor={state=="EDIT" ? "#fddada" : state=="CONFIRM" ? "#a2cffe" : "none"}
-                selectedColor={state=="EDIT" ? "#ffadad" : state=="CONFIRM" ? "#63c5da" : "none"}
+                hoveredColor={state=="EDIT" ? "#fddada" : state=="CONFIRM" ? "lightcoral" : "none"}
+                selectedColor={state=="EDIT" ? "#ffadad" : state=="CONFIRM" ? "crimson" : "none"}
                 rowGap="5px"
                 columnGap="7px"
                 renderDateCell={state=="EDIT" || state=="CONFIRM" ? undefined:(datetime, selected, refSetter) => {
@@ -365,7 +365,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                     if(select == 1){
                         fixedScheduleList.map((sche:Date)=>{
                             if (new Date(sche).getTime() == new Date(datetime).getTime()){
-                                    cellColor = "#63c5da";
+                                    cellColor = "crimson";
                                 }
                         })
                     }

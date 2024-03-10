@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
@@ -85,6 +85,8 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
 
     const [scheConfirm, setScheConfirm] = useState(exist);
 
+    useEffect(()=>{console.log("fixedSchedule",fixedSchedule)}, [fixedSchedule])
+
     return(
         <li className={`flex flex-col ${showMaxMember ? "gap-2":"gap-0.5"} bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer`}  key={index}>
           <div className={`flex flex-row gap-1`} onClick={()=>{
@@ -139,6 +141,10 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
                                 if(newSche.length <=0){
                                     setSelect(0);
                                     setConfirm(0);
+                                }
+                                else{
+                                    setSelect(1);
+                                    setConfirm(2);
                                 }
                                 console.log("fixedDateList cancel",newSche);
                                 handleConfirm(newSche, week, eventID, setPreFixedSchedule);                

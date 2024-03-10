@@ -184,7 +184,7 @@ const Setter = (props:any): ReactNode => {
 
   return (
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>
-      <div className="w-full flex flex-row items-center text-center">
+      {props.isLogin ? "" :<div className="w-full flex flex-row items-center text-center">
         <button className={`${className_button} py-1 ${setterBtnTab.tab_btn} ${loginMode === 'nonMember' ? 'bg-[#ffadad]' : 'bg-[#fddada]'}`}
           onClick={(e)=>{
             e.preventDefault();
@@ -248,8 +248,8 @@ const Setter = (props:any): ReactNode => {
             }}}>
         {lang == 'ko' ? "소셜 로그인": "SOCIAL LOGIN"}
         </button>
-      </div>
-      <div className={`flex flex-col flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center overflow-hidden gap-0 ${error && error.length > 0 ? "pt-1" : "pt-4"}`}>
+      </div>}
+      <div className={`flex flex-col flex-nonwrap items-center text-center bg-[#ffadad] ${props.isLogin ? "rounded" : "rounded-b-lg"} justify-center overflow-hidden gap-0 ${error && error.length > 0 ? "pt-1" : "pt-4"}`}>
         {error && error.length > 0 ? <div className="h-4 m-4 text-md text-red-400">{error}</div>:""}
         <div className={`flex ${props.width <= 500 ? "flex-col" : "flex-row"} flex-nonwrap items-center text-center bg-[#ffadad] rounded-b-lg justify-center p-4 pt-0 overflow-hidden gap-0`}>
           {props.isLogin ? 
@@ -301,7 +301,7 @@ const Setter = (props:any): ReactNode => {
                   props.setLoginNonMem(undefined);
                   props.setNonMemLogin(false)
                 }, 5000);
-                signOut();
+                signOut({ redirect: false });
               }
               else{
                 props.setScheduleTable(false);
