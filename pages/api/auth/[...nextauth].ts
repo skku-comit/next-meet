@@ -11,7 +11,7 @@ const handler = NextAuth({
 
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs
-      // console.log(`url: ${url}, baseurl: ${url == baseUrl ? baseUrl : url}`);
+      console.log(`url: ${url}, baseurl: ${url == baseUrl ? baseUrl : url}`);
       return url == baseUrl ? baseUrl : url;
       if (url.startsWith("/")) return `${baseUrl}${url}`
       // Allows callback URLs on the same originpm
@@ -31,8 +31,33 @@ const handler = NextAuth({
       console.log("This is session");
       if(token && token.user){
         console.log(token.user)
-        const userInfo = await getUserInfoByID(+(token.user as User).id);
-        console.log('userInfo: ',userInfo);
+        // const userInfo = await getUserInfoByID(+(token.user as User).id);
+        // console.log('userInfo: ',userInfo);
+
+        if(token.user && token.user.id){
+          const res2 = await fetch(`${NEXTAUTH_URL}/api/user`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              provider: "google",
+              userName: token.user.name,
+              loginID : token.user.name,
+              email : token.user.email,
+              password : ""
+            }),
+          });
+          const {message, user} = await res2.json();
+
+          console.log("login userg", message, user)
+          if(message==0 || message == 11){
+            session.user = user;
+            return session;
+          }
+         
+        }
+
         session.user = token.user;
         return session;
       }
@@ -74,8 +99,8 @@ const handler = NextAuth({
         try {
           if (!credentials) throw new Error("No credentials");
           console.log("This is authorization function")
-          console.log(credentials);
-          console.log(req);
+          console.log("credentials",credentials);
+          console.log("req",req);
           const res = await fetch(`${NEXTAUTH_URL}/api/login`, {
             method: "POST",
             headers: {
@@ -87,6 +112,9 @@ const handler = NextAuth({
             }),
           });
           const {message, user} = await res.json();
+
+          console.log("login user", user)
+
           if (message === 0) {
             return user;
           }

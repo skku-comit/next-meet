@@ -5,10 +5,13 @@ import { signOut, useSession } from "next-auth/react";
 import { NextMeetEvent } from "@/template/Event";
 import { getEvent } from "@/lib/functions/CRUD";
 
+const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
+
 const LogoutButton = (): ReactNode => {
   return (
     <button
-      className="mt-auto pt-20 hover:underline underline-offset-[6px]"
+      // className={"mt-auto pt-20 hover:underline underline-offset-[6px]"}
+      className={`${className_button} py-2 mt-5`}
       onClick={(e) => {
         e.preventDefault();
         signOut({ redirect: false });
@@ -27,7 +30,7 @@ const MyPage = (): ReactNode => {
   
   useEffect(()=>{
     if(session && session.user){
-      // getEventList();
+      getEventList();
     }
   },[session]);
 

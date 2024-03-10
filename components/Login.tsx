@@ -189,14 +189,14 @@ const Login = (): ReactNode => {
           구글로 로그인
         </button>
         <p>하여 이벤트를 둘러보세요.</p>
-        <button
+        {/* <button
           className={`${className_button} py-2`}
           onClick={(e) => {
             e.preventDefault();
             signOut();
           }}>
           로그아웃
-        </button>
+        </button> */}
       </div>
     </div>
   );

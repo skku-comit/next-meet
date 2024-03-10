@@ -14,7 +14,8 @@ interface MyComponentProps {
     sche : string;
     isHost:boolean;
     checked_mem_num : number[];
-    totalMemNum:number;
+    totalMem:number;
+    prevTotalMem:number;
     week_startDate:Date;
     dateList : string[];
     selectedWeekDay : DaysOfWeek[];
@@ -25,7 +26,7 @@ interface MyComponentProps {
     setPreFixedSchedule:Function;
 }
 
-const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,sche, checked_mem_num, totalMemNum, week_startDate, 
+const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,sche, checked_mem_num, totalMem, prevTotalMem, week_startDate, 
         dateList, selectedWeekDay, setFixedSchedule, setSelect, setConfirm, eventID, setPreFixedSchedule}:MyComponentProps) =>{
     
     const [lang, setLang] = useRecoilState(language);
@@ -76,7 +77,7 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
                 <div className="inline-block mx-1"> ~ </div>
                 <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
                 <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
-                <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*totalMemNum) + '/' + totalMemNum + ')'}</p>
+                <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*prevTotalMem) + '/' + prevTotalMem + ')'}</p>
             </div>
             {showMaxMember ? <FaAngleUp/> : <FaAngleDown/>}
           </div>

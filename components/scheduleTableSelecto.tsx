@@ -25,6 +25,8 @@ interface MyComponentProps {
     setShowDateTime : Function;
     setTotalScheduleList:Function;
     totalMem:number;
+    prevTotalMem:number;
+    setPrevTotalMem:Function;
     select:number;
     fixedSchedule : {schedule :Date[]};
     width:number;
@@ -40,13 +42,16 @@ interface MyComponentProps {
     eventID : number;
     preMySelected: Date[];
     setPreMySelected:Function;
+    wait:boolean;
+    setWait2:Function;
 }
 
 const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     {eventParti, eventTimeInfo, isLogin, width, week, state, handleChange, 
     schedule, name, setShowMember, setTotalScheduleList, totalMem, eventID,setShowMemberList,
     fixedSchedule, select,confirm, nonMemLogin, loginNonMem, isHost, week_startDate,
-    preMySelected, setPreMySelected, setShowDateTime}:MyComponentProps) {
+    preMySelected, setPreMySelected, setShowDateTime, prevTotalMem, setPrevTotalMem,
+    wait, setWait2}:MyComponentProps) {
 
     const [lang, setLang] = useRecoilState(language);
 
@@ -109,12 +114,12 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     const startTimeHour:number = parseInt(timePeriod.startTime.split(':')[0])+parseFloat(timePeriod.startTime.split(':')[1]=='30'?'0.5':'0');
     const endTimeHour:number = timePeriod.endTime == "00:00" ? 24 : parseInt(timePeriod.endTime.split(':')[0])+parseFloat(timePeriod.endTime.split(':')[1]=='30'?'0.5':'0');
 
-    const [totalMemNum, setTotalMemNum] = useState(totalMem);
+    // const [prevTotalMem, setPrevTotalMem] = useState(totalMem);
   
     const dummyScheduleList:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}} = {
-        checked_num : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":4/totalMemNum,
-                        "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":3/totalMemNum,
-                        "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":2/totalMemNum},
+        checked_num : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":4/prevTotalMem,
+                        "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":3/prevTotalMem,
+                        "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":2/prevTotalMem},
         member : {"Wed Feb 21 2024 00:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "강성대", "송성균"],
         "Wed Feb 21 2024 00:30:00 GMT+0900 (한국 표준시)":["김명륜", "이율전", "송성균"],
         "Wed Feb 21 2024 01:00:00 GMT+0900 (한국 표준시)":["김명륜", "이율전"]}
@@ -161,7 +166,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     if(eventParti) {
         for(let i = 0; i < eventParti.length; i++){
             const time_str = realScheStr(eventParti[i].time);
-            givenEventScheList.checked_num[time_str] = totalMemNum == 0 ? 0 :eventParti[i].user.length / totalMemNum ;
+            givenEventScheList.checked_num[time_str] = prevTotalMem == 0 ? 0 :eventParti[i].user.length / prevTotalMem ;
             givenEventScheList.member[time_str] = []
             for(let j = 0; j < eventParti[i].user.length; j++){
                 givenEventScheList.member[time_str].push(eventParti[i].user[j]?.userName)}
@@ -172,17 +177,21 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     useEffect(()=>{
         let revisedScheduleList = scheduleList;
         for(const key in scheduleList.checked_num){
-            revisedScheduleList.checked_num[key] = totalMem == 0 ? 0 : scheduleList.checked_num[key] * totalMemNum / totalMem;
+            revisedScheduleList.checked_num[key] = totalMem == 0 ? 0 : scheduleList.checked_num[key] * prevTotalMem / totalMem;
         }
         setScheduleList(revisedScheduleList);
+        setPrevTotalMem(totalMem);
+
         }, [totalMem]);
-  
 
     useEffect(()=>{
-        if(totalMem != totalMemNum){
+        console.log("wait", wait, totalMem != prevTotalMem, totalMem, prevTotalMem)
+
+        if(wait || totalMem != prevTotalMem){
             return;
         }
         if(isLogin){
+            setWait2(true); console.log("wait2 true");
             console.log("update", preMySelected)
             preMySelected?.map((sche:Date)=>{
                 const sche_str = realScheStr(sche);
@@ -218,7 +227,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                 const sche_str = realScheStr(sche);
                 if(Object.keys(scheduleList.checked_num).includes(sche_str)){
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>{
-                        console.log("totalMem", totalMem, totalMemNum, (prevSche.checked_num[sche_str]),(totalMem==0 ? 1 : totalMem))
+                        console.log("totalMem", totalMem, prevTotalMem, (prevSche.checked_num[sche_str]),(totalMem==0 ? 1 : totalMem))
                         return({
                         checked_num:{
                             ...prevSche.checked_num,
@@ -233,7 +242,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                 }
                 else{
                     setScheduleList((prevSche:{checked_num:{[key:string]:number}, member:{[key:string]:string[]}})=>{
-                        console.log("totalMem n", totalMem, totalMemNum)
+                        console.log("totalMem n", totalMem, prevTotalMem)
                         return({
                         checked_num:{
                             ...prevSche.checked_num,
@@ -245,13 +254,14 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                         }
                     })})
                 }
-            console.log("updated scheduleList",scheduleList)
-        })}
+            console.log("updated scheduleList wait2",scheduleList)
+        })
+            setWait2(false); console.log("wait2 false");
+        }
         else{
             setPreMySelected([]);
         }
-        setTotalMemNum(totalMem);
-    }, [schedule.schedule, totalMem, isLogin])
+    }, [wait, schedule.schedule, prevTotalMem, isLogin])
 
 
     useEffect(
@@ -263,7 +273,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     const startDate = week? week_startDate : new Date(dateList[0]);
     const numsDay = week? DayList.length : dateList.length;
 
-    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, totalMemNum, state)}, [schedule.schedule, state])
+    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, prevTotalMem, state)}, [schedule.schedule, state])
 
 
   return (
@@ -320,7 +330,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                     if(selectedPct == 0){
                         cellColor="#eee";
                     }
-                    else if(selectedPct*totalMemNum == 1){
+                    else if(selectedPct*prevTotalMem == 1){
                          cellColor = "#f9e3e3";
                     }
                     else if(selectedPct <= 0.2){
@@ -362,7 +372,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                         onMouseOver={()=>{setShowMember(true); setShowMemberList(memberList); setShowDateTime(datetimeStr)}}
                         onMouseOut={()=>{setShowMember(false); setShowMemberList([]);}}>
                             
-                            {width > 768 && (confirm == 2) ? "" :
+                            {width > 768 && (confirm == 2) || scheduleList.member[datetimeStr]?.length <=0 ? "" :
                             <div className ={`${scheduleTableCSS.date_cell_popup}`}>
                                {scheduleList.member[datetimeStr] ? <ul>
                                 {scheduleList.member[datetimeStr].map((member)=>{

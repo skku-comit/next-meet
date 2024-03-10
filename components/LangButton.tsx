@@ -1,19 +1,25 @@
 import { ReactNode } from "react";
 
 type LangButtonProps = {
-  on: boolean;
-  setState: any;
+  lang: "ko"|"en";
+  setLang: any;
 };
 
-const LangButton = ({ on }: LangButtonProps): ReactNode => {
+const LangButton = ({ lang, setLang }: LangButtonProps): ReactNode => {
+
   return (
-    <div className="w-20 h-10 rounded-full relative bg-red-300">
-      <div
-        className={`w-8 h-8 rounded-full bg-white absolute cursor-pointer top-1 transition-all ${
-          on ? "left-1" : "left-18"
-        }`}
-      ></div>
-    </div>
+    <div className={`w-20 h-10 mt-4 rounded-full relative border-box border-[3px] border-red-300
+          ${lang !== "ko"? "bg-white  ":"bg-red-300"} `} 
+          onClick={()=>{setLang((prev:"ko"|"en") => prev == "ko" ? "en" : "ko")}}>
+      <div className={`rounded-full w-[30px] h-[30px] m-[2px] flex items-center justify-center absolute cursor-pointer transition-all duration-300
+          ${lang === "ko"? "bg-white text-red-300":"bg-red-300 text-white ml-10"} `}>
+          {lang === "ko" ? '한' : 'en'}
+      </div>
+      <div className={`rounded-full w-[30px] h-[30px] m-[2px] flex items-center justify-center transition-all duration-300
+          ${lang !== "ko"? "bg-white text-red-300":"bg-red-300 text-white ml-10"} absolute`}>
+          {lang === "ko" ? '영' : 'ko'}
+      </div>
+      </div>
   );
 };
 

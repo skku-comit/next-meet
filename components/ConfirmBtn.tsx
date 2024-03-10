@@ -4,7 +4,7 @@ import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { useSearchParams } from "next/navigation";
 import React, {useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import { language } from '../lib/recoil/language';
+import { language } from '../lib/recoil/Language';
 import { useRecoilState } from "recoil";
 import { handleConfirm } from "@/lib/functions/handleConfirm";
 
