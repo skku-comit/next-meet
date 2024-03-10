@@ -98,6 +98,22 @@ const EventPage = ({
   const [week, setWeek]: [boolean, Function] = useState(
     event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly
   );
+
+  const sortedSelectedWeekDay = event
+    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
+        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
+      )
+    : [];
+  let week_startDate: Date = new Date(0);
+  if (sortedSelectedWeekDay) {
+    for (let i = 0; i < 7; i++) {
+      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
+        break;
+      }
+      week_startDate.setDate(week_startDate.getDate() + 1);
+    }
+  }
+  
   const [schedule, setSchedule]: [{ schedule: Date[] }, Function] =
     useState(eventParticiTime);
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
@@ -248,24 +264,6 @@ useEffect(() => {
         fixedMeeting.schedule.push(date);
       });
     });
-  }
-
-  
-
-  
-  const sortedSelectedWeekDay = event
-    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
-        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
-      )
-    : [];
-  let week_startDate: Date = new Date(0);
-  if (sortedSelectedWeekDay) {
-    for (let i = 0; i < 7; i++) {
-      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
-        break;
-      }
-      week_startDate.setDate(week_startDate.getDate() + 1);
-    }
   }
 
   const indexOfLongestUserParti =
