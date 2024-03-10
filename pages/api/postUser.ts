@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Event from "@/template/schema/event.model";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    if(req.method=="POST"){
+    if(req.method==="POST"){
         console.log("post-user")
         try {
             await connectDB();
