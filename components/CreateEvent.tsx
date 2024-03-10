@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import CalendarInput from "./CalendarInput";
 import TimeInput from "./TimeInput";
@@ -10,13 +10,13 @@ import { useSession } from "next-auth/react";
 import { TimeInfo } from "@/template/TimeInfo";
 import { NextMeetUser, User } from "@/template/User";
 import { useRouter } from "next/navigation";
-import { useRecoilState } from "recoil";
-import { language } from '../lib/recoil/Language';
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
 
 
 const CreateEvent = (): ReactNode => {
 
-  const [lang, setLang] = useRecoilState(language);
+  const lang = useRecoilValue(language);
 
   //useRouter
   const router = useRouter();
@@ -76,17 +76,20 @@ const CreateEvent = (): ReactNode => {
   };
 
   const dateClickHandler = (value: Date | DaysOfWeek) => {
-    if (dateSelection.isWeekly) {
+    console.log('date Click Handler')
+    if (dateSelection.isWeekly === true) {
       //week mode
       if (value instanceof Date)
-        setDateSelection({ isWeekly: false, dateList: [value] });
+        setDateSelection({ isWeekly: false, dateList: [ value ] });
       else {
-        if (!dateSelection.dateList.includes(value)) {
+        if (dateSelection.dateList.includes(value) === false) {
+          console.log('new Date input');
           setDateSelection((prev) => ({
             isWeekly: true,
             dateList: [...(prev.dateList as DaysOfWeek[]), value],
           })); // add new date
         } else {
+          console.log('existing Date input');
           setDateSelection((prev) => ({
             isWeekly: true,
             dateList: (prev.dateList as DaysOfWeek[]).filter(
@@ -99,16 +102,15 @@ const CreateEvent = (): ReactNode => {
       //specific days mode
       if (value instanceof Date) {
         if (
-          dateSelection.dateList.find(
-            (date) => date.getTime() === value.getTime()
-          ) === undefined
-        ) {
-          setDateSelection((prev) => ({
+          dateSelection.dateList.find(date => date.getTime() === value.getTime()) === undefined) {
+          console.log('add Date input');
+          setDateSelection(prev => ({
             isWeekly: false,
             dateList: [...(prev.dateList as Date[]), value],
           })); // add new date
         } else {
-          setDateSelection((prev) => ({
+          console.log('delete Date input');
+          setDateSelection(prev => ({
             isWeekly: false,
             dateList: (prev.dateList as Date[]).filter(
               (date) => date.getTime() !== value.getTime()
@@ -126,7 +128,6 @@ const CreateEvent = (): ReactNode => {
   };
 
   const proceedCheck = () => {
-    console.log("dateSelection.dateList",dateSelection.dateList);
     if (!eventNameRef.current || !descriptionRef.current) return;
 
     //check session
@@ -141,6 +142,7 @@ const CreateEvent = (): ReactNode => {
     }
 
     //check date selection
+    console.log(dateSelection.dateList);
     if (dateSelection.dateList.length === 0) {
       setCanProceed(false);
       return;
@@ -159,6 +161,19 @@ const CreateEvent = (): ReactNode => {
     setEndTime(endTime);
   };
 
+  useEffect(()=>{
+    console.log('proceedCheck');
+    proceedCheck();
+  },[eventNameRef.current?.value,
+    hostNameRef.current?.value,
+    hostPWRef.current?.value,
+    dateSelection.dateList,
+    session,session?.user]);
+
+    useEffect(()=>{
+      console.log(eventNameRef.current?.value);
+    },[eventNameRef.current?.value]);
+
   return (
     <div className="w-screen h-max mb-40 flex flex-col items-center">
       {!isCreatingEvent && (
@@ -169,14 +184,14 @@ const CreateEvent = (): ReactNode => {
             setIsCreatingEvent(true);
           }}
         >
-          <IoMdAddCircleOutline className="mr-2 w-8 h-8" />{lang=="ko" ? "새 이벤트 만들기" : "Create New Event"}
+          <IoMdAddCircleOutline className="mr-2 w-8 h-8"/>{lang=="ko" ? "새 이벤트 만들기" : "Create New Event"}
         </button>
       )}
 
       {isCreatingEvent && (
         <div className="w-screen mt-10 flex flex-col items-center">
           <form className="w-[70%] flex flex-col mb-12 items-center">
-            <label className="text-2xl font-bold py-4">이벤트 이름</label>
+            <label className="text-2xl font-bold py-4">{lang==='ko' ? '이벤트 이름' : 'Event title'}</label>
             <input
               type="text"
               className="w-full h-12 p-2 text-xl border-2 border-solid border-black rounded-md"
@@ -184,9 +199,9 @@ const CreateEvent = (): ReactNode => {
               onChange={proceedCheck}
             />
             <p className="m-2 text-red-400 text-sm">
-              * 이벤트 이름은 필수 항목입니다.
+              {lang==='ko' ? '*이벤트 이름은 필수 항목입니다.' : '*This field must be filled.'}
             </p>
-            <label className="text-xl font-bold py-4">이벤트 설명</label>
+            <label className="text-xl font-bold py-4">{lang==='ko' ? '이벤트 설명' : 'Event description'}</label>
             <textarea
               className="w-full h-20 p-2 resize-none border-2 border-solid border-black rounded-md"
               ref={descriptionRef}
@@ -196,7 +211,6 @@ const CreateEvent = (): ReactNode => {
             onToggleDateMode={onToggleDateMode}
             onClickDate={dateClickHandler}
             selectedDates={dateSelection}
-            onChange={proceedCheck}
           />
           <TimeInput
             onStartTimeChange={onStartTimeChange}
@@ -204,7 +218,7 @@ const CreateEvent = (): ReactNode => {
           />
           {!(session && session.user) && (
             <>
-              <p className="mt-16 text-2xl">아직 회원이 아니신가요?</p>
+              <p className="mt-16 text-2xl">{lang==='ko' ? '아직 회원이 아니신가요?' : 'Not our member yet?'}</p>
               <form className="m-8 mb-24 flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                   <label className="w-32 text-center">
@@ -216,7 +230,6 @@ const CreateEvent = (): ReactNode => {
                     className="border-[1px] py-1 indent-2 indent outline-none rounded-md"
                     type="text"
                     ref={hostNameRef}
-                    onChange={proceedCheck}
                   ></input>
                 </div>
                 <div className="flex items-center gap-2">
@@ -229,7 +242,6 @@ const CreateEvent = (): ReactNode => {
                     className="border-[1px] py-1 indent-2 outline-none rounded-md"
                     type="password"
                     ref={hostPWRef}
-                    onChange={proceedCheck}
                     placeholder="6자리 이상 입력해주세요"
                   ></input>
                 </div>
@@ -237,14 +249,10 @@ const CreateEvent = (): ReactNode => {
             </>
           )}
 
-          <button
-            className={`${className_button} text-xl mb-10 ${
-              !canProceed && "bg-gray-300 cursor-auto"
-            }`}
+          <button className={`${className_button} text-xl mb-10 ${!canProceed && "bg-gray-300 cursor-auto"}`}
             onClick={onProceed}
-            disabled={!canProceed}
-          >
-            이벤트 생성하기
+            disabled={!canProceed}>
+            {lang === 'ko' ? '이벤트 생성하기' : 'Create Event'}
           </button>
         </div>
       )}

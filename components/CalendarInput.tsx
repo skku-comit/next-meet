@@ -4,7 +4,8 @@ import { stringifyDate } from "@/lib/functions/stringifyDate";
 import DaysPicker from "./DaysPicker";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { DateSelection } from "@/template/DateSelection";
-
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
 
 type DateListProps ={
   dateList: Date[];
@@ -36,14 +37,13 @@ type CalendarInputProps ={
   onToggleDateMode:(isWeekly:boolean)=>void;
   onClickDate:(value: Date | DaysOfWeek) =>void;
   selectedDates:DateSelection;
-  onChange:()=>void;
 }
 
-const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates,onChange}:CalendarInputProps):ReactNode =>{
-
+const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates}:CalendarInputProps):ReactNode =>{
+    const lang = useRecoilValue(language);
     return( 
       <div className="w-screen flex flex-col items-center">
-        <p className="text-2xl text-center">날짜 선택</p>
+        <p className="text-2xl text-center">{lang==='ko' ? '날짜 선택' : 'Select Date'}</p>
         
         {selectedDates.isWeekly ? <DaysPicker
           selectedDays={selectedDates.dateList}
@@ -53,7 +53,6 @@ const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates,onChange}:Cal
           // value={value}
           onClickDay={value=>{
             onClickDate(value as Date);
-            onChange();
           }}
           tileClassName={({date,view}) => view === 'month' && selectedDates.dateList.find(target=>target.getTime() === date.getTime()) ? 'react-calendar__selectedTile' : null}
           minDate={new Date()}
@@ -63,7 +62,7 @@ const CalendarInput = ({onToggleDateMode,onClickDate,selectedDates,onChange}:Cal
           onChange={(e)=>{
             onToggleDateMode(e.target.checked);
           }}/>
-        <label>또는 요일 선택</label>
+        <label>{lang==='ko' ? '또는 요일 선택' : 'or choose from week'}</label>
         </div>
         {!selectedDates.isWeekly ? <DateList dateList={selectedDates.dateList as Date[]}/>
         : <DayList dayList={selectedDates.dateList as DaysOfWeek[]}/>}

@@ -3,7 +3,7 @@ import { ReactNode, useEffect, useState } from "react"
 import LangButton from "./LangButton";
 // import { useLocation } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 
 const Header = ():ReactNode =>{
     const [lang, setLang] = useRecoilState(language);

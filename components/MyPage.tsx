@@ -36,13 +36,14 @@ const MyPage = (): ReactNode => {
 
   const getEventList = async () => {
     const eventList: NextMeetEvent[] = [];
-    const eventIDPromises = session!.user.eventIDList.map(async (eventID: string) => {
+    if(session && session.user){
+    const eventIDPromises = session!.user!.eventIDList.map(async (eventID: string) => {
       const event = await getEvent(eventID);
       if (event) eventList.push(event);
+      // Wait for all promises to resolve
+      await Promise.all(eventIDPromises);
     });
-  
-    // Wait for all promises to resolve
-    await Promise.all(eventIDPromises);
+    }
   
     setEventList(eventList);
   }

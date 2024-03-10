@@ -1,7 +1,7 @@
 import { NextMeetEvent } from "@/template/Event";
 import { ReactNode } from "react";
 import EventBlock from "./EventBlock";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 
 // const dummyEventList: NextMeetEvent[] = [

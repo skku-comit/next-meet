@@ -14,8 +14,8 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { NextMeetEvent } from "@/template/Event";
 import { useRecoilState } from "recoil";
 import { Participate } from "@/template/Participate";
-import { useSession } from "next-auth/react";
-import {  User } from "@/template/User";
+import { getSession, useSession } from "next-auth/react";
+import { NextMeetUser, User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { language } from "@/lib/recoil/language";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
@@ -91,26 +91,6 @@ export const getServerSideProps = async (context: any) => {
 const EventPage = ({
   event,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  
-  // const params = useSearchParams();
-  // const eventID = params.get('id');
-  // const res = await fetch("api/getEvent", {
-  //     method: "POST",
-  //     headers: {
-  //         "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ eventID }),
-  // });
-
-  // const data = await res.json();
-  // console.log(data);
-
-  // const router = useRouter();
-  // useEffect(()=>{
-  //     if(!event){
-  //         router.push(`/404`);
-  //     }
-  // }, [])
 
   console.log("event", event);
   

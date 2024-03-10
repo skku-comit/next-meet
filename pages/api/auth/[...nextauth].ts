@@ -2,7 +2,8 @@ import NextAuth from "next-auth/next";
 import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { getUserInfoByID } from "@/lib/functions/CRUD";
+import { addRemoveUserEventID, getUserInfoByID } from "@/lib/functions/CRUD";
+import { useState } from "react";
 const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
 const NEXTAUTH_URL = "http://localhost:3000";
 
@@ -51,11 +52,10 @@ const handler = NextAuth({
           const {message, user} = await res2.json();
 
           console.log("login userg", message, user)
-          if(message==0 || message == 11){
+          if(message == 0 || message == 11){
             session.user = user;
             return session;
           }
-         
         }
 
         session.user = token.user;

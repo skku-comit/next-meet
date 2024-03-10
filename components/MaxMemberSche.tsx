@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
@@ -34,6 +34,8 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
     const [scheConfirm, setScheConfirm] = useState(false);
 
     const WEEKDAY:DaysOfWeek[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const WEEKDAY2 = ['일', '월', '화', '수', '목', '금', '토'];
+    const WEEKDAY3 = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const weekDaySorter:{ [index: string]: number } = { 'Mon':1 , 'Tue':2 , 'Wed':3 , 'Thu':4 , 'Fri':5 , 'Sat':6 ,'Sun':7 , }
     const sortedSelectedWeekDay = selectedWeekDay.sort((a:string,b:string)=>weekDaySorter[a]-weekDaySorter[b])
 
@@ -72,10 +74,10 @@ const MaxMemberSche = ({index, week, isHost, start_sche, end_sche, scheduleList,
             showMaxMember ? setShowMaxMember(false) : setShowMaxMember(true)
             }}>
             <div>
-                <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
+                <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')'}</p>
                 <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                 <div className="inline-block mx-1"> ~ </div>
-                <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
+                <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')')}</p>
                 <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                 <p className="inline-block ml-2 text-[red] font-bold">{'(' + (Math.max(...checked_mem_num)*prevTotalMem) + '/' + prevTotalMem + ')'}</p>
             </div>

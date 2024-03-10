@@ -2,7 +2,7 @@ import scheduleResultCSS from "@/styles/scheduleResult.module.css";
 import React, {useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche"
 import { TimeInfo } from "@/template/TimeInfo";
@@ -70,8 +70,9 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
     }, [scheduleList, wait2]);
 
     
-    const WEEKDAY = ['일', '월', '화', '수', '목', '금', '토'];
-
+    const WEEKDAY2 = ['일', '월', '화', '수', '목', '금', '토'];
+    const WEEKDAY3 = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    
     let term:number = 0;
     let mem_term:number = 0;
 
@@ -179,10 +180,10 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({setShowResu
                             return(
                                 <li className="bg-[lightgray] px-3 pt-3 pb-2 rounded cursor-pointer" onClick={()=>{}}>
                             
-                                    <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[start_sche.getDay()] + ')'}</p>
+                                    <p className="inline-block">{(week ? "" : start_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')'}</p>
                                     <p className="inline-block ml-0.5">{start_sche.toLocaleTimeString('ko-KR')}</p>
                                     <div className="inline-block mx-1"> ~ </div>
-                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + WEEKDAY[end_sche.getDay()] + ')')}</p>
+                                    <p className="inline-block">{(week ? "" : start_sche.getUTCDate() == end_sche.getUTCDate() ? "" : (end_sche.toLocaleDateString('ko-KR')) + '(' + (lang=="ko" ? WEEKDAY2[start_sche.getDay()] :WEEKDAY3[start_sche.getDay()]) + ')')}</p>
                                     <p className="inline-block ml-0.5">{end_sche.toLocaleTimeString('ko-KR')}</p>
                                     
                 
