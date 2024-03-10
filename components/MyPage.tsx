@@ -12,7 +12,7 @@ const LogoutButton = (): ReactNode => {
   return (
     <button
       // className={"mt-auto pt-20 hover:underline underline-offset-[6px]"}
-      className={`${className_button} py-2 mt-5`}
+      className={`${className_button} w-40 py-2 mt-5`}
       onClick={(e) => {
         e.preventDefault();
         signOut({ redirect: false });
@@ -21,7 +21,6 @@ const LogoutButton = (): ReactNode => {
     </button>
   );
 };
-
 
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();

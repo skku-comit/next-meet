@@ -558,9 +558,8 @@ useEffect(() => {
           )}
         </div>
       </div>
-      {width > 768 && confirm == 2 ? (
-        ""
-      ) : showResult ? (
+      {width > 768 && confirm == 2 ? ""
+       : showResult ? (
         <div className={`z-30 w-full fixed bottom-0 h-48`}>
           <div
             className={`bg-[lightgray] h-0.5 cursor-row-resize hover:bg-[darkgray] ${scheResultBotCSS.result_bottom_border}`}
