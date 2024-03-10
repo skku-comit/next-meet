@@ -9,17 +9,15 @@ import scheResultBotCSS from "@/styles/scheduleResultBottom.module.css";
 import { FaList, FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { useState, useEffect,  MouseEventHandler } from "react";
 import { throttle } from "lodash";
-
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import type { InferGetServerSidePropsType } from "next";
 import { NextMeetEvent } from "@/template/Event";
 import { useRecoilState } from "recoil";
 import { Participate } from "@/template/Participate";
-import { getSession, useSession } from "next-auth/react";
-import { NextMeetUser, User } from "@/template/User";
+import { useSession } from "next-auth/react";
+import { User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { language } from "@/lib/recoil/language";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
-import { redirect } from "next/navigation";
 import Header from "@/components/Header";
 
 export const getServerSideProps = async (context: any) => {
@@ -27,14 +25,8 @@ export const getServerSideProps = async (context: any) => {
   try {
     const { id } = context.params;
     console.log(id);
-    const res = await fetch(`http://localhost:3000/api/form?id=${id}`, {
+    const res = await fetch(`http://localhost:3000/api/event?id=${id}`, {
       method: "GET",
-      // headers: {
-      //     "Content-Type": "application/json",
-      // },
-      // body: JSON.stringify({
-      //     id
-      // }),
     });
 
     if (res.ok) {
@@ -46,7 +38,7 @@ export const getServerSideProps = async (context: any) => {
       console.log("Get Event Data failed.");
       return {
         redirect: {
-          destination: "/404",
+          // destination: "/404",
           permanent: false,
         },
       };
@@ -470,8 +462,7 @@ const EventPage = ({
         <div
           className={`flex ${
             width < 768 ? "flex-col" : "flex-row"
-          } flex-nowrap items-start text-center gap-4 justify-center`}
-        >
+          } flex-nowrap items-start text-center gap-4 justify-center`}>
           {confirm == 1 || confirm == 3 ? (
             <ScheduleTableConfirm
               week={week}
