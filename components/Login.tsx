@@ -3,11 +3,16 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import LoginForm from "./LoginForm";
 import { existingUserCheck, registerEmail } from "@/lib/functions/CRUD";
 import isFormValid from "@/lib/functions/isFormValid";
-import { signIn, signOut } from "next-auth/react";
+import { signIn  } from "next-auth/react";
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
 
 const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
 const Login = (): ReactNode => {
+
+  //language
+  const lang = useRecoilValue(language);
   
   //useState
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
@@ -167,15 +172,14 @@ const Login = (): ReactNode => {
           </button>
         ) : (
           <>
-            <p>또는</p>
+            <p>{lang === 'ko' ? '또는' : 'or'}</p>
             <button
               className={`${className_button} py-2`}
               onClick={(e) => {
                 e.preventDefault();
                 setIsLoggingIn(true);
-              }}
-            >
-              이메일로 로그인
+              }}>
+              {lang === 'ko' ? '이메일로 로그인' : 'Login with email'}
             </button>
           </>
         )}
@@ -186,9 +190,9 @@ const Login = (): ReactNode => {
             // console.log('currentEvent: ',currentEventState);
             signIn("google", { callbackUrl: '/' }, { prompt: "select_account" });
           }}>
-          구글로 로그인
+          {lang === 'ko' ? '구글로 로그인' : 'Login with google'}
         </button>
-        <p>하여 이벤트를 둘러보세요.</p>
+        <p>{lang === 'ko' ? '하여 이벤트를 둘러보세요.' : 'to browse your events.'}</p>
         {/* <button
           className={`${className_button} py-2`}
           onClick={(e) => {

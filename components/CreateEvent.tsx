@@ -239,7 +239,7 @@ const CreateEvent = (): ReactNode => {
                     type="password"
                     ref={hostPWRef}
                     onChange={proceedCheck}
-                    placeholder="6자리 이상 입력해주세요"
+                    placeholder={lang === 'ko' ? "6자리 이상 입력해주세요": 'longer than 6 digits'}
                   ></input>
                 </div>
               </form>
