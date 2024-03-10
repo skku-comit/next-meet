@@ -359,7 +359,7 @@ useEffect(() => {
         }}>
         <FaLink className="w-6 h-6 mr-4"/>
         { lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</button>
-        {showCopyMessage ?? <CopiedAlert/>}
+        {showCopyMessage && <CopiedAlert/>}
       </div>
       {confirm != 3 && (!select || confirm == 1) ? "" : (
         <div className={ isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`}></div>
