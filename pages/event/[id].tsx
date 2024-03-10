@@ -98,6 +98,22 @@ const EventPage = ({
   const [week, setWeek]: [boolean, Function] = useState(
     event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly
   );
+
+  const sortedSelectedWeekDay = event
+    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
+        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
+      )
+    : [];
+  let week_startDate: Date = new Date(0);
+  if (sortedSelectedWeekDay) {
+    for (let i = 0; i < 7; i++) {
+      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
+        break;
+      }
+      week_startDate.setDate(week_startDate.getDate() + 1);
+    }
+  }
+  
   const [schedule, setSchedule]: [{ schedule: Date[] }, Function] =
     useState(eventParticiTime);
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
@@ -250,24 +266,6 @@ useEffect(() => {
     });
   }
 
-  
-
-  
-  const sortedSelectedWeekDay = event
-    ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
-        (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
-      )
-    : [];
-  let week_startDate: Date = new Date(0);
-  if (sortedSelectedWeekDay) {
-    for (let i = 0; i < 7; i++) {
-      if (WEEKDAY[week_startDate.getDay()] == sortedSelectedWeekDay[0]) {
-        break;
-      }
-      week_startDate.setDate(week_startDate.getDate() + 1);
-    }
-  }
-
   const indexOfLongestUserParti =
     event && event.participateStatus.length > 0
       ? event.participateStatus.reduce(
@@ -348,22 +346,22 @@ useEffect(() => {
 
   return (
     <div className="w-screen h-full min-h-screen pt-20 flex flex-col">
-      <div className="relative self-end mx-20 mt-8">
-      <button className={`${className_button} flex items-center justify-center w-72 `}
-        onClick={() => {
-          onURLCopy();
-          setShowCopyMessage(true);
-          setTimeout(()=>{
-            setShowCopyMessage(false);
-          },1000);
-        }}>
-        <FaLink className="w-6 h-6 mr-4"/>
-        { lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</button>
-        {showCopyMessage && <CopiedAlert/>}
-      </div>
       {confirm != 3 && (!select || confirm == 1) ? "" : (
         <div className={ isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`}></div>
       )}
+      <div className={`relative self-end mx-20 ${confirm == 2 || confirm == 3 ? "mb-4" : "mt-6"}`}>
+        <button className={`${className_button} flex items-center justify-center w-72 `}
+            onClick={() => {
+            onURLCopy();
+            setShowCopyMessage(true);
+            setTimeout(()=>{
+                setShowCopyMessage(false);
+            },1000);
+            }}>
+            <FaLink className="w-6 h-6 mr-4"/>
+            { lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</button>
+            {showCopyMessage && <CopiedAlert/>}
+      </div>
       <div className={`w-screen ${select ? "" : "pt-6"} ${ width < 768 ? "px-10" : "px-20"}`}>
         <div className={`rounded w-full bg-[#eee] min-h-10 p-3 text-center ${showDescription ? "" : "pb-2"}`}>
           <div className={`relative font-bold min-h-5 ${showDescription ? "pb-1" : "" } cursor-pointer`}
