@@ -21,7 +21,6 @@ const LogoutButton = (): ReactNode => {
   );
 };
 
-
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
   console.log("MyPage")
@@ -32,7 +31,7 @@ const MyPage = (): ReactNode => {
     if(session && session.user){
       getEventList();
     }
-  },[session]);
+  },[session,session?.user]);
 
   const getEventList = async () => {
     const eventList: NextMeetEvent[] = [];
@@ -44,7 +43,7 @@ const MyPage = (): ReactNode => {
       await Promise.all(eventIDPromises);
     });
     }
-  
+    // console.log(eventList)
     setEventList(eventList);
   }
 

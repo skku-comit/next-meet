@@ -1,96 +1,66 @@
 import { NextMeetEvent } from "@/template/Event";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import EventBlock from "./EventBlock";
-import { language } from '../lib/recoil/language';
+import { language } from "../lib/recoil/language";
 import { useRecoilState } from "recoil";
+import { useSession } from "next-auth/react";
+import { getEvent } from "@/lib/functions/CRUD";
 
-// const dummyEventList: NextMeetEvent[] = [
-//   {
-//     eventName: "회의 1",
-//     description: "example event",
-//     eventID: 12345,
-//     timeInfo:{
-//       isWeekly: true,
-//       startTime: "12:30",
-//       endTime: "15:00",
-//       dateList:[],
-//     },
-//     participateStatus: [],
-//     fixedMeeting: [],
-//     hostUserInfo: {
-//       userName: "name",
-//       userID: 1234,
-//       password: "1234",
-//     },
-//   },
-//   {
-//     eventName: "모임 1",
-//     description: "example event",
-//     eventID: 12345,
-//     timeInfo:{
-//       isWeekly: false,
-//       startTime: "12:30",
-//       endTime: "18:00",
-//       dateList:[],
-//     },
-//     participateStatus: [],
-//     fixedMeeting: [{ date: new Date(), timeRange: ["12:30"] }],
-//     hostUserInfo: {
-//       userName: "name",
-//       userID: 1234,
-//       password: "1234",
-//     },
-//   },
-//   {
-//     eventName: "모임 2",
-//     description: "example event",
-//     eventID: 12345,
-//     timeInfo:{
-//       isWeekly: true,
-//       startTime: "12:30",
-//       endTime: "15:00",
-//       dateList:[],
-//     },
-//     participateStatus: [],
-//     fixedMeeting: [],
-//     hostUserInfo: {
-//       userName: "name",
-//       userID: 1234,
-//       password: "1234",
-//     },
-//   },
-// ];
+const EventList = (): ReactNode => {
+  const [lang, setLang] = useRecoilState(language);
+  const { data: session } = useSession();
+  const [eventList, setEventList] = useState<NextMeetEvent[]>([]);
 
-type EventListProps = {
-  eventList : NextMeetEvent[];
-}
-const EventList = ({eventList}:EventListProps): ReactNode => {
-
-    const [lang, setLang] = useRecoilState(language);
-
-    console.log('eventList:',eventList);
-    const onGoingEvents = eventList
-      .filter((item) => item.fixedMeeting.length === 0)
-      .map((item, idx) => (
-        <EventBlock event={item} key={idx} />
-      ));
-
-    const terminatedEvents = eventList
-    .filter((item) => item.fixedMeeting.length !== 0)
-    .map((item, idx) => (
-      <EventBlock event={item} key={idx} />
-    ));
+  const getEventList = async () => {
+    const eventList: NextMeetEvent[] = [];
+    
+    try {
+      if (session && session.user) {
+        const eventIDPromises = session.user.eventIDList.map(async (eventID: string) => {
+          const event = await getEvent(eventID);
+          if (event) eventList.push(event);
+        });
   
-    return (
+        // Wait for all promises to resolve after the map has been executed
+        await Promise.all(eventIDPromises);
+      }
+    } catch (error) {
+      console.error("Error fetching event list:", error);
+    }
+    console.log(eventList);
+    setEventList(eventList);
+  };
+
+
+  useEffect(() => {
+    if (session && session.user) {
+      getEventList();
+    }
+  }, [session, session?.user]);
+
+
+  return (
     <div className="w-screen flex justify-center">
       <div className="(eventlist container) w-full lg:mx-20 mx-10 p-5 h-fit bg-slate-100 rounded-2xl">
-        <p className="text-xl">{lang=="ko"?"진행중인 이벤트":"Events in Progress"}</p>
+        <p className="text-xl">
+          {lang == "ko" ? "진행중인 이벤트" : "Events in Progress"}
+        </p>
         <div className="p-2 py-4 grid lg:grid-cols-4 gap-6">
-          {onGoingEvents}
+          {eventList
+            .filter((item) => item.fixedMeeting.length === 0)
+            .map((item, idx) => (
+              <EventBlock event={item} key={idx} />
+            ))}
         </div>
-        <p className="text-xl mt-8">{lang=="ko"?"종료된 이벤트":"Ended Events"}</p>
+        <p className="text-xl mt-8">
+          {lang == "ko" ? "종료된 이벤트" : "Terminated Events"}
+        </p>
         <div className="p-2 py-4 grid lg:grid-cols-4 gap-6">
-          {terminatedEvents}
+          {eventList
+            .filter((item) => item.fixedMeeting.length !== 0)
+            .map((item, idx) => (
+              <EventBlock event={item} key={idx} />
+            ))}
         </div>
       </div>
     </div>

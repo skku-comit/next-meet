@@ -124,7 +124,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await connectDB();
 
-      const {id} = req.query;
+      const { id } = req.query;
       console.log("eventID", id);
       let event; 
       // event = typeof eventID == "string" ? await Event.findOne({ eventID: parseInt(eventID) }) : "";
@@ -135,7 +135,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error(error);
       res.status(500).json({ message: "Internal server issue occurred" });
     }
-
+    //not found 
     res.status(200).json({});
   }
 };

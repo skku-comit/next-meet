@@ -161,17 +161,15 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
 };
 
 export const getEvent = async (eventID: string|null) => {
-  const res = await fetch("api/getEvent", {
-    method: "POST",
+  const res = await fetch(`api/event?id=${eventID}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ eventID }),
   });
 
   const data = await res.json();
-  console.log(data?.existingEvent);
-  return data?.existingEvent;
+  return data.event ? data.event : null;
 };
 
 
