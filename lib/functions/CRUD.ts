@@ -71,7 +71,7 @@ export const createEvent = async (
   console.log('createEvent with');
   console.log(eventName,description,timeInfo,hostUserInfo);
   try {
-    const res = await fetch("api/form", {
+    const res = await fetch("api/event", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export const editEvent = async (
 ):Promise<string|undefined> => {
   
   try {
-    const res = await fetch("api/form", {
+    const res = await fetch("api/event", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -229,7 +229,7 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
 }
 
 export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser | undefined, state : string)=>{
-  const res2 = await fetch(`${NEXTAUTH_URL}/api/form`,{
+  const res2 = await fetch(`${NEXTAUTH_URL}/api/event`,{
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

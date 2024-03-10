@@ -119,7 +119,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         console.log("FixedMeeting", fixedMeeting)
     
         try {
-          const res = await fetch("http://localhost:3000/api/form", {
+          const res = await fetch("http://localhost:3000/api/event", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
