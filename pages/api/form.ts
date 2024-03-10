@@ -70,6 +70,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           (user.eventIDList as number[]).push(parseFloat(reqBody.eventID));
           await user.save();
         }
+        const set = new Set(user.eventIDList);
+        const uniqueArr = [...set];
+        if(uniqueArr.length != user.eventIDList.length){
+          // console.log("length gap", uniqueArr.length != user.eventIDList.length)
+          await NextMeetUser.findOneAndUpdate({userID: reqBody.user.userID}, {$set:{eventIDList: uniqueArr}}, { overwrite: true })
+          // console.log("done");
+        }
       }
       
       const event = await Event.findOne({ eventID: reqBody.eventID });
@@ -89,7 +96,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
       }
       
-      res.status(201).json({ data: [user ? user.userID : "",  existedUser]});
+      res.status(201).json({ data: [user,  existedUser]});
       return NextResponse.json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser });
     } catch (error) {
       console.error(error);

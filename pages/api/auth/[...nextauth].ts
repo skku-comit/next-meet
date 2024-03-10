@@ -19,13 +19,16 @@ const handler = NextAuth({
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
      },
-    async jwt({ token, account, profile, user }) {
+    async jwt({ token, account, profile, user, trigger, session }) {
       console.log("This is jwt");
       console.log(token);
       console.log(account);
       console.log(profile);
       console.log(user);
       user && (token.user = user);
+      if (trigger === "update" && session.eventIDList) {
+        token.user.eventIDList = session.eventIDList
+      }
       return token;
     },
     async session ({session, token, user }) {
@@ -34,7 +37,6 @@ const handler = NextAuth({
         console.log(token.user)
         // const userInfo = await getUserInfoByID(+(token.user as User).id);
         // console.log('userInfo: ',userInfo);
-
         if(token.user && token.user.id){
           const res2 = await fetch(`${NEXTAUTH_URL}/api/user`, {
             method: "POST",

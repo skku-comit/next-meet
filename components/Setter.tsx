@@ -17,7 +17,7 @@ import { useRecoilState } from "recoil";
 
 const className_button = 'w-2/4 p-6 py-3 text-white';
 const Setter = (props:any): ReactNode => {
-  const { data: session } = useSession();
+  const { data: session,  update } = useSession();
   console.log( "session", session );
 
   const [lang, setLang] = useRecoilState(language);
@@ -34,7 +34,10 @@ const Setter = (props:any): ReactNode => {
   const [error, setError] = useState<string>("");
 
   const router = useRouter();
-  const eventID = router.query['id'];
+  const [eventID, setEventID] = useState(router.query['id']);
+  useEffect(()=>{
+    setEventID(router.query['id']);
+  },[router.query])
   console.log("eventID",eventID);
 
   const ERROR_MESSAGE = {
@@ -55,16 +58,20 @@ const Setter = (props:any): ReactNode => {
   };
 
   const setUp = async() =>{
-    if(session?.user?.provider == "google"){
-      const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session.user, "addEvent");
-      const data = await res2.json();
-      console.log("put data", data.data);
-    }
+    const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session?.user, "addEvent");
+    const data = await res2.json();
+    console.log("put data", data?.data);
+    if(data?.data){
+      update(data?.data[0]);
+      if (data?.data[0].userID == props.eventHost.userID){
+          props.setIsHost(true);
+      }
+    } 
   }
     
   useEffect(()=>{
     setUp()
-  }, [session?.user, eventID])
+  }, [props.isLogin, eventID])
 
   const onMemLoginHandler = async () => {
     if (!(nameIdInputRef.current && pwInputRef.current)) return;
@@ -103,16 +110,17 @@ const Setter = (props:any): ReactNode => {
       }
       props.setName(session?.user.userName);
       setIsMember(true);
+      props.setIsLogin(true);
 
-      const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session.user, "addEvent");
+      // const res2 = await addRemoveUserEventID(parseFloat(eventID as string), session.user, "addEvent");
 
-      const data = await res2.json();
+      // const data = await res2.json();
 
-      console.log("put data", data.data);
+      // console.log("put data", data.data);
 
-      if (data.data[0] == props.eventHost.userID){
-        props.setIsHost(true);
-      }
+      // if (data.data[0] == props.eventHost.userID){
+      //   props.setIsHost(true);
+      // }
     } catch (error) {
       console.error("error:", error);
     }
@@ -260,9 +268,9 @@ const Setter = (props:any): ReactNode => {
               className={`bg-[#eee] rounded p-2 pt-3 hover:bg-[lightgray] hover:font-bold`}
               onClick={(e) => {
                 e.preventDefault();
-                setTimeout(()=>{
-                  props.setIsLogin(true);
-                }, 5000);              
+                // setTimeout(()=>{
+                //   props.setIsLogin(true);
+                // }, 5000);              
                 signIn("google", { callbackUrl: `/event/${eventID}` }, { prompt: "select_account" });
               }}>
               구글로 로그인

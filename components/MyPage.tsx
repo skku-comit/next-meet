@@ -36,7 +36,9 @@ const MyPage = (): ReactNode => {
 
   const getEventList = async () => {
     const eventList: NextMeetEvent[] = [];
-    const eventIDPromises = session!.user.eventIDList.map(async (eventID: string) => {
+    const set = new Set(session!.user.eventIDList);
+    const uniqueEventList = [...set];
+    const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
       const event = await getEvent(eventID);
       if (event) eventList.push(event);
     });

@@ -5,7 +5,7 @@ import React, {useEffect, useState } from "react";
 import ScheduleSelector from 'react-schedule-selector'
 // import WeeklyFixedDate from '@/template/WeeklyFixedDate';
 import {ko} from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, getDate } from 'date-fns';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { TimeInfo } from "@/template/TimeInfo";
@@ -109,7 +109,11 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
 
     const dummyTimePeriod = {startTime : "00:00", endTime : "24:00"};
 
-    const [dateList, setDateList]:[Date[], Function] = useState(eventTimeInfo ? eventTimeInfo.dateList.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : []);
+    const eventDateArr = eventTimeInfo?.dateList.map((date)=>{
+        return(new Date(date.toString().split("T")[0]));
+    })
+
+    const [dateList, setDateList]:[Date[], Function] = useState(eventDateArr ? eventDateArr.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : []);
     const [timePeriod, setTimePeriod] = useState(eventTimeInfo ? {startTime: eventTimeInfo.startTime, endTime : eventTimeInfo.endTime} : dummyTimePeriod);
     const startTimeHour:number = parseInt(timePeriod.startTime.split(':')[0])+parseFloat(timePeriod.startTime.split(':')[1]=='30'?'0.5':'0');
     const endTimeHour:number = timePeriod.endTime == "00:00" ? 24 : parseInt(timePeriod.endTime.split(':')[0])+parseFloat(timePeriod.endTime.split(':')[1]=='30'?'0.5':'0');
@@ -270,10 +274,10 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
 
     const [open, setOpen] = useState(true);
 
-    const startDate = week? week_startDate : new Date(dateList[0]);
+    const startDate = week? week_startDate : dateList[0]
     const numsDay = week? DayList.length : dateList.length;
 
-    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, prevTotalMem, state)}, [schedule.schedule, state])
+    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, prevTotalMem, state, dateList, dateList[0], new Date("2024-03-19T15:00:00.000Z"))}, [schedule.schedule, state])
 
 
   return (
@@ -294,11 +298,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                 hourlyChunks={2}
                 renderDateLabel={(date:Date) => {
                     if(!week){
-                        let index = Math.abs(date.getTime() - new Date(dateList[0]).getTime());
-                        index = Math.ceil(index / (1000 * 60 * 60 * 24));
-                        if(index == 1 && date.getDate() == new Date(dateList[0]).getDate()){
-                            index = 0;
-                        }
+                        const index = getDateDiff(date, dateList[0])
                         return  <div className="w-full h-full" style={{height:'25px', minWidth:"70px"}}>
                         {(new Date(dateList[index]).getMonth()+1)+'/'+new Date(dateList[index]).getDate()}
                         {"("} 
