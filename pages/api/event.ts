@@ -64,10 +64,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       const reqBody = req.body;
       console.log("put reqBody", reqBody);
       const user = await NextMeetUser.findOne({ userID: reqBody.user.userID });
-      console.log("includes eventID", user.eventIDList.includes(parseFloat(reqBody.eventID)))
+        // console.log("includes eventID", user.eventIDList.includes(parseInt(reqBody.eventID)))
       if(reqBody.state == "addEvent"){
-        if(!(user.eventIDList.includes(parseFloat(reqBody.eventID)))){
-          (user.eventIDList as number[]).push(parseFloat(reqBody.eventID));
+        if(!((user.eventIDList as number[]).includes(parseInt(reqBody.eventID)))){
+          (user.eventIDList as number[]).push(parseInt(reqBody.eventID));
           await user.save();
         }
         const set = new Set(user.eventIDList);
@@ -130,12 +130,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   else if(req.method === "GET"){
     try {
       await connectDB();
-      console.log("connectDB");
-      const {id} = req.query;
-      const reqBody = req.body;
+
+      const { id } = req.query;
       console.log("eventID", id);
       let event; 
-      // event = typeof eventID == "string" ? await Event.findOne({ eventID: parseFloat(eventID) }) : "";
+      // event = typeof eventID == "string" ? await Event.findOne({ eventID: parseInt(eventID) }) : "";
       event = await Event.findOne({ eventID: id });
 
       res.status(201).json({ event : event });
@@ -143,7 +142,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error(error);
       res.status(500).json({ message: "Internal server issue occurred" });
     }
-
+    //not found 
     res.status(200).json({});
   }
 };

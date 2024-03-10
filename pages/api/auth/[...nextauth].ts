@@ -54,17 +54,34 @@ const handler = NextAuth({
           const {message, user} = await res2.json();
 
           console.log("login userg", message, user)
-          if(message==0 || message == 11){
+          if(message == 0 || message == 11){
             session.user = user;
             return session;
           }
-         
         }
 
         session.user = token.user;
         return session;
       }
-      
+      const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: (token.user as User).email })
+      });
+      if (getUserInfo.ok) {
+        const userInfo = await getUserInfo.json();
+        if (userInfo) {
+          (session as Session).user = userInfo;
+          console.log(session.user);
+          return session;
+        } else {
+          throw new Error("Failed to form json");
+        }
+      } else {
+        throw new Error("Failed to get valid response");
+      }
     },
   },
   providers: [

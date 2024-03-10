@@ -2,7 +2,7 @@ import scheduleResultCSS from "@/styles/scheduleResult.module.css";
 import React, {useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche"
 import { TimeInfo } from "@/template/TimeInfo";

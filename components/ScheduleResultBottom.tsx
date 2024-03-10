@@ -7,7 +7,7 @@ import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 import { TimeInfo } from "@/template/TimeInfo";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { useSearchParams } from "next/navigation";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche"
 
@@ -119,7 +119,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
         console.log("FixedMeeting", fixedMeeting)
     
         try {
-          const res = await fetch("http://localhost:3000/api/form", {
+          const res = await fetch("http://localhost:3000/api/event", {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",

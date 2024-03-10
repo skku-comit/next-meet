@@ -1,16 +1,13 @@
 import Setter from "@/components/Setter";
 import ScheduleTableSelecto from "@/components/scheduleTableSelecto";
 import ScheduleTableSelectoEdit from "@/components/scheduleTableSelectoEdit";
-import eventIdCSS from "@/styles/eventId.module.css";
 import ScheduleResultBottom from "@/components/ScheduleResultBottom";
 import ScheduleResultRight from "@/components/ScheduleResultRight";
 import ScheduleTableConfirm from "@/components/scheduleTableConfirm";
 import ConfirmBtn from "@/components/ConfirmBtn";
 import scheResultBotCSS from "@/styles/scheduleResultBottom.module.css";
-
 import { FaList, FaAngleDown, FaAngleUp } from "react-icons/fa";
-
-import { useState, useEffect, useReducer, MouseEventHandler } from "react";
+import { useState, useEffect,  MouseEventHandler } from "react";
 import { throttle } from "lodash";
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
@@ -20,10 +17,7 @@ import { Participate } from "@/template/Participate";
 import { getSession, useSession } from "next-auth/react";
 import { NextMeetUser, User } from "@/template/User";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-import { useSearchParams } from "next/dist/client/components/navigation";
-import { useRouter } from "next/router";
-import { language } from "@/lib/recoil/Language";
-import { TimeInfo } from "@/template/TimeInfo";
+import { language } from "@/lib/recoil/language";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { redirect } from "next/navigation";
 import Header from "@/components/Header";
@@ -99,6 +93,7 @@ const EventPage = ({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
   console.log("event", event);
+  
   const { data: session } = useSession();
   console.log("session", session);
 

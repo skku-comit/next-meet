@@ -71,7 +71,7 @@ export const createEvent = async (
   console.log('createEvent with');
   console.log(eventName,description,timeInfo,hostUserInfo);
   try {
-    const res = await fetch("api/form", {
+    const res = await fetch("api/event", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export const editEvent = async (
 ):Promise<string|undefined> => {
   
   try {
-    const res = await fetch("api/form", {
+    const res = await fetch("api/event", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -130,16 +130,15 @@ export const editEvent = async (
 
 export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
   const queryParams = new URLSearchParams({
-    userID: "null",
     provider: provider,
     loginID: loginID,
     email: email,
   });
-  const res = await fetch(`api/user?userID=${queryParams}`, {
+  const res = await fetch(`api/user?${queryParams}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
   });
 
   const {user, message} = await res.json();
@@ -149,15 +148,12 @@ export const existingUserCheck = async (provider: 'credentials'|'google', loginI
 export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null> => {
   const queryParams = new URLSearchParams({
     userID: userID.toString(),
-    provider: "null",
-    loginID: "null",
-    email: "null"
   });
-  const res = await fetch(`https://localhost:3000/api/user?${queryParams}`, {
+  const res = await fetch(`api/user?${queryParams}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    // headers: {
+    //   "Content-Type": "application/json",
+    // },
   });
 
   const {user, message} = await res.json();
@@ -165,17 +161,15 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
 };
 
 export const getEvent = async (eventID: string|null) => {
-  const res = await fetch("api/getEvent", {
-    method: "POST",
+  const res = await fetch(`api/event?id=${eventID}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ eventID }),
   });
 
   const data = await res.json();
-  console.log(data?.existingEvent);
-  return data?.existingEvent;
+  return data.event ? data.event : null;
 };
 
 
@@ -233,7 +227,7 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
 }
 
 export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser | undefined, state : string)=>{
-  const res2 = await fetch(`${NEXTAUTH_URL}/api/form`,{
+  const res2 = await fetch(`${NEXTAUTH_URL}/api/event`,{
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

@@ -21,7 +21,6 @@ const LogoutButton = (): ReactNode => {
   );
 };
 
-
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
   console.log("MyPage")
@@ -32,20 +31,25 @@ const MyPage = (): ReactNode => {
     if(session && session.user){
       getEventList();
     }
-  },[session]);
+  },[session,session?.user]);
 
   const getEventList = async () => {
     const eventList: NextMeetEvent[] = [];
+<<<<<<< HEAD
     const set = new Set(session!.user.eventIDList);
     const uniqueEventList = [...set];
     const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
+=======
+    if(session && session.user){
+    const eventIDPromises = session!.user!.eventIDList.map(async (eventID: string) => {
+>>>>>>> a17a44e0ec1c024609d39db87afee1dfbb4ce195
       const event = await getEvent(eventID);
       if (event) eventList.push(event);
+      // Wait for all promises to resolve
+      await Promise.all(eventIDPromises);
     });
-  
-    // Wait for all promises to resolve
-    await Promise.all(eventIDPromises);
-  
+    }
+    // console.log(eventList)
     setEventList(eventList);
   }
 

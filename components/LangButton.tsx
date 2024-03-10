@@ -8,34 +8,18 @@ type LangButtonProps = {
 const LangButton = ({ lang, setLang }: LangButtonProps): ReactNode => {
 
   return (
-    <div className={`w-20 h-10 rounded-full relative ${lang !="ko"? "bg-white border-red-300":"bg-red-300"} mt-4`} 
-          onClick={()=>{setLang((prev:"ko"|"en")=>prev=="ko" ? "en" : "ko")}}
-          style={{borderWidth:lang !="ko"? "3.5px" : "", width:"80px", height:"40px"}}>
-      <div
-        className={`rounded-full ${lang=="ko"? "bg-white":"bg-red-300"} absolute cursor-pointer transition-all ${
-          lang=="ko" ? "w-8 h-8 left-1 top-1" : "left-10"
-        }`}
-        style={{width:lang=="ko" ? "":"31px", height:lang=="ko" ? "":"31px", top:lang=="ko" ? "":"1px"}}
-      >
-        {lang == "ko" ? 
-          <p className="text-red-300" style={{paddingTop:"2.7px", paddingLeft:"6px", fontSize:"20px"}}>한</p>
-          : <p className="text-white" style={{paddingTop:"5px", paddingLeft:"3px", fontSize:"15.5px"}}>EN</p>}
-        {/* {lang == "ko" ? 
-          <span>
-            <p className="font-bold pr-2 border-1 border-[gray] border-solid">한글</p>
-            <p className="pl-2">영어</p>
-          </span> 
-          :
-          <span>
-            <p className="pr-2 border-1 border-[gray] border-solid">KOREAN</p>
-            <p className="font-bold pl-2">ENGLISH</p>
-          </span> 
-        } */}
+    <div className={`w-20 h-10 mt-4 rounded-full relative border-box border-[3px] border-red-300
+          ${lang !== "ko"? "bg-white  ":"bg-red-300"} `} 
+          onClick={()=>{setLang((prev:"ko"|"en") => prev == "ko" ? "en" : "ko")}}>
+      <div className={`rounded-full w-[30px] h-[30px] m-[2px] flex items-center justify-center absolute cursor-pointer transition-all duration-300
+          ${lang === "ko"? "bg-white text-red-300":"bg-red-300 text-white ml-10"} `}>
+          {lang === "ko" ? '한' : 'en'}
       </div>
-      {lang == "ko" ? 
-          <p className="text-white absolute" style={{right:"10px", paddingTop:"6.7px", fontSize:"22px"}}>영</p>
-          : <p className="text-red-300 absolute" style={{paddingTop:"6.7px", paddingLeft:"5.1px", fontSize:"15.5px"}}>KO</p>}
-    </div>
+      <div className={`rounded-full w-[30px] h-[30px] m-[2px] flex items-center justify-center transition-all duration-300
+          ${lang !== "ko"? "bg-white text-red-300":"bg-red-300 text-white ml-10"} absolute`}>
+          {lang === "ko" ? '영' : 'ko'}
+      </div>
+      </div>
   );
 };
 

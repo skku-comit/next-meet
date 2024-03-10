@@ -1,5 +1,8 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import TimePicker from "./TimePicker";
+import { useRecoilValue } from "recoil";
+import { language } from '../lib/recoil/language';
+
 type TimeInputProps = {
   onStartTimeChange:(startTime:string)=>void;
   onEndTimeChange:(endTime:string)=>void;
@@ -7,6 +10,7 @@ type TimeInputProps = {
 
 const TimeInput = ({onStartTimeChange,onEndTimeChange}:TimeInputProps): ReactNode => {
 
+  const lang = useRecoilValue(language);
   //useStates
   const [startTime,setStartTime] = useState<{hour:string, min:string}>({hour:"00", min:"00"});
   const [endTime,setEndTime] = useState<{hour:string, min:string}>({hour:"00", min:"00"});
@@ -51,7 +55,7 @@ const TimeInput = ({onStartTimeChange,onEndTimeChange}:TimeInputProps): ReactNod
  
   return (
     <div className="w-screen h-max p-10 flex flex-col items-center ">
-      <p className="text-2xl">시간 선택</p>
+      <p className="text-2xl">{lang === 'ko' ? '시간 선택' : 'Select time'}</p>
       <div className="p-8 pb-4 flex flex-col items-end gap-2">
         <div className="flex items-center gap-2">
           <label>from</label>
@@ -71,7 +75,7 @@ const TimeInput = ({onStartTimeChange,onEndTimeChange}:TimeInputProps): ReactNod
             setIsAllDay(false);
           }
         }}></input>
-        <label>All Day</label>
+        <label>{lang === 'ko' ? '하루종일' : 'All Day'}</label>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { language } from '../lib/recoil/Language';
+import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { DaysOfWeek } from "@/template/DaysOfWeek";
