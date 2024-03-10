@@ -98,6 +98,34 @@ const EventPage = ({
   const [week, setWeek]: [boolean, Function] = useState(
     event?.timeInfo.isWeekly == undefined ? false : event.timeInfo.isWeekly
   );
+  let fixedMeeting: { schedule: Date[] } = { schedule: [] };
+
+  if (week) {
+    event?.fixedMeeting.map((sche) => {
+      const date = new Date(week_startDate);
+      for (let i = 0; i < 7; i++) {
+        if (date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]) {
+          break;
+        }
+        date.setDate(week_startDate.getDate() + 1);
+      }
+      sche.timeRange.map((time: string) => {
+        date.setHours(parseInt(time.split(":")[0]));
+        date.setMinutes(parseInt(time.split(":")[1]));
+        fixedMeeting.schedule.push(date);
+      });
+    });
+  } else {
+    event?.fixedMeeting.map((sche) => {
+      const date = new Date((sche as FixedDate).date);
+      sche.timeRange.map((time: string) => {
+        date.setHours(parseInt(time.split(":")[0]));
+        date.setMinutes(parseInt(time.split(":")[1]));
+        fixedMeeting.schedule.push(date);
+      });
+    });
+  }
+
   const [schedule, setSchedule]: [{ schedule: Date[] }, Function] =
     useState(eventParticiTime);
   const [preMySelected, setPreMySelected] = useState(schedule.schedule);
@@ -196,63 +224,17 @@ const EventPage = ({
     // console.log("loginNonMem", loginNonMem)
   }, [session ? session.user : nonMemLogin]);
 
-  useEffect(() => {
-    setName(
-      session && isLogin
-        ? session.user.userName
-        : loginNonMem
-        ? loginNonMem.userName
-        : ""
-    );
-  }, [isLogin]);
-  
-  useEffect(()=>{
-    console.log("isHost",isHost, session?.user?.userID == event.hostUserInfo.userID, fixedSchedule)
-}, [isHost]);
-
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    setWidth(window.innerWidth);
-  }
-}, []);
-
-useEffect(() => {
-  window.addEventListener("resize", handleResize);
-  return () => {
-    // cleanup
-    window.removeEventListener("resize", handleResize);
+  const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const weekDaySorter: { [index: string]: number } = {
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+    Sun: 7,
   };
-}, []);
-
-  if (week) {
-    event?.fixedMeeting.map((sche) => {
-      const date = new Date(week_startDate);
-      for (let i = 0; i < 7; i++) {
-        if (date.getDay() == weekDaySorter[(sche as WeeklyFixedDate).day]) {
-          break;
-        }
-        date.setDate(week_startDate.getDate() + 1);
-      }
-      sche.timeRange.map((time: string) => {
-        date.setHours(parseInt(time.split(":")[0]));
-        date.setMinutes(parseInt(time.split(":")[1]));
-        fixedMeeting.schedule.push(date);
-      });
-    });
-  } else {
-    event?.fixedMeeting.map((sche) => {
-      const date = new Date((sche as FixedDate).date);
-      sche.timeRange.map((time: string) => {
-        date.setHours(parseInt(time.split(":")[0]));
-        date.setMinutes(parseInt(time.split(":")[1]));
-        fixedMeeting.schedule.push(date);
-      });
-    });
-  }
-
-  
-
-  
+  console.log(event?.timeInfo.isWeekly);
   const sortedSelectedWeekDay = event
     ? (event.timeInfo.dayList as DaysOfWeek[]).sort(
         (a: string, b: string) => weekDaySorter[a] - weekDaySorter[b]
@@ -267,6 +249,36 @@ useEffect(() => {
       week_startDate.setDate(week_startDate.getDate() + 1);
     }
   }
+
+  const [totalScheduleList, setTotalScheduleList]: [
+    {
+      checked_num: { [key: string]: number };
+      member: { [key: string]: string[] };
+    },
+    Function
+  ] = useState({ checked_num: {}, member: {} });
+  const [name, setName] = useState(
+    session && isLogin
+      ? session.user.userName
+      : loginNonMem
+      ? loginNonMem.userName
+      : ""
+  );
+  useEffect(() => {
+    setName(
+      session && isLogin
+        ? session.user.userName
+        : loginNonMem
+        ? loginNonMem.userName
+        : ""
+    );
+  }, [isLogin]);
+  const [showMember, setShowMember]: [boolean, Function] = useState(false);
+  const [showMemberList, setShowMemberList] = useState([]);
+  // const [showMemberList, setShowMemberList] = useReducer((state:string[], action:{list:string[]})=>(action.list), []);
+  const [showDateTime, setShowDateTime] = useState("");
+
+  const [showResult, setShowResult] = useState(false);
 
   const indexOfLongestUserParti =
     event && event.participateStatus.length > 0

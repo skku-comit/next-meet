@@ -234,7 +234,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({width, se
                                 scheduleList={scheduleList} sche={sche} isHost={isHost} checked_mem_num={checked_mem_num} 
                                 prevTotalMem={prevTotalMem} totalMem={totalMem} week_startDate={week_startDate} dateList={dateList} selectedWeekDay={selectedWeekDay}
                                 setFixedSchedule={setFixedSchedule} setSelect={setSelect} setConfirm={setConfirm}
-                                eventID={eventID} setPreFixedSchedule={setPreFixedSchedule}/>
+                                eventID={eventID} setPreFixedSchedule={setPreFixedSchedule} fixedSchedule={fixedSchedule}/>
                             )
                         }):""}
                     </ul>

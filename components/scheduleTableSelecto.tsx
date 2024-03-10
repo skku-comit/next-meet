@@ -110,7 +110,11 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
     const dummyTimePeriod = {startTime : "00:00", endTime : "24:00"};
 
     const eventDateArr = eventTimeInfo?.dateList.map((date)=>{
-        return(new Date(date.toString().split("T")[0]));
+        const newDate = new Date(date.toString().split("T")[0]);
+        newDate.setHours(0);
+        newDate.setMinutes(0);
+        newDate.setMilliseconds(0);
+        return(newDate);
     })
 
     const [dateList, setDateList]:[Date[], Function] = useState(eventDateArr ? eventDateArr.sort((a:Date,b:Date)=>(new Date(a).getTime()- new Date(b).getTime())) : []);
@@ -274,10 +278,10 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
 
     const [open, setOpen] = useState(true);
 
-    const startDate = week? week_startDate : dateList[0]
+    const startDate = week? week_startDate : dateList[0];
     const numsDay = week? DayList.length : dateList.length;
 
-    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, prevTotalMem, state, dateList, dateList[0], new Date("2024-03-19T15:00:00.000Z"))}, [schedule.schedule, state])
+    useEffect(()=>{console.log("scheduleList TotalMem state",scheduleList, schedule.schedule, prevTotalMem, state, dateList, dateList[0])}, [schedule.schedule, state])
 
 
   return (
@@ -299,6 +303,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto(
                 renderDateLabel={(date:Date) => {
                     if(!week){
                         const index = getDateDiff(date, dateList[0])
+                        // console.log('index', date, startDate)
                         return  <div className="w-full h-full" style={{height:'25px', minWidth:"70px"}}>
                         {(new Date(dateList[index]).getMonth()+1)+'/'+new Date(dateList[index]).getDate()}
                         {"("} 

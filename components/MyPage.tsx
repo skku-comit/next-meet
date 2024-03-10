@@ -22,10 +22,34 @@ const LogoutButton = (): ReactNode => {
   );
 };
 
+
 const MyPage = (): ReactNode => {
   const { data: session } = useSession();
   console.log("MyPage")
   console.log( 'session:',session );
+  const [eventList,setEventList] = useState<NextMeetEvent[]>([]);
+  
+  useEffect(()=>{
+    if(session && session.user){
+      getEventList();
+    }
+  },[session,session?.user]);
+
+  const getEventList = async () => {
+    const eventList: NextMeetEvent[] = [];
+    if(session && session.user){
+      const set = new Set(session!.user.eventIDList);
+      const uniqueEventList = [...set];
+      const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
+      const event = await getEvent(eventID);
+      if (event) eventList.push(event);
+      // Wait for all promises to resolve
+      await Promise.all(eventIDPromises);
+    });
+    }
+    // console.log(eventList)
+    setEventList(eventList);
+  }
 
   return (
     <div className="flex-grow lg:p-20 pb-10 h-fit flex flex-col items-center justify-center">
@@ -34,6 +58,7 @@ const MyPage = (): ReactNode => {
       ) : (
         <>
           <p className="text-2xl self-center lg:self-start p-10 lg:p-5">{session.user.userName ?? session.user.name ?? session.user.email} 님의</p>
+          <EventList/>
           <EventList/>
           <LogoutButton />
         </>

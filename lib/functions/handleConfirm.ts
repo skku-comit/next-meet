@@ -26,7 +26,7 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
     console.log("FixedMeeting", fixedMeeting)
 
     try {
-      const res = await fetch("http://localhost:3000/api/form", {
+      const res = await fetch("http://localhost:3000/api/event", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
