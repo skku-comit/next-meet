@@ -1,11 +1,5 @@
-import scheduleTableCSS from "@/styles/scheduleTable.module.css";
+
 import React, {useState, useEffect } from "react";
-// import Selecto from "react-selecto";
-import ScheduleSelector from 'react-schedule-selector';
-// import WeeklyFixedDate from '@/template/WeeklyFixedDate';
-import {ko} from 'date-fns/locale';
-import { format } from 'date-fns';
-// import { type } from './../template/User';
 const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { TimeInfo } from "@/template/TimeInfo";
@@ -16,7 +10,9 @@ import { useSession } from "next-auth/react";
 import { User, NextMeetUser } from "@/template/User";
 import { useParams, useSearchParams } from "next/navigation";
 import { addRemoveUserEventID } from "@/lib/functions/CRUD";
+import { checkEnvironment } from "@/lib/functions/checkEnv";
 
+const NEXTAUTH_URL = checkEnvironment();
 
 interface MyComponentProps {
     // fixedDate:Date[]|WeeklyFixedDate[] | null;
@@ -151,7 +147,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
 
     try {
-      const res = await fetch("api/event", {
+      const res = await fetch(`${NEXTAUTH_URL}event`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

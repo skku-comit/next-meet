@@ -4,13 +4,14 @@ import connectDB from "@/lib/mongodb/connectDB";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
 import { NM_CODE } from "@/lib/msg/errorMessage";
-
+import { checkEnvironment } from "@/lib/functions/checkEnv";
+const NEXTAUTH_URL = checkEnvironment();
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDB();
   if (req.method === "POST") {
     //check if the user already exist, and add new user otherwise
     const { provider, userName, loginID, email, password } = req.body;
-    console.log("@api/user/Post", req.body);
+    console.log(`${NEXTAUTH_URL}/api/user/Post`, req.body);
     try {
       // Check if the member is in database
       let checkQuery;

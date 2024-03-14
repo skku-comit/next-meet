@@ -7,6 +7,9 @@ import { language } from "../lib/recoil/language";
 import { useRecoilState } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche";
 import { IoMdClose } from "react-icons/io";
+import { checkEnvironment } from "@/lib/functions/checkEnv";
+
+const NEXTAUTH_URL = checkEnvironment();
 
 interface MyComponentProps {
   showResult: boolean;
@@ -167,7 +170,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({
     console.log("FixedMeeting", fixedMeeting);
 
     try {
-      const res = await fetch("api/event", {
+      const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

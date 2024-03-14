@@ -1,7 +1,9 @@
 import { TimeInfo } from "@/template/TimeInfo";
 import { NextMeetUser, User } from "@/template/User";
 import { NM_CODE } from "../msg/errorMessage";
+import { checkEnvironment } from "./checkEnv";
 
+const NEXTAUTH_URL = checkEnvironment();
 
 export const registerEmail = async (
   userName: string,
@@ -10,7 +12,7 @@ export const registerEmail = async (
   password: string
 ):Promise<NM_CODE> => {
   try {
-    const res = await fetch("api/user", {
+    const res = await fetch(`${NEXTAUTH_URL}/api/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +36,7 @@ export const registerGoogle = async (
   email: string,
 ):Promise<NM_CODE> => {
   try {
-    const res = await fetch("api/user", {
+    const res = await fetch(`${NEXTAUTH_URL}/api/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +68,7 @@ export const createEvent = async (
   console.log('createEvent with');
   console.log(eventName,description,timeInfo,hostUserInfo);
   try {
-    const res = await fetch("api/event", {
+    const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -130,7 +132,7 @@ export const existingUserCheck = async (provider: 'credentials'|'google', loginI
     loginID: loginID,
     email: email,
   });
-  const res = await fetch(`api/user?${queryParams}`, {
+  const res = await fetch(`${NEXTAUTH_URL}/api/user?${queryParams}`, {
     method: "GET",
     // headers: {
     //   "Content-Type": "application/json",
@@ -145,7 +147,7 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
   const queryParams = new URLSearchParams({
     userID: userID.toString(),
   });
-  const res = await fetch(`api/user?${queryParams}`, {
+  const res = await fetch(`${NEXTAUTH_URL}/api/user?${queryParams}`, {
     method: "GET",
     // headers: {
     //   "Content-Type": "application/json",
@@ -157,7 +159,7 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
 };
 
 export const getEvent = async (eventID: string|null) => {
-  const res = await fetch(`api/event?id=${eventID}`, {
+  const res = await fetch(`${NEXTAUTH_URL}/api/event?id=${eventID}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -169,7 +171,7 @@ export const getEvent = async (eventID: string|null) => {
 };
 
 export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{
-    const res = await fetch(`api/postUser?id=${eventID}`, {
+    const res = await fetch(`${NEXTAUTH_URL}/api/postUser?id=${eventID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -184,7 +186,7 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
 }
 
 export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser | undefined, state : string)=>{
-  const res2 = await fetch(`api/event`,{
+  const res2 = await fetch(`${NEXTAUTH_URL}/api/event`,{
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

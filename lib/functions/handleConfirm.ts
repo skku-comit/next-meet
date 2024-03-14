@@ -1,6 +1,7 @@
 import { DaysOfWeek } from "@/template/DaysOfWeek";
 import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-
+import { checkEnvironment } from "./checkEnv";
+const NEXTAUTH_URL = checkEnvironment();
 export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:number, setPreFixedSchedule:Function) => {
 
     console.log("handleConfirm", newSchedule)
@@ -26,7 +27,7 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
     console.log("FixedMeeting", fixedMeeting)
 
     try {
-      const res = await fetch("api/event", {
+      const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

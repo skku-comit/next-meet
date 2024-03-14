@@ -22,13 +22,15 @@ import { FaLink } from "react-icons/fa";
 import { className_button } from "@/styles/button";
 import { copyURL } from "@/lib/functions/copyURL";
 import CopiedAlert from "@/components/CopiedAlert";
+import { checkEnvironment } from "@/lib/functions/checkEnv";
+const NEXTAUTH_URL = checkEnvironment();
 
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
   try {
     const { id } = context.params;
     console.log(id);
-    const res = await fetch(`api/event?id=${id}`, {
+    const res = await fetch(`${NEXTAUTH_URL}/api/event?id=${id}`, {
       method: "GET",
     });
 
