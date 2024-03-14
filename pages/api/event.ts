@@ -5,8 +5,8 @@ import { User } from "@/template/User";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
 import { TimeInfo } from "@/template/TimeInfo";
-import { Participate } from "@/template/Participate";
 import { NextResponse } from "next/server";
+import { NM_CODE } from "@/lib/msg/errorMessage";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -53,7 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(201).json({ eventID: newEventID});
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server issue occurred" });
+      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "PUT"){
@@ -71,7 +71,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           await user.save();
         }
         const set = new Set(user.eventIDList);
-        const uniqueArr = [...set];
+        const uniqueArr = Array.from(set);
         if(uniqueArr.length != user.eventIDList.length){
           // console.log("length gap", uniqueArr.length != user.eventIDList.length)
           await NextMeetUser.findOneAndUpdate({userID: reqBody.user.userID}, {$set:{eventIDList: uniqueArr}}, { overwrite: true })
@@ -100,7 +100,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return NextResponse.json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server issue occurred" });
+      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "PATCH"){
@@ -124,7 +124,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(201).json({ eventID: reqBody.eventID });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server issue occurred" });
+      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "GET"){
@@ -140,7 +140,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(201).json({ event : event });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Internal server issue occurred" });
+      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
     //not found 
     res.status(200).json({});

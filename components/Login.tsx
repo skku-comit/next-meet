@@ -6,6 +6,7 @@ import isFormValid from "@/lib/functions/isFormValid";
 import { signIn  } from "next-auth/react";
 import { useRecoilValue } from "recoil";
 import { language } from '../lib/recoil/language';
+import { NM_CODE, NM_MSG_ENG, NM_MSG_KOR } from "@/lib/msg/errorMessage";
 
 const className_button = "w-60 p-6 py-3 bg-[#ffadad] rounded-xl text-white";
 
@@ -26,23 +27,6 @@ const Login = (): ReactNode => {
   const pwcInputRef = useRef<HTMLInputElement>(null);
   //useEffects
 
-  //data
-  const ERROR_MESSAGE = {
-    0: "",
-    1: "동일한 아이디가 존재합니다.",
-    2: "동일한 이메일이 존재합니다.",
-    3: "이름이 너무 짧습니다",
-    4: "아이디가 너무 짧습니다.",
-    5: "비밀번호가 너무 짧습니다.",
-    6: "이메일 형식이 옳지 않습니다.",
-    7: "비밀번호가 일치하지 않습니다.",
-    8: "아이디를 입력하세요.",
-    9: "비밀번호를 입력하세요.",
-    10: "아이디 혹은 비밀번호가 틀렸습니다.",
-    11: "존재하는 구글계정입니다.",
-    99: "서버 오류가 발생했습니다.",
-    100: "회원가입이 완료되었습니다."
-  };
   //functions
   const resetForm = () => {
     if (
@@ -64,14 +48,14 @@ const Login = (): ReactNode => {
   };
 
   const onLoginHandler = async () => {
-    setError(ERROR_MESSAGE[0]);
+    setError('');
     if (!(idInputRef.current && pwInputRef.current)) return;
     const loginID = idInputRef.current.value;
     const password = pwInputRef.current.value;
 
     let errorNo = isFormValid("login", loginID, "", "", password, "");
     if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo]);
+      setError( NM_MSG_KOR[NM_CODE.NO_ERROR] );
       return;
     }
     try {
@@ -81,7 +65,7 @@ const Login = (): ReactNode => {
         redirect: false,
       });
       if (res && +res.error! != 0) {
-        setError(ERROR_MESSAGE[10]);
+        setError(lang==='ko' ? NM_MSG_KOR[NM_CODE.LOGIN_FAILED] : NM_MSG_ENG[NM_CODE.LOGIN_FAILED]);
       }
     } catch (error) {
       console.error("error:", error);
@@ -97,7 +81,7 @@ const Login = (): ReactNode => {
         emailInputRef.current &&
         pwcInputRef.current)) return;
 
-    setError(ERROR_MESSAGE[0]);
+    setError(NM_MSG_KOR[0]);
     const userName = nameInputRef.current.value;
     const loginID = idInputRef.current.value;
     const email = emailInputRef.current.value;
@@ -105,7 +89,7 @@ const Login = (): ReactNode => {
     const passwordCheck = pwcInputRef.current.value;
 
     //test input validity
-    let errorNo = isFormValid(
+    let errorCode = isFormValid(
       "register",
       loginID,
       userName,
@@ -113,8 +97,8 @@ const Login = (): ReactNode => {
       password,
       passwordCheck
     );
-    if (errorNo !== 0) {
-      setError(ERROR_MESSAGE[errorNo]);
+    if (errorCode !== 0) {
+      setError(lang==='ko' ? NM_MSG_KOR[errorCode] : NM_MSG_ENG[errorCode]);
       return;
     }
     // try {
@@ -126,15 +110,15 @@ const Login = (): ReactNode => {
     // } catch (error) {
     //   console.log(error);
     // }
-    const registerStatus: 0|1|2|11|99 = await registerEmail(userName, loginID, email, password);
+    const registerStatus: NM_CODE = await registerEmail(userName, loginID, email, password);
     if(registerStatus !== 0){ //error
-      setError(ERROR_MESSAGE[registerStatus])
+      setError(lang==='ko' ? NM_MSG_KOR[registerStatus] : NM_MSG_ENG[registerStatus])
       return;
     }
     await registerEmail(userName, loginID, email, password);
     resetForm();
     setIsRegistering(false);
-    setError(ERROR_MESSAGE[100]);
+    setError(lang==='ko' ? NM_MSG_KOR[NM_CODE.REGISTER_SUCCESS] : NM_MSG_ENG[NM_CODE.REGISTER_SUCCESS]);
   };
 
   return (

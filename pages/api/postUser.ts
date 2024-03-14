@@ -2,6 +2,7 @@ import connectDB from "@/lib/mongodb/connectDB";
 import { User } from "@/template/User";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Event from "@/template/schema/event.model";
+import { NM_CODE } from "@/lib/msg/errorMessage";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if(req.method==="POST"){
@@ -30,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             res.status(201).json({ eventID: id, userList:userList });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal server issue occurred" });
+            res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
         }
     }
 }

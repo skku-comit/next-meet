@@ -1,6 +1,6 @@
 
 
-import { addRemoveUserEventID, postUser } from "@/lib/functions/CRUD";
+import { addRemoveUserEventID } from "@/lib/functions/CRUD";
 import getID from "@/lib/functions/getID";
 import isFormValid from "@/lib/functions/isFormValid";
 import setterBtnTab from "@/styles/setterbtntab.module.css";
@@ -176,11 +176,10 @@ const Setter = (props:any): ReactNode => {
       console.log("done")
 
     } catch (error) {
-      // console.error("error:", error);
+      console.error("error:", error);
       return null;
     }
   }
-  console.log("error",error)
 
   return (
     <div className={`w-screen mt-6 ${props.width < 768 ? "px-10":"px-20"}`}>

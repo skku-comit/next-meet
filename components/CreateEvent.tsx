@@ -31,7 +31,6 @@ const CreateEvent = (): ReactNode => {
   const [startTime, setStartTime] = useState<string | "">("00:00");
   const [endTime, setEndTime] = useState<string | "">("00:00");
   const [canProceed, setCanProceed] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
 
   //useRefs
   const eventNameRef = useRef<HTMLInputElement>(null);
@@ -162,7 +161,6 @@ const CreateEvent = (): ReactNode => {
   };
 
   useEffect(()=>{
-    // console.log('proceedCheck');
     proceedCheck();
   },[dateSelection.dateList,
     session,session?.user]);

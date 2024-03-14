@@ -5,14 +5,14 @@ const NextMeetUserSchema = new Schema({
     type: String,
     required: true
   },
-  loginID: { //id created by user
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
+  loginID: { //id created by user, only required for email account
     type: String,
     required: false,
+    unique: true,
+  },
+  password: { //only required for email account
+    type: String,
+    required: false, 
   },
   userID: { //id for identification, created by server
     type: Number,

@@ -2,10 +2,11 @@ import NextAuth from "next-auth/next";
 import { User, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { addRemoveUserEventID, getUserInfoByID } from "@/lib/functions/CRUD";
-import { useState } from "react";
-const NEXTAUTH_SECRET = "examplenextauthsecretfornextmeetproject";
-const NEXTAUTH_URL = "http://localhost:3000";
+import { NextMeetUser } from "@/template/User";
+import { checkEnvironment } from "@/lib/functions/checkEnv";
+import { NM_CODE } from "@/lib/msg/errorMessage";
+
+const NEXTAUTH_URL = checkEnvironment();
 
 const handler = NextAuth({
   callbacks: {
@@ -27,17 +28,16 @@ const handler = NextAuth({
       console.log(user);
       user && (token.user = user);
       if (trigger === "update" && session.eventIDList) {
-        token.user.eventIDList = session.eventIDList
+        (token.user as NextMeetUser).eventIDList = session.eventIDList
       }
       return token;
     },
     async session ({session, token, user }) {
       console.log("This is session");
       if(token && token.user){
-        console.log(token.user)
-        // const userInfo = await getUserInfoByID(+(token.user as User).id);
-        // console.log('userInfo: ',userInfo);
-        if(token.user && token.user.id){
+        console.log('token.user: ',token.user)
+        
+        if(token.user && (token.user as User).id){
           const res2 = await fetch(`${NEXTAUTH_URL}/api/user`, {
             method: "POST",
             headers: {
@@ -45,24 +45,22 @@ const handler = NextAuth({
             },
             body: JSON.stringify({
               provider: "google",
-              userName: token.user.name,
-              loginID : token.user.name,
-              email : token.user.email,
-              password : ""
+              userName: (token.user as User).name,
+              email : (token.user as User).email,
             }),
           });
-          const {message, user} = await res2.json();
-
-          console.log("login userg", message, user)
-          if(message == 0 || message == 11){
+          const { message, user } = await res2.json();
+          console.log("@@@session@@@ google user logged in", message, user);
+          if(user){
             session.user = user;
             return session;
           }
         }
-
-        session.user = token.user;
+        console.log('token.user: ', token.user);
+        (session.user as NextMeetUser) = (token.user as NextMeetUser);
         return session;
       }
+      console.log("flag@@@@@@@@@@@@@@")
       const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/user`, {
         method: "POST",
         headers: {
@@ -72,6 +70,7 @@ const handler = NextAuth({
       });
       if (getUserInfo.ok) {
         const userInfo = await getUserInfo.json();
+        
         if (userInfo) {
           (session as Session).user = userInfo;
           console.log(session.user);
@@ -135,8 +134,7 @@ const handler = NextAuth({
     strategy: "jwt",
     maxAge: 3 * 24 * 60 * 60,
   },
-  //   secret:process.env.NEXTAUTH_SECRET
-  secret: NEXTAUTH_SECRET,
+    secret:process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/",
   },

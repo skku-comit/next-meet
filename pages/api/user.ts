@@ -3,15 +3,14 @@ import bcrypt from "bcryptjs";
 import connectDB from "@/lib/mongodb/connectDB";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
-
-export enum USER_SEARCH_RESPONSE { "NO_ERROR" = 0, "EXISTING_LOGINID", "EXISTING_EMAIL", "EXISTING_GOOGLE_ACCOUNT" = 11, "INTERNAL_SERVER_ERROR" = 99 };
+import { NM_CODE } from "@/lib/msg/errorMessage";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await connectDB();
   if (req.method === "POST") {
     //check if the user already exist, and add new user otherwise
     const { provider, userName, loginID, email, password } = req.body;
-    console.log("user Post", req.body, [loginID]);
+    console.log("@api/user/Post", req.body);
     try {
       // Check if the member is in database
       let checkQuery;
@@ -19,8 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         checkQuery = await NextMeetUser.find({ provider:'credentials', loginID: req.body.loginID });
         if (checkQuery.length !== 0) {
           // Member already exist
-          res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_LOGINID });
-          return;
+          return res.status(200).json({ message: NM_CODE.REGISTER_EXISTING_ID, user: null });
         }
       }
       else{
@@ -28,36 +26,45 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         console.log("checkQuery", checkQuery);
         if (checkQuery.length !== 0) {
           // Member already exist
-          res.status(400).json({ message: USER_SEARCH_RESPONSE.EXISTING_GOOGLE_ACCOUNT, user:checkQuery[0] });
-          return;
+          return res.status(200).json({ message: NM_CODE.REGISTER_EXISTING_ACCOUNT, user:checkQuery[0] });
         }
       }
 
       // Register new member
       const user = NextMeetUser;
-      const hashedPassword = await bcrypt.hash(password, 10);
-
       const userID = getID(1);
-      const new_user = {
-        provider:provider,
-        loginID,
-        password: hashedPassword,
-        userID: userID,
-        userName,
-        email,
+      let new_user;
+      if(provider === 'credentials'){ //email register
+        const hashedPassword = await bcrypt.hash(password, 10);
+        new_user = {
+          provider: 'credentials',
+          loginID,
+          password: hashedPassword,
+          userID: userID,
+          userName,
+          email,
+        }
       }
+      else{ //social register
+        new_user = {
+          provider: 'google',
+          userID,
+          userName,
+          email,
+        }
+      }
+
       console.log("new user", new_user);
-
       await user.create(new_user);
-
       console.log(`${userName} registered as user`);
-      res.status(200).json({ message: USER_SEARCH_RESPONSE.NO_ERROR, 
-        user : new_user });
+
+      res.status(200).json({ message: NM_CODE.NO_ERROR, user : new_user });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR });
+      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR, user : null });
     }
   }
+
   else if(req.method === "GET"){
     //check if the user already exist, and return user info otherwise
     const { userID, provider, loginID, email } = req.query;
@@ -76,25 +83,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if(provider === 'credentials'){
       existingUser = await NextMeetUser.findOne({ loginID: loginID }).select("_id");
       if(existingUser){
-        return res.status(400).json({ user: existingUser, message: USER_SEARCH_RESPONSE.EXISTING_LOGINID });
+        return res.status(400).json({ user: existingUser, message: NM_CODE.SEARCH_EXISTING_ID });
       }
       else{
         existingUser = await NextMeetUser.findOne({ email: email }).select("_id");
-        return res.status(400).json({ user: existingUser, message: USER_SEARCH_RESPONSE.EXISTING_EMAIL });
+        return res.status(400).json({ user: existingUser, message: NM_CODE.SEARCH_EXISTING_EMAIL });
       }
     }
     else{ //provider == google
       existingUser = await NextMeetUser.findOne({ email: email }).select("_id");
       if(existingUser){
-        return res.status(400).json({ user: existingUser, message: USER_SEARCH_RESPONSE.EXISTING_GOOGLE_ACCOUNT });
+        return res.status(400).json({ user: existingUser, message: NM_CODE.SEARCH_EXISTING_ACCOUNT });
       }
     }
   
-    return res.status(200).json({ user: null, message: USER_SEARCH_RESPONSE.NO_ERROR });
+    return res.status(200).json({ user: null, message: NM_CODE.NO_ERROR });
 
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ user: null, message: USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR }); // Handle internal server errors
+    return res.status(500).json({ user: null, message: NM_CODE.INTERNAL_SERVER_ERROR }); // Handle internal server errors
   }
 }
 };

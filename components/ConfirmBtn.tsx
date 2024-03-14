@@ -1,9 +1,4 @@
-import scheduleResultCSS from "@/styles/scheduleResult.module.css";
-import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-import { DaysOfWeek } from "@/template/DaysOfWeek";
-import { useSearchParams } from "next/navigation";
-import React, {useEffect, useState } from "react";
-import { IoMdClose } from "react-icons/io";
+import React from "react";
 import { language } from '../lib/recoil/language';
 import { useRecoilState } from "recoil";
 import { handleConfirm } from "@/lib/functions/handleConfirm";

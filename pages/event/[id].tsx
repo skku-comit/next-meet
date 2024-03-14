@@ -28,7 +28,7 @@ export const getServerSideProps = async (context: any) => {
   try {
     const { id } = context.params;
     console.log(id);
-    const res = await fetch(`http://localhost:3000/api/event?id=${id}`, {
+    const res = await fetch(`api/event?id=${id}`, {
       method: "GET",
     });
 
@@ -311,14 +311,6 @@ useEffect(() => {
     setWidth(window.innerWidth);
   }, 200);
 
-  
-
-  
-
-  // useEffect(()=>{
-  //     // console.log("fixedSchedule",fixedSchedule)
-  // }, [fixedSchedule])
-
   const [height, setHeight] = useState(192);
 
   const dragHandler: MouseEventHandler<HTMLDivElement> = (e) => {
@@ -349,8 +341,8 @@ useEffect(() => {
       {confirm != 3 && (!select || confirm == 1) ? "" : (
         <div className={ isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`}></div>
       )}
-      <div className={`relative self-end mx-20 ${confirm == 2 || confirm == 3 ? "mb-4" : "mt-6"}`}>
-        <button className={`${className_button} flex items-center justify-center w-72 `}
+      <div className={`relative lg:self-end mx-20 ${confirm == 2 || confirm == 3 ? "mb-4" : "mt-6"}`}>
+        <button className={`${className_button} flex items-center justify-center lg:w-72 `}
             onClick={() => {
             onURLCopy();
             setShowCopyMessage(true);
@@ -359,7 +351,8 @@ useEffect(() => {
             },1000);
             }}>
             <FaLink className="w-6 h-6 mr-4"/>
-            { lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</button>
+            <p className="lg:text-lg text-sm">{ lang === 'ko' ? 'NextMeet URL 복사' : 'Copy NextMeet URL'}</p>
+              </button>
             {showCopyMessage && <CopiedAlert/>}
       </div>
       <div className={`w-screen ${select ? "" : "pt-6"} ${ width < 768 ? "px-10" : "px-20"}`}>
@@ -380,7 +373,7 @@ useEffect(() => {
             </div>}
         </div>
       </div>
-      {(select || confirm == 2 || confirm == 3) && isHost ? (
+      {(select || confirm == 2 || confirm == 3) && isHost &&
         <ConfirmBtn
           week={week}
           select={select}
@@ -391,11 +384,8 @@ useEffect(() => {
           setFixedSchedule={setFixedSchedule}
           setPreFixedSchedule={setPreFixedSchedule}
           eventID={event.eventID}
-        />
-      ) : (
-        ""
-      )}
-      {true || !select || confirm == 1 || confirm == 3 ? (
+        />}
+      {true || !select || confirm == 1 || confirm == 3 &&
         <Setter
           width={width}
           isLogin={isLogin}
@@ -419,16 +409,13 @@ useEffect(() => {
           setPreMySelected={setPreMySelected}
           setLoginNonMem={setLoginNonMem}
           preFixedSchedule={preFixedSchedule}
-        />
-      ) : (
-        ""
-      )}
+        />}
       <div className={`w-screen pt-5 ${width < 768 ? "px-10" : "px-20"} pb-5`}>
         <div
           className={`flex ${
             width < 768 ? "flex-col" : "flex-row"
           } flex-nowrap items-start text-center gap-4 justify-center`}>
-          {confirm == 1 || confirm == 3 ? (
+          {confirm == 1 || confirm == 3 && 
             <ScheduleTableConfirm
               week={week}
               isLogin={isLogin}
@@ -458,10 +445,8 @@ useEffect(() => {
               wait={wait}
               setWait2={setWait2}
             />
-          ) : (
-            ""
-          )}
-          {isLogin && confirm == 0 ? (
+          }
+          {isLogin && confirm == 0 &&
             <ScheduleTableSelectoEdit
               week={week}
               isLogin={isLogin}
@@ -469,7 +454,6 @@ useEffect(() => {
               width={width}
               setSchedule={setSchedule}
               confirm={confirm}
-              // fixedDate={null} fixedDay={null} fixedTime={null}
               name={name}
               setShowMember={setShowMember}
               setShowMemberList={setShowMemberList}
@@ -493,10 +477,8 @@ useEffect(() => {
               wait={wait}
               setWait={setWait}
               setWait2={setWait2}
-            />
-          ) : (
-            ""
-          )}
+            />}
+
           <ScheduleTableSelecto
             isLogin={isLogin}
             schedule={schedule}
@@ -526,9 +508,8 @@ useEffect(() => {
             setPreMySelected={setPreMySelected}
             wait={wait}
             setWait2={setWait2}
-            // fixedDate={null} fixedDay={null} fixedTime={null}
           />
-          {width > 768 && confirm == 2 ? (
+          {width > 768 && confirm == 2 &&
             <ScheduleResultRight
               setShowResult={setShowResult}
               showResult={showResult}
@@ -550,10 +531,7 @@ useEffect(() => {
               eventID={event.eventID}
               setPreFixedSchedule={setPreFixedSchedule}
               wait2={wait2}
-            />
-          ) : (
-            ""
-          )}
+            />}
         </div>
       </div>
       {width > 768 && confirm == 2 ? ""
@@ -594,8 +572,7 @@ useEffect(() => {
         <div
           className="z-30 fixed bottom-5 right-5 rounded-full bg-[#eee] h-fit p-4 cursor-pointer"
           style={{ height: "52px" }}
-          onClick={() => setShowResult(true)}
-        >
+          onClick={() => setShowResult(true)}>
           <FaList className="w-5 h-5" />
         </div>
       )}

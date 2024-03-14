@@ -2,12 +2,12 @@ import { NextMeetEvent } from "@/template/Event";
 import { ReactNode, useEffect, useState } from "react";
 import EventBlock from "./EventBlock";
 import { language } from "../lib/recoil/language";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { useSession } from "next-auth/react";
 import { getEvent } from "@/lib/functions/CRUD";
 
 const EventList = (): ReactNode => {
-  const [lang, setLang] = useRecoilState(language);
+  const lang = useRecoilValue(language);
   const { data: session } = useSession();
   const [eventList, setEventList] = useState<NextMeetEvent[]>([]);
 
@@ -17,7 +17,7 @@ const EventList = (): ReactNode => {
     try {
       if (session && session.user) {
         const set = new Set(session!.user.eventIDList);
-        const uniqueEventList = [...set];
+        const uniqueEventList = Array.from(set);
         const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
                   const event = await getEvent(eventID);
           if (event) eventList.push(event);

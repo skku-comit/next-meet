@@ -1,10 +1,6 @@
-import { USER_SEARCH_RESPONSE } from "@/pages/api/user";
-import { NextMeetEvent } from "@/template/Event";
-import { Participate } from "@/template/Participate";
 import { TimeInfo } from "@/template/TimeInfo";
 import { NextMeetUser, User } from "@/template/User";
-import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-const NEXTAUTH_URL = "http://localhost:3000";
+import { NM_CODE } from "../msg/errorMessage";
 
 
 export const registerEmail = async (
@@ -12,7 +8,7 @@ export const registerEmail = async (
   loginID: string,
   email: string,
   password: string
-):Promise<0|1|2|11|99> => {
+):Promise<NM_CODE> => {
   try {
     const res = await fetch("api/user", {
       method: "POST",
@@ -22,42 +18,41 @@ export const registerEmail = async (
       body: JSON.stringify({ provider: 'credentials', userName, loginID, email, password }),
     });
 
-    const { message } = await res.json();
-
-    return message;
-    // if (res.status == 200) {
-    // } else {
-    //   const { message } = await res.json();
-    //   console.log("register failed.");
-    //   console.log('message:', message);
-    // }
+    if(res.ok){
+      const { message, user } = await res.json();
+      return message;
+    }
+    else return NM_CODE.ETC;
   } catch (error) {
-    console.log(error);
-    return USER_SEARCH_RESPONSE.INTERNAL_SERVER_ERROR;
+    console.log('register email failed:', error);
+    return NM_CODE.INTERNAL_SERVER_ERROR;
   }
 };
 
 export const registerGoogle = async (
   userName: string,
   email: string,
-) => {
+):Promise<NM_CODE> => {
   try {
     const res = await fetch("api/user", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ provider: 'google', userName, loginID:'', email, password:'' }),
+      body: JSON.stringify({ provider: 'google', userName, email }),
     });
 
     if (res.ok) {
-      const data = await res.json();
-      console.log(data.message);
+      const { message, user } = await res.json();
+      console.log(message);
+      return message;
     } else {
       console.log("register failed.");
+      return NM_CODE.ETC;
     }
   } catch (error) {
     console.log(error);
+    return NM_CODE.INTERNAL_SERVER_ERROR;
   }
 };
 
@@ -85,6 +80,7 @@ export const createEvent = async (
     });
     console.log(res);
     const data = await res.json();
+    console.log(data);
     const eventID = data.eventID;
     return eventID;
 
@@ -94,39 +90,39 @@ export const createEvent = async (
 };
 
 
-export const editEvent = async (
-  eventName: string,
-  description: string,
-  timeInfo: TimeInfo,
-  hostUserInfo:User,
-  participateStatus:Participate[],
-  fixedMeeting:FixedDate[] | WeeklyFixedDate[],
-):Promise<string|undefined> => {
+// export const editEvent = async (
+//   eventName: string,
+//   description: string,
+//   timeInfo: TimeInfo,
+//   hostUserInfo:User,
+//   participateStatus:Participate[],
+//   fixedMeeting:FixedDate[] | WeeklyFixedDate[],
+// ):Promise<string|undefined> => {
   
-  try {
-    const res = await fetch("api/event", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({      
-        eventName,
-        description,
-        timeInfo,
-        participateStatus,
-        fixedMeeting,
-        hostUserInfo
-      }),
-    });
-    console.log(res);
-    const data = await res.json();
-    const eventID = data.eventID;
+//   try {
+//     const res = await fetch("api/event", {
+//       method: "PUT",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({      
+//         eventName,
+//         description,
+//         timeInfo,
+//         participateStatus,
+//         fixedMeeting,
+//         hostUserInfo
+//       }),
+//     });
+//     console.log(res);
+//     const data = await res.json();
+//     const eventID = data.eventID;
 
-    return eventID;
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     return eventID;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 export const existingUserCheck = async (provider: 'credentials'|'google', loginID: string, email: string) => {
   const queryParams = new URLSearchParams({
@@ -172,47 +168,8 @@ export const getEvent = async (eventID: string|null) => {
   return data.event ? data.event : null;
 };
 
-
-// export const getEventData = async (context: any) => {
-
-//   try{
-//     // const params = useSearchParams();
-//     // const eventID = params.get('id');
-//     // console.log("eventID",eventID)
-//     // const existenceOfEvent = await existingEventCheck(eventID);
-//     // console.log("existenceOfEvent",existenceOfEvent);
-//     // if(existenceOfEvent != 1){
-//     //     redirect(`/404`);
-//     // }
-
-//     const { id } = context.params;
-//     const res = await fetch('api/form',{
-//             method: "GET",
-//             headers: {
-//                 "Content-Type": "application/json",
-//             },
-//             body: JSON.stringify({      
-//                 id
-//             }),
-//         }
-//     );
-    
-//     if(res.ok){
-//         const data: NextMeetEvent = await res.json()
-//         console.log("eventName",data.eventName);
-//         return data;
-//     }
-//     else{
-//       console.log("Get Event Data failed.");
-//     }
-//   }catch(error){
-//     console.log("event data", error);
-//     return null;
-//   }
-// }
-
 export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{
-    const res = await fetch(`${NEXTAUTH_URL}/api/postUser?id=${eventID}`, {
+    const res = await fetch(`api/postUser?id=${eventID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -227,7 +184,7 @@ export const postUser = async(eventID:string | string[] | undefined, newNonMem:U
 }
 
 export const addRemoveUserEventID = async (eventID:number, user : User | NextMeetUser | undefined, state : string)=>{
-  const res2 = await fetch(`${NEXTAUTH_URL}/api/event`,{
+  const res2 = await fetch(`api/event`,{
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
