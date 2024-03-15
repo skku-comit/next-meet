@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { NextMeetUser } from "@/template/User";
 import { checkEnvironment } from "@/lib/functions/checkEnv";
-import { NM_CODE } from "@/lib/msg/errorMessage";
 
 const NEXTAUTH_URL = checkEnvironment();
 
@@ -54,7 +53,7 @@ const handler = NextAuth({
             }),
           });
           const { message, user } = await res2.json();
-          console.log("@@@session@@@ google user logged in", message, user);
+          console.log("session google user logged in", message, user);
           if(user){
             session.user = user;
             return session;
@@ -64,7 +63,6 @@ const handler = NextAuth({
         (session.user as NextMeetUser) = (token.user as NextMeetUser);
         return session;
       }
-      console.log("flag@@@@@@@@@@@@@@")
       const getUserInfo = await fetch(`${NEXTAUTH_URL}/api/user`, {
         method: "POST",
         headers: {
