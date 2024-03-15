@@ -72,23 +72,25 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     setSchedule((prev: { schedule: Date[]; })=>{
       if(prev.schedule.length <= 0){
-        setWait(true);  console.log("wait true")
+        setWait(true);
+        console.log("wait true")
       }
-      return{schedule:newSchedule}
+      return {schedule: newSchedule}
     })
 
     if(isLogin){
       if(newSchedule.length > 0){
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "addUser");
-        const data = await res.json();
-        console.log("addUser handle", data);
-        if(data?.data[1]?.length <=0){setTotalMem((prev:number)=>(prev+1))};
+        const { userID, existedUser, message } = await res.json();
+        // console.log("addUser handle", data);
+        if(existedUser && existedUser.length <=0) setTotalMem((prev:number)=>(prev+1));
       }
       else{
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
-        const data = await res.json();
-        console.log("removeUser handle", data, data?.data[1]?.length > 0);
-        if(data?.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
+        const { userID, existedUser, message } = await res.json();
+        // console.log("removeUser handle", data, data?.data[1]?.length > 0);
+        // if(data?.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
+        if(existedUser && existedUser.length > 0) setTotalMem((prev:number)=>(prev-1));
       }
     }    
 
@@ -147,7 +149,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
 
     try {
-      const res = await fetch(`${NEXTAUTH_URL}event`, {
+      const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -164,10 +166,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       console.log("error",error);
     } 
     console.log("typeof",typeof(schedule.schedule));
-
-    
    }
-
 
   return (
     <ScheduleTableSelecto 

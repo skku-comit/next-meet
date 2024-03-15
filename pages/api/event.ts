@@ -5,7 +5,6 @@ import { User } from "@/template/User";
 import getID from "@/lib/functions/getID";
 import NextMeetUser from "@/template/schema/user.model";
 import { TimeInfo } from "@/template/TimeInfo";
-import { NextResponse } from "next/server";
 import { NM_CODE } from "@/lib/msg/errorMessage";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -92,15 +91,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       else if(reqBody.state=="removeUser"){
         if(existedUser.length > 0){
-          await Event.findOneAndUpdate({eventID:reqBody.eventID}, {$set:{userList: event.userList.filter((eventuser:any)=>(eventuser.userID != reqBody.user.userID))}}, { overwrite: true })
+          await Event.findOneAndUpdate({ eventID:reqBody.eventID }, {$set:{userList: event.userList.filter((eventuser:any)=>(eventuser.userID != reqBody.user.userID))}}, { overwrite: true })
         }
       }
       
-      res.status(201).json({ data: [user,  existedUser]});
-      return NextResponse.json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser });
+      // res.status(201).json({ data: [user,  existedUser]});
+      res.status(201).json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser, message: NM_CODE.NO_ERROR });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
+      res.status(500).json({ userID: null, existingUser:null, message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "PATCH"){
