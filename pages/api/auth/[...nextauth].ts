@@ -10,6 +10,10 @@ const NEXTAUTH_URL = checkEnvironment();
 
 const handler = NextAuth({
   callbacks: {
+    async signIn({user}){
+      if(user) return true;
+      else return false;
+    },
 
     async redirect({ url, baseUrl }) { 
       // Allows relative callback URLs

@@ -1,36 +1,23 @@
 
-import React, {useState, useEffect } from "react";
-const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
-import { DaysOfWeek } from "@/template/DaysOfWeek";
+import React from "react";
 import { TimeInfo } from "@/template/TimeInfo";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { Participate } from '@/template/Participate';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { useSession } from "next-auth/react";
-import { User, NextMeetUser } from "@/template/User";
-import { useParams, useSearchParams } from "next/navigation";
+import { User } from "@/template/User";
 import { addRemoveUserEventID } from "@/lib/functions/CRUD";
 import { checkEnvironment } from "@/lib/functions/checkEnv";
 
 const NEXTAUTH_URL = checkEnvironment();
 
 interface MyComponentProps {
-    // fixedDate:Date[]|WeeklyFixedDate[] | null;
-    // fixedDate:Date[] | null;
-    // fixedDay:DaysOfWeek[] | null;
-    // fixedTime:{startTime:string, endTime:string} | null;
     isLogin:boolean;
     week:boolean;
     schedule:{schedule :Date[]};
-    // commitFixedSchedule:{schedule :Date[]};
     name:string;
-    // showMember:string[];
-    // setShowResult : Function;
     setShowMember : Function;
     setShowMemberList : Function;
     setShowDateTime : Function;
-    // scheduleList : {checked_num:{[key:string]:number}, member:{[key:string]:string[]}};
-    // setScheduleList : Function;
     setTotalScheduleList:Function;
     totalMem:number;
     select:number;
@@ -73,7 +60,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     setSchedule((prev: { schedule: Date[]; })=>{
       if(prev.schedule.length <= 0){
         setWait(true);
-        console.log("wait true")
+        // console.log("wait true");
       }
       return {schedule: newSchedule}
     })
@@ -82,19 +69,16 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       if(newSchedule.length > 0){
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "addUser");
         const { userID, existedUser, message } = await res.json();
-        // console.log("addUser handle", data);
         if(existedUser && existedUser.length <=0) setTotalMem((prev:number)=>(prev+1));
       }
       else{
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
         const { userID, existedUser, message } = await res.json();
-        // console.log("removeUser handle", data, data?.data[1]?.length > 0);
-        // if(data?.data[1]?.length > 0){setTotalMem((prev:number)=>(prev-1))};
         if(existedUser && existedUser.length > 0) setTotalMem((prev:number)=>(prev-1));
       }
     }    
 
-    setWait(false); console.log("wait false");
+    // setWait(false); console.log("wait false");
 
     let participateStatus:Participate[]|undefined = eventParti;
 
@@ -117,7 +101,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       }
     })  
 
-    console.log("participateStatus before newSchedule", participateStatus)
+    // console.log("participateStatus before newSchedule", participateStatus);
 
     newSchedule.map((sche:Date, idx)=>{
 
