@@ -387,7 +387,7 @@ useEffect(() => {
           setPreFixedSchedule={setPreFixedSchedule}
           eventID={event.eventID}
         />}
-      {true || !select || confirm == 1 || confirm == 3 &&
+      {/* {true || !select || confirm == 1 || confirm == 3 && */}
         <Setter
           width={width}
           isLogin={isLogin}
@@ -411,7 +411,8 @@ useEffect(() => {
           setPreMySelected={setPreMySelected}
           setLoginNonMem={setLoginNonMem}
           preFixedSchedule={preFixedSchedule}
-        />}
+        />
+        {/* } */}
       <div className={`w-screen pt-5 ${width < 768 ? "px-10" : "px-20"} pb-5`}>
         <div
           className={`flex ${
