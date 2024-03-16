@@ -343,7 +343,7 @@ useEffect(() => {
       {confirm != 3 && (!select || confirm == 1) ? "" : (
         <div className={ isHost ? `pt-10 ${confirm == 3 ? "pb-5" : "pb-10"}` : `pt-5`}></div>
       )}
-      <div className={`relative lg:self-end mx-20 ${confirm == 2 || confirm == 3 ? "mb-4" : "mt-6"}`}>
+      <div className={`relative lg:self-end self-center mx-20 ${confirm == 2 || confirm == 3 ? "mb-4" : "mt-6"}`}>
         <button className={`${className_button} flex items-center justify-center lg:w-72 `}
             onClick={() => {
             onURLCopy();
@@ -417,8 +417,8 @@ useEffect(() => {
           className={`flex ${
             width < 768 ? "flex-col" : "flex-row"
           } flex-nowrap items-start text-center gap-4 justify-center`}>
-          {confirm == 1 || confirm == 3 && 
-            <ScheduleTableConfirm
+          {confirm == 1 || confirm == 3 &&
+             <ScheduleTableConfirm
               week={week}
               isLogin={isLogin}
               width={width}
@@ -447,6 +447,7 @@ useEffect(() => {
               wait={wait}
               setWait2={setWait2}
             />
+            
           }
           {isLogin && confirm == 0 &&
             <ScheduleTableSelectoEdit

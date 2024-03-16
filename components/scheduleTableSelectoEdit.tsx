@@ -82,7 +82,6 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     let participateStatus:Participate[]|undefined = eventParti;
 
-
     const preSelected = eventParti?.filter((part)=>(part && part.user.length > 0 ?  part!.user.filter((user)=>(user.userID == (session ? session.user.userID : loginNonMem?.userID))).length > 0 : false));
 
     console.log("preSelected",preSelected)

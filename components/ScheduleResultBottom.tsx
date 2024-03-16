@@ -103,13 +103,13 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({
     if (wait2) return;
     
     if (scheduleList.checked_num) {
-      const _checked_mem_num = Object.values(scheduleList.checked_num);
+      checked_mem_num = Object.values(scheduleList.checked_num);
 
-      const _max_checked_mem_sche =
-        (Math.max(..._checked_mem_num) == 0 ? [] : Object.keys(scheduleList.checked_num))
-        .filter((key: string) => scheduleList.checked_num[key] === Math.max(..._checked_mem_num));
+      max_checked_mem_sche =
+        (Math.max(...checked_mem_num) == 0 ? [] : Object.keys(scheduleList.checked_num))
+        .filter((key: string) => scheduleList.checked_num[key] === Math.max(...checked_mem_num));
       
-      console.log("max_checked_mem_sche", _max_checked_mem_sche);
+      console.log("max_checked_mem_sche", max_checked_mem_sche);
 
       setSortedMemList(
         max_checked_mem_sche.sort(
