@@ -49,10 +49,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         userList:[host],
       });
 
-      res.status(201).json({ eventID: newEventID});
+      return res.status(201).json({ eventID: newEventID});
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
+      return res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "PUT"){
@@ -96,10 +96,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
       
       // res.status(201).json({ data: [user,  existedUser]});
-      res.status(201).json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser, message: NM_CODE.NO_ERROR });
+      return res.status(201).json({ userID: user ? user.userID : reqBody.user.userID, existedUser : existedUser, message: NM_CODE.NO_ERROR });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ userID: null, existingUser:null, message: NM_CODE.INTERNAL_SERVER_ERROR });
+      return res.status(500).json({ userID: null, existingUser:null, message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "PATCH"){
@@ -120,10 +120,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         console.log("Patch Edit")
         await Event.findOneAndUpdate({eventID: reqBody.eventID}, {$set:{participateStatus: reqBody.participateStatus}}, { overwrite: true })
       }
-      res.status(201).json({ eventID: reqBody.eventID });
+      return res.status(201).json({ eventID: reqBody.eventID });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
+      return res.status(500).json({ message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
   }
   else if(req.method === "GET"){
@@ -134,13 +134,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       console.log("eventID", id);
       const event = await Event.findOne({ eventID: id });
 
-      res.status(201).json({ event : event, message: NM_CODE.NO_ERROR });
+
+      if(event) return res.status(201).json({ event : event, message: NM_CODE.NO_ERROR });
+      //event not found 
+      return res.status(200).json({ event: null , message: NM_CODE.ETC });
+      
     } catch (error) {
       console.error(error);
-      res.status(500).json({ event: null, message: NM_CODE.INTERNAL_SERVER_ERROR });
+      return res.status(500).json({ event: null, message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
-    //event not found 
-    res.status(200).json({ event: null , message: NM_CODE.ETC });
   }
 };
 
