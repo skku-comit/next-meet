@@ -132,16 +132,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const { id } = req.query;
       console.log("eventID", id);
-      let event; 
-      // event = typeof eventID == "string" ? await Event.findOne({ eventID: parseInt(eventID) }) : "";
-      event = await Event.findOne({ eventID: id });
+      const event = await Event.findOne({ eventID: id });
 
       res.status(201).json({ event : event, message: NM_CODE.NO_ERROR });
     } catch (error) {
       console.error(error);
       res.status(500).json({ event: null, message: NM_CODE.INTERNAL_SERVER_ERROR });
     }
-    //not found 
+    //event not found 
     res.status(200).json({ event: null , message: NM_CODE.ETC });
   }
 };

@@ -159,10 +159,13 @@ export const getEvent = async (eventID: string|null) => {
   console.log(`${NEXTAUTH_URL}/api/event?id=${eventID}`);
   const res = await fetch(`${NEXTAUTH_URL}/api/event?id=${eventID}`, {
     method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   const { event, message } = await res.json();
-  if(message === NM_CODE.NO_ERROR) return event;
+  return message === NM_CODE.NO_ERROR ? event : null;
 };
 
 export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{
