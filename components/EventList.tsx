@@ -19,7 +19,7 @@ const EventList = (): ReactNode => {
         const set = new Set(session!.user.eventIDList);
         const uniqueEventList = Array.from(set);
         const eventIDPromises = uniqueEventList.map(async (eventID: string) => {
-                  const event = await getEvent(eventID);
+          const event = await getEvent(eventID);
           if (event) eventList.push(event);
         });
   

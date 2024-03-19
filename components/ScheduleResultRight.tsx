@@ -1,9 +1,7 @@
 import scheduleResultCSS from "@/styles/scheduleResult.module.css";
-import React, { useEffect, useMemo, useState } from "react";
-import { IoMdClose } from "react-icons/io";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
 import { language } from "../lib/recoil/language";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche";
 import { TimeInfo } from "@/template/TimeInfo";
 
@@ -55,7 +53,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({
   setPreFixedSchedule,
   wait2,
 }: MyComponentProps) {
-  const [lang, setLang] = useRecoilState(language);
+  const lang = useRecoilValue(language);
 
   const dateListD: Date[] = eventTimeInfo
     ? eventTimeInfo.dateList.sort(

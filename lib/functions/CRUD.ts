@@ -149,9 +149,6 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
   });
   const res = await fetch(`${NEXTAUTH_URL}/api/user?${queryParams}`, {
     method: "GET",
-    // headers: {
-    //   "Content-Type": "application/json",
-    // },
   });
 
   const {user, message} = await res.json();
@@ -159,6 +156,7 @@ export const getUserInfoByID = async (userID: number):Promise<NextMeetUser|null>
 };
 
 export const getEvent = async (eventID: string|null) => {
+  console.log(`${NEXTAUTH_URL}/api/event?id=${eventID}`);
   const res = await fetch(`${NEXTAUTH_URL}/api/event?id=${eventID}`, {
     method: "GET",
     headers: {
@@ -166,8 +164,8 @@ export const getEvent = async (eventID: string|null) => {
     },
   });
 
-  const data = await res.json();
-  return data.event ? data.event : null;
+  const { event, message } = await res.json();
+  return message === NM_CODE.NO_ERROR ? event : null;
 };
 
 export const postUser = async(eventID:string | string[] | undefined, newNonMem:User)=>{

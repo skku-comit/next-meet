@@ -1,25 +1,10 @@
-import scheduleTableCSS from "@/styles/scheduleTable.module.css";
-import React, {useState, useEffect } from "react";
-// import Selecto from "react-selecto";
-import ScheduleSelector from 'react-schedule-selector';
-import { DaysOfWeek } from "@/template/DaysOfWeek";
+import React from "react";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from "@/template/Participate";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-// import WeeklyFixedDate from '@/template/WeeklyFixedDate';
-import {ko} from 'date-fns/locale';
-import { format } from 'date-fns';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { NextMeetUser, User } from "@/template/User";
-import { useSearchParams } from "next/navigation";
-import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
-// import { type } from './../template/User';
-const className_div_theadtd = 'rounded-2xl p-3 pt-4 text-black';
 
 interface MyComponentProps {
-    // fixedDate:Date[] | null;
-    // fixedDay:DaysOfWeek[] | null;
-    // fixedTime:{startTime:String, lastTime:String} | null;
     isLogin:boolean;
     week:boolean|0;
     select:number;
@@ -59,7 +44,6 @@ const ScheduleTableConfirm = React.memo(function ScheduleTableConfirm(
 
 
   const handleChange = async (newSchedule:Date[]) => {
-    
     setFixedSchedule({schedule:newSchedule})
   }
 
