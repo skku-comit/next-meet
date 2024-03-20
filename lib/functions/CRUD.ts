@@ -2,6 +2,8 @@ import { TimeInfo } from "@/template/TimeInfo";
 import { NextMeetUser, User } from "@/template/User";
 import { NM_CODE } from "../msg/errorMessage";
 import { checkEnvironment } from "./checkEnv";
+import { Participate } from "@/template/Participate";
+import { FixedDate, WeeklyFixedDate } from "@/template/WeeklyFixedDate";
 
 const NEXTAUTH_URL = checkEnvironment();
 
@@ -196,4 +198,47 @@ export const addRemoveUserEventID = async (eventID:number, user : User | NextMee
 
   console.log("res2", res2)
   return res2;
+}
+
+export const editParticiStatus = async (eventID:number, participateStatus:Participate[]|undefined, state:string, schedule:{schedule :Date[]}) => {
+  try {
+    const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({      
+        eventID, participateStatus, state
+      }),
+    });
+    console.log(res);
+    const data = await res.json();
+    console.log("data", data);
+
+  } catch (error) {
+    console.log("error",error);
+  } 
+  console.log("typeof",typeof(schedule.schedule));
+
+}
+
+export const editFixedMeetingInfo = async (eventID:number, fixedMeeting: FixedDate[] | WeeklyFixedDate[], state:string)=>{
+  try {
+    const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventID,
+        fixedMeeting,
+        state,
+      }),
+    });
+    console.log(res);
+    const data = await res.json();
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
 }

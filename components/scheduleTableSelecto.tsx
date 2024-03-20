@@ -234,14 +234,15 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({
 
   useEffect(() => {
     console.log("wait", wait, totalMem != prevTotalMem, totalMem, prevTotalMem);
+    console.log("scheduleList update",totalMem, wait, totalMem != prevTotalMem);
 
     if (wait || totalMem != prevTotalMem) {
       return;
     }
     if (isLogin) {
-      setWait2(true);
-      console.log("wait2 true");
-      console.log("update", preMySelected);
+      // setWait2(true);
+      // console.log("wait2 true");
+      console.log("scheduleList update2", preMySelected);
       preMySelected?.map((sche: Date) => {
         const sche_str = realScheStr(sche);
         console.log("updatedSchedule", sche_str);
@@ -330,12 +331,12 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({
         }
         console.log("updated scheduleList wait2", scheduleList);
       });
-      setWait2(false);
-      console.log("wait2 false");
+      // setWait2(false);
+      // console.log("wait2 false");
     } else {
       setPreMySelected([]);
     }
-  }, [wait, schedule.schedule, prevTotalMem, isLogin]);
+  }, [wait, schedule.schedule, prevTotalMem, totalMem, isLogin]);
 
   useEffect(() => {
     setTotalScheduleList(scheduleList);
@@ -349,6 +350,7 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({
   useEffect(() => {
     console.log(
       "scheduleList TotalMem state",
+      isLogin,
       scheduleList,
       schedule.schedule,
       prevTotalMem,
@@ -482,10 +484,9 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({
                     if (datetimeStr in scheduleList.checked_num) {
                       selectedPct = scheduleList.checked_num[datetimeStr];
                     }
+
                     if (selectedPct == 0) {
                       cellColor = "#eee";
-                    } else if (selectedPct * prevTotalMem == 1) {
-                      cellColor = "#f9e3e3";
                     } else if (selectedPct <= 0.2) {
                       cellColor = "#f9e3e3";
                     } else if (selectedPct <= 0.4) {
@@ -501,6 +502,8 @@ const ScheduleTableSelecto = React.memo(function ScheduleTableSelecto({
                     } else {
                       cellColor = "#eee";
                     }
+
+                    console.log("scheduleList SelectedPct", scheduleList, selectedPct, cellColor)
 
                     const fixedScheduleList: Date[] = fixedSchedule.schedule;
 

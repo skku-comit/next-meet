@@ -5,7 +5,7 @@ import { Participate } from '@/template/Participate';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { useSession } from "next-auth/react";
 import { User } from "@/template/User";
-import { addRemoveUserEventID } from "@/lib/functions/CRUD";
+import { addRemoveUserEventID, editParticiStatus } from "@/lib/functions/CRUD";
 import { checkEnvironment } from "@/lib/functions/checkEnv";
 
 const NEXTAUTH_URL = checkEnvironment();
@@ -78,7 +78,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       }
     }    
 
-    // setWait(false); console.log("wait false");
+    setWait(false); console.log("wait false");
 
     let participateStatus:Participate[]|undefined = eventParti;
 
@@ -131,24 +131,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
     console.log("final participateStatus",participateStatus)
 
 
-    try {
-      const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({      
-          eventID, participateStatus, state
-        }),
-      });
-      console.log(res);
-      const data = await res.json();
-      console.log("data", data);
-
-    } catch (error) {
-      console.log("error",error);
-    } 
-    console.log("typeof",typeof(schedule.schedule));
+    editParticiStatus(eventID, participateStatus, state, schedule);
    }
 
   return (

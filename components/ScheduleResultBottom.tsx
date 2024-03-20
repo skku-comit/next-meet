@@ -8,6 +8,7 @@ import { useRecoilState } from "recoil";
 import MaxMemberSche from "@/components/MaxMemberSche";
 import { IoMdClose } from "react-icons/io";
 import { checkEnvironment } from "@/lib/functions/checkEnv";
+import { editFixedMeetingInfo } from "@/lib/functions/CRUD";
 
 const NEXTAUTH_URL = checkEnvironment();
 
@@ -169,24 +170,7 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({
 
     console.log("FixedMeeting", fixedMeeting);
 
-    try {
-      const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          eventID,
-          fixedMeeting,
-          state,
-        }),
-      });
-      console.log(res);
-      const data = await res.json();
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
+    editFixedMeetingInfo(eventID, fixedMeeting, state)
   };
 
   useEffect(() => {
