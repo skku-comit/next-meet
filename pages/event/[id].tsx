@@ -255,43 +255,6 @@ useEffect(() => {
     });
   }
 
-  const indexOfLongestUserParti =
-    event && event.participateStatus.length > 0
-      ? event.participateStatus.reduce(
-          (previousValue: Participate, currentValue: Participate) =>
-            previousValue.user.length > currentValue.user.length
-              ? previousValue
-              : currentValue
-        )
-      : null;
-
-  const longestUser = indexOfLongestUserParti?.user;
-  // console.log("event_userList",event.userList?.length);
-  // const userList:(User|NextMeetUser)[]=[];
-  // useEffect(()=>{
-  // if(event && event.participateStatus.length>0){
-  // event.participateStatus.map((participate:Participate)=>{
-  // for(let x = 0 ; x < event.participateStatus.length; x++){
-  //     const participate = event.participateStatus[x];
-  //     console.log("userList p",participate)
-  // if(participate.user.length > 0){
-  //     for(let i = 0; i<participate.user.length;i++){
-  //         let diff = true;
-  //         for(let j=0; j<userList.length; i++){
-  //             if(userList[j].userID == participate.user[i]?.userID){
-  //                 diff = false;
-  //             }
-  //         }
-  //         if(diff){
-  //             userList.push(participate.user[i]);
-  //         }
-  //     }
-  // }
-  // }
-  // }
-  // }, [])
-  // console.log("userList",userList);
-
   const onURLCopy = () =>{
     copyURL(event.eventID);
   }
