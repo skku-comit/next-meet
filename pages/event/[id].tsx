@@ -199,19 +199,6 @@ const EventPage = ({
 
   useEffect(() => {
     setIsLogin(nonMemLogin || (session && session.user) ? true : false);
-    // eventParticipate = event.participateStatus && event.participateStatus.length > 0 ? event.participateStatus?.filter((participate:Participate) =>{
-    // const user = loginNonMem;
-    //     for(let i = 0; i<participate.user.length; i++){
-    //         console.log("eventParticiTime v", participate.user[i].userID, user ? user[0]?.userID : "")
-    //         if(participate.user[i].userID == (loginNonMem && user && user?.length > 0 ? user[0]?.userID:null)){
-    //             return true;
-    //         }
-    //     }
-    //     return false}) : null;
-    // eventParticiTime = {schedule : eventParticipate ? eventParticipate.map((participate:Participate)=>(participate.time)) : [] }
-    // console.log("eventParticiTime",eventParticiTime,eventParticipate)
-    // setSchedule(eventParticiTime);
-    // console.log("loginNonMem", loginNonMem)
   }, [session ? session.user : nonMemLogin]);
 
   useEffect(() => {
