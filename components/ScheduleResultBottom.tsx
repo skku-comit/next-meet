@@ -203,18 +203,15 @@ const ScheduleResultBottom = React.memo(function ScheduleResultBottom({
               >
                 {confirm != 1 && confirm != 3 && sortedList.length > 0
                   && sortedList.map((sche: Date, index) => {
-                      console.log("sortedList", sortedList);
                       let diffMin = 0;
                       let diffMSec = 0;
                       const schedule: Date = new Date(sche.getTime());
                       const post_time: Date =
-                        fixedSchedule.schedule[
-                          index < fixedSchedule.schedule.length - 1
-                            ? index + 1
-                            : index
-                        ];
-                      const prev_time: Date =
-                        fixedSchedule.schedule[index > 0 ? index - 1 : index];
+                        sortedList[index < sortedList.length - 1 ? index + 1 : index];
+                      const prev_time: Date = sortedList[index > 0 ? index - 1 : index];
+                            
+                      console.log("sortedList", sortedList, post_time, prev_time);
+  
                       if (term == 0 && fixedSchedule.schedule.length > 1) {
                         diffMin =
                           post_time.getHours() * 60 +

@@ -123,6 +123,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({
         (a: Date, b: Date) => new Date(a).getTime() - new Date(b).getTime()
       )
     );
+    console.log("sortedList 2", sortedList);
   }, [fixedSchedule]);
 
   return (
@@ -233,7 +234,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({
           </div>
           <hr className="border-t-2 my-1 mb-2" />
           <ul className={`px-2 min-h-6 grid grid-column gap-1 ${scheduleResultCSS.result_scrolling2}`}>
-            {sortedList.map((sche: Date, index) => {
+            {sortedList ? sortedList.map((sche: Date, index) => {
               console.log("sortedList", sortedList);
               let diffMin = 0;
               let diffMSec = 0;
@@ -304,7 +305,7 @@ const ScheduleResultRight = React.memo(function ScheduleResultRight({
                   </p>
                 </li>
               );
-            })}
+            }):""}
           </ul>
         </div>
       </div>
