@@ -368,7 +368,7 @@ useEffect(() => {
           className={`flex ${
             width < 768 ? "flex-col" : "flex-row"
           } flex-nowrap items-start text-center gap-4 justify-center`}>
-          {confirm == 1 || confirm == 3 &&
+          {confirm == 1 || confirm == 3 ?
              <ScheduleTableConfirm
               week={week}
               isLogin={isLogin}
@@ -398,7 +398,7 @@ useEffect(() => {
               wait={wait}
               setWait2={setWait2}
             />
-            
+            :""
           }
           {isLogin && confirm == 0 &&
             <ScheduleTableSelectoEdit
