@@ -11,7 +11,8 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
     let fixedMeeting:FixedDate[] | WeeklyFixedDate[] = [];
     const WEEKDAY = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    newSchedule.map((sche:Date)=>{
+    if(newSchedule.length > 0) {
+      newSchedule.map((sche:Date)=>{
         const time = new Date(sche).getHours() + ":" + new Date(sche).getMinutes();
 
         if(week){
@@ -22,7 +23,8 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
         }
     //   }
       
-    })
+      })
+    }
 
     console.log("FixedMeeting", fixedMeeting)
 
