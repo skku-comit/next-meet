@@ -164,7 +164,7 @@ const EventPage = ({
     setIsHost(
       session && session.user
         ? session.user.userID == event.hostUserInfo.userID
-        : loginNonMem?.userID == event.hostUserInfo.userID
+        : loginNonMem?.userName == event.hostUserInfo.userName && loginNonMem?.password == event.hostUserInfo.password
     );
   }, [isLogin, session?.user]);
 
