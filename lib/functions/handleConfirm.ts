@@ -20,9 +20,7 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
         }
         else{
           (fixedMeeting as FixedDate[]).push({date : new Date(sche), timeRange:[time]})
-        }
-    //   }
-      
+        }      
       })
     }
 
