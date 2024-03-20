@@ -43,6 +43,6 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
       console.log(error);
     } 
 
-    setPreFixedSchedule({schedule:[newSchedule]});
+    setPreFixedSchedule({schedule:newSchedule.length > 0 ? [newSchedule]:[]});
     // console.log(fixedSchedule.schedule);
 }
