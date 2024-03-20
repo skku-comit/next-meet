@@ -24,7 +24,7 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
       })
     }
 
-    console.log("FixedMeeting", fixedMeeting)
+    console.log("FixedMeeting", fixedMeeting, newSchedule.length > 0 ? [...newSchedule]:[])
 
     try {
       const res = await fetch(`${NEXTAUTH_URL}/api/event`, {
@@ -43,6 +43,6 @@ export const handleConfirm = async (newSchedule:Date[], week:boolean, eventID:nu
       console.log(error);
     } 
 
-    setPreFixedSchedule({schedule:newSchedule.length > 0 ? [newSchedule]:[]});
+    setPreFixedSchedule({schedule:newSchedule.length > 0 ? [...newSchedule]:[]});
     // console.log(fixedSchedule.schedule);
 }
