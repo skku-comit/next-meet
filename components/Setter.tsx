@@ -143,8 +143,8 @@ const Setter = (props:any): ReactNode => {
       if (props.eventHost.userID == 0 && loginName == props.eventHost.userName && password == props.eventHost.password){
         props.setIsHost(true);
       }
-      const existedUser = props.eventUsers && props.eventUsers.length > 0 ? props.eventUsers.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password == eventUser.password : false):[];
-      console.log("existedUser", existedUser.length, props.eventUsers)
+      const existedUser = props.eventUserList && props.eventUserList.length > 0 ? props.eventUserList.filter((eventUser: User|NextMeetUser) => eventUser as User ? loginName == eventUser.userName && password == eventUser.password : false):[];
+      console.log("existedUser", existedUser.length, props.eventUserList)
       if(existedUser.length > 0){
         props.setLoginNonMem(existedUser[0]);
         user = existedUser[0];

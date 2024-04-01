@@ -4,7 +4,7 @@ import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from '@/template/Participate';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
 import { useSession } from "next-auth/react";
-import { User } from "@/template/User";
+import { NextMeetUser, User } from "@/template/User";
 import { addRemoveUserEventID, editParticiStatus } from "@/lib/functions/CRUD";
 import { checkEnvironment } from "@/lib/functions/checkEnv";
 
@@ -40,6 +40,7 @@ interface MyComponentProps {
     setWait2:Function;
     prevTotalMem:number;
     setPrevTotalMem:Function;
+    setEventUserList:Function;
 }
 
 const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
@@ -49,7 +50,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
         fixedSchedule, select,
         nonMemLogin, loginNonMem, isHost, week_startDate, eventID,
         preMySelected, setPreMySelected, setTotalMem,
-        wait,setWait, setWait2, prevTotalMem, setPrevTotalMem
+        wait,setWait, setWait2, prevTotalMem, setPrevTotalMem, setEventUserList
       }:MyComponentProps) {
   
    const { data: session } = useSession();
@@ -70,11 +71,17 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
       if(newSchedule.length > 0){
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "addUser");
         const { userID, existedUser, message } = await res.json();
+        setEventUserList((prev:any)=>{
+          return [...prev, session && session.user ? session.user : loginNonMem];
+        })
         if(existedUser && existedUser.length <=0) setTotalMem((prev:number)=>(prev+1));
       }
       else{
         const res = await addRemoveUserEventID(eventID, session && session.user ? session.user : loginNonMem, "removeUser");
         const { userID, existedUser, message } = await res.json();
+        setEventUserList((prev:any)=>{
+          return prev.filter((p:User|NextMeetUser)=>(p.userID != (session && session.user ? session.user?.userID : loginNonMem?.userID)));
+        })
         if(existedUser && existedUser.length > 0) setTotalMem((prev:number)=>(prev-1));
       }
     }    

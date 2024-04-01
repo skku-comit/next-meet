@@ -87,6 +87,7 @@ const EventPage = ({
   };
 
   //useState
+  const [eventUserList, setEventUserList] = useState(event?.userList);
   const [showCopyMessage,setShowCopyMessage] = useState<boolean>(false);
   const [showDescription, setShowDescription] = useState(false);
   const [nonMemLogin, setNonMemLogin] = useState(false);
@@ -351,7 +352,7 @@ useEffect(() => {
           select={select}
           scheduleTable={scheduleTable}
           setScheduleTable={setScheduleTable}
-          eventUsers={event?.userList}
+          eventUserList={eventUserList}
           eventHost={event?.hostUserInfo}
           setSchedule={setSchedule}
           setIsHost={setIsHost}
@@ -431,6 +432,7 @@ useEffect(() => {
               wait={wait}
               setWait={setWait}
               setWait2={setWait2}
+              setEventUserList={setEventUserList}
             />}
 
           <ScheduleTableSelecto
