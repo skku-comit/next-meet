@@ -46,7 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         participateStatus: [],
         fixedMeeting: [],
         hostUserInfo: host,
-        userList:[host],
+        userList:[],
       });
 
       return res.status(201).json({ eventID: newEventID});
