@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { TimeInfo } from "@/template/TimeInfo";
 import { Participate } from '@/template/Participate';
 import ScheduleTableSelecto from "./scheduleTableSelecto";
@@ -54,6 +54,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
   
    const { data: session } = useSession();
    const state = "EDIT";
+   const [updatedEventPartici, setUpdatedEventPartici] = useState(eventParti);
 
    const handleChange = async (newSchedule:Date[]) => {
 
@@ -80,18 +81,18 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     setWait(false); console.log("wait false");
 
-    let participateStatus:Participate[]|undefined = eventParti;
+    let participateStatus:Participate[]|undefined = updatedEventPartici;
 
-    const preSelected = eventParti?.filter((part)=>(part && part.user.length > 0 ?  part!.user.filter((user)=>(user.userID == (session ? session.user.userID : loginNonMem?.userID))).length > 0 : false));
+    const preSelected = updatedEventPartici?.filter((part)=>(part && part.user.length > 0 ?  part!.user.filter((user)=>(user.userID == (session ? session.user.userID : loginNonMem?.userID))).length > 0 : false));
 
     console.log("preSelected",preSelected)
     preSelected?.map((sche:Participate, idx)=>{
       const newIncludePre = newSchedule.filter((newSche)=>{
           return(new Date(sche.time).getTime() == new Date(newSche).getTime())});
       if(!(newIncludePre.length > 0)){
-        let participate = (eventParti ? eventParti : []).filter((part)=>(new Date(part.time).getTime() == new Date(sche.time).getTime()));
+        let participate = (updatedEventPartici ? updatedEventPartici : []).filter((part)=>(new Date(part.time).getTime() == new Date(sche.time).getTime()));
         let part:Participate = participate[0];
-        participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche.time).getTime()));
+        participateStatus = updatedEventPartici?.filter((part)=>(new Date(part.time).getTime() != new Date(sche.time).getTime()));
         if(part){
           const users = part.user.filter((user)=>(user.userID != (session ? session.user.userID : loginNonMem?.userID)));
           part.user = users;
@@ -104,12 +105,12 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     newSchedule.map((sche:Date, idx)=>{
 
-      let participate2 = eventParti ? eventParti.filter((part)=>(new Date(part.time).getTime() == new Date(sche).getTime())):null;
+      let participate2 = updatedEventPartici ? updatedEventPartici.filter((part)=>(new Date(part.time).getTime() == new Date(sche).getTime())):null;
       let part2= participate2 && participate2.length > 0 ? participate2[0] : null;
       console.log("part2",idx, part2, participate2);
       if(part2){
         if(!(part2!.user.filter((user)=>(user.userID == (session && session.user ? session.user.userID : loginNonMem?.userID))).length > 0)){
-          participateStatus = eventParti?.filter((part)=>(new Date(part.time).getTime() != new Date(sche).getTime()));
+          participateStatus = updatedEventPartici?.filter((part)=>(new Date(part.time).getTime() != new Date(sche).getTime()));
           if((session && session.user)) {
             part2!.user.push(session.user)
           }
@@ -130,7 +131,7 @@ const ScheduleTableSelectoEdit = React.memo(function ScheduleTableSelectoEdit(
 
     console.log("final participateStatus",participateStatus)
 
-
+    setUpdatedEventPartici(participateStatus);
     editParticiStatus(eventID, participateStatus, state, schedule);
    }
 
